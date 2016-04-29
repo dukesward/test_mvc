@@ -3,10 +3,11 @@
 class Kernel_Router {
 
 	protected static $_instance;
+	private $_path;
 
 	private function __construct() {
-		echo ' start dispatching ';
-		$this->parseURL();
+		echo ' start routing ';
+		$this->parseUrl();
 	}
 
 	public static function getInstance() {
@@ -17,11 +18,8 @@ class Kernel_Router {
 		return self::$_instance;
 	}
 
-	protected function parseURL() {
-		$path = trim(parse_url($_SERVER["REQUEST_URI"], PHP_URL_PATH), "/");
-		$path = preg_replace('/[^a-zA-Z0-9]\//', "", $path);
-
-		@list($controller, $action, $params) = explode("/", $path, 3);
+	public function route($request) {
+		@list($controller, $action, $params) = explode("/", $this->_path, 3);
 		
 		if(isset($controller)) {
 			$this->useController($controller);
@@ -34,6 +32,15 @@ class Kernel_Router {
 		if(isset($params)) {
 			$this->useParams(explode("/", $params));
 		}
+
+		return $request;
+	}
+
+	protected function parseUrl() {
+		$path = trim(parse_url($_SERVER["REQUEST_URI"], PHP_URL_PATH), "/");
+		$path = preg_replace('/[^a-zA-Z0-9]\//', "", $path);
+
+		$this->_path = $path;
 	}
 
 	public function useController($controller) {

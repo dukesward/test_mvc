@@ -44,6 +44,8 @@ class Controller_Dispatcher {
 			}catch (Exception $e) {
 				$this->_response->setException($e);
 			}
+		}catch (Exception $e) {
+			$this->_response->setException($e);
 		}
 	}
 
