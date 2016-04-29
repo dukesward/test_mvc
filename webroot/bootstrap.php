@@ -2,7 +2,7 @@
 
 echo 'hello';
 
-require_once "lib/Util/autoLoader.php";
+require_once "../lib/Util/autoLoader.php";
 
 $autoLoader = AutoLoader::getInstance();
 $autoLoader->registerNamespace('Test');

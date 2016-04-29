@@ -5,13 +5,13 @@ class Controller_Dispatcher {
 	protected static $_instance;
 
 	private function __construct() {
-		echo 'start dispatching';
+		echo ' start dispatching ';
 		$this->parseURL();
 	}
 
 	protected function parseURL() {
-
 		$path = trim(parse_url($_SERVER["REQUEST_URI"], PHP_URL_PATH), "/");
+		print_r($path);
 	}
 
 	public static function getInstance() {
