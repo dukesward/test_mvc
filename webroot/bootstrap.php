@@ -13,4 +13,4 @@ $autoLoader->registerNamespace('Kernel');
 $debugger = Helper_Debugger::getInstance();
 
 $dispatcher = Controller_Dispatcher::getInstance();
-$dispatcher->dispatch();
+$dispatcher->run();

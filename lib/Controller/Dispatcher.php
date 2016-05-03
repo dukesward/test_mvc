@@ -21,6 +21,21 @@ class Controller_Dispatcher {
 		}
 	}
 
+	protected function dispatch(Kernel_Request $request) {
+		//controllerName should be a className registered
+		$controllerName = $request->getControllerName();
+		$controller = new $controllerName($request, $this->_response);
+
+		try {
+			$controller->dispatch();
+		}catch (Exception $e) {
+			throw $e;
+		}
+
+		$this->_response->attachContent();
+		$controller = null;
+	}
+
 	public function setRequest($request) {
 		$this->_request = $request;
 	}
@@ -32,7 +47,7 @@ class Controller_Dispatcher {
 		return Self::$_instance;
 	}
 
-	public function dispatch(Kernel_Request $request = null, Kernel_Response $response = null) {
+	public function run(Kernel_Request $request = null, Kernel_Response $response = null) {
 		if(null == $request) {
 			$request = new Kernel_Request();
 		}
@@ -44,9 +59,22 @@ class Controller_Dispatcher {
 			}catch (Exception $e) {
 				$this->_response->setException($e);
 			}
+
+			do {
+				$this->_request->setState('dispatched');
+
+				try{
+					$this->dispatch();
+				}catch (Exception $e) {
+					$this->_response->setException($e);
+				}
+
+			}while (!$this->_request->isDispatched());
 		}catch (Exception $e) {
 			$this->_response->setException($e);
 		}
+
+		$this->_response->send();
 	}
 
 }
