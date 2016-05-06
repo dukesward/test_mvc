@@ -19,7 +19,7 @@ class Kernel_Router {
 	}
 
 	protected function setDefaultRoute() {
-		
+		$defaultRoutes = $routeProcessor->loadDefaultRoutes();
 	}
 
 	public function addRoute($name, Kernel_Core_Route $route) {
