@@ -1,8 +1,8 @@
 <?php
 
-class Model_RouteProcessor {
+class Model_Utils_RouteProcessor {
 
-	protected $_instance;
+	protected static $_instance;
 
 	protected function __construct() {
 
@@ -10,7 +10,7 @@ class Model_RouteProcessor {
 
 	public static function getInstance() {
 		if(null === self::$_instance) {
-			self::$_instance = new self();
+			self::$_instance = new Model_Utils_RouteProcessor();
 		}
 		return self::$_instance;
 	}

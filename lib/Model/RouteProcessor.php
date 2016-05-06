@@ -2,7 +2,7 @@
 
 class Model_RouteProcessor {
 
-	protected $_instance;
+	protected static $_instance;
 	protected $_table;
 
 	protected function __construct($table = null) {
