@@ -2,7 +2,8 @@
 
 class Kernel_Request {
 
-	private $state;
+	private $_state;
+	private $_pathInfo = array();
 
 	public function __construct($url = null) {
 		if(null !== $url) {
@@ -12,15 +13,27 @@ class Kernel_Request {
 		}
 	}
 
+	public function getPathInfo() {
+		return $this->_pathInfo;
+	}
+
+	public function setRouteInfo() {
+
+	}
+
 	public function setRequestUrl($url = null) {
 
 	}
 
 	public function setState($state) {
-		$this->state = $state;
+		$this->_state = $state;
 	}
 
-	public function getController() {
+	public function getControllerName() {
+
+	}
+
+	public function setControllerName() {
 
 	}
 
@@ -28,7 +41,11 @@ class Kernel_Request {
 
 	}
 
-	public function getAction() {
+	public function setParams() {
 		
+	}
+
+	public function getAction() {
+
 	}
 }
