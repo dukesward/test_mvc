@@ -3,11 +3,16 @@
 class Model_CoreProcessor {
 
 	protected static $_instance;
+	protected static $_className = 'Model_CoreProcessor';
 
-	public static function getInstance() {
-		if(null === self::$_instance) {
-			self::$_instance = new self($table);
+	public static function getInstance($table = null) {
+		if(null === static::$_instance) {
+			static::$_instance = new static::$_className($table);
 		}
-		return self::$_instance;
+		return static::$_instance;
+	}
+
+	public function loadDefaultConfigs() {
+
 	}
 }

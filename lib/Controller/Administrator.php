@@ -2,9 +2,20 @@
 
 class Controller_Administrator {
 
+	protected static $_models;
+
 	public static function InitModels($models) {
-		$coreProcessor = Model_CoreProcessor::getInstance();
-		$models['routeProcessor'] = Model_Utils_RouteProcessor::getInstance($coreProcessor);
+		$models['routeProcessor'] = Model_Utils_RouteProcessor::getInstance();
+		self::$_models = $models;
+	}
+
+	public static function getModel($modelName) {
+		if(self::$_models[$modelName]) {
+			$model = self::$_models[$modelName];
+			return $model;
+		}else {
+			throw new Exception('Specified model name: '.$modelName.' does not match any model');
+		}
 	}
 
 }

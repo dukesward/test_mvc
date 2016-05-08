@@ -2,14 +2,16 @@
 
 echo 'hello';
 
-require_once "../lib/Util/autoLoader.php";
+require_once "../lib/Util/AutoLoader.php";
 
-$autoLoader = AutoLoader::getInstance();
+$autoLoader = Util_AutoLoader::getInstance();
 $autoLoader->registerNamespace('Test');
 $autoLoader->registerNamespace('Controller');
 $autoLoader->registerNamespace('Helper');
 $autoLoader->registerNamespace('Kernel');
 $autoLoader->registerNamespace('Model');
+
+Kernel_Registry_Configs::initConfigRegistry();
 
 $debugger = Helper_Debugger::getInstance();
 $administrator = Controller_Administrator::InitModels($model = array());

@@ -3,25 +3,29 @@
 class Kernel_Db_Adapter {
 
 	protected static $_instance;
-	protected $_nameSpace = 'Kernel_Db_Adapter_';
+	protected $_nameSpace;
 	protected $_db;
 
 	protected function __construct($adapter = null) {
+		$this->_nameSpace = 'Kernel_Db_Adapter_';
+
 		if(!$adapter) {
 			$adapter = $this->getDefaultAdapter();
 		}
 
-		$this->_db = $this->getDbAdapterFromAdapter($adapter);
+		$this->_db = $this->getDbConfigFromAdapter($adapter);
 	}
 
 	protected function getDefaultAdapter() {
-		$defaultAdapter = Kernel_Registry_Config::loadKernelConfig('model_config', 'default_db_adapter');
-		return 
+		$defaultAdapter = Kernel_Registry_Configs::loadKernelConfig('model', 'default_db_adapter');
+		return $defaultAdapter;
 	}
 
 	protected function getDbConfigFromAdapter($adapter) {
 		if(is_string($adapter)) {
-			$adapterName = $this->$_nameSpace + ucwords($adapter);
+			$adapterName = $this->_nameSpace . ucwords($adapter);
+		}else {
+			throw new Kernel_Exception_Standard();
 		}
 
 		$dbAdapter = new $adapterName();

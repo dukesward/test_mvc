@@ -4,10 +4,18 @@ class Kernel_Router {
 
 	protected static $_instance;
 	protected $_routes = array();
+	protected $_processor;
 	private $_path;
 
 	private function __construct() {
 		echo ' start routing ';
+		if(!isset($this->_processor)) {
+			try {
+				$this->_processor = Controller_Administrator::getModel('routeProcessor');
+			}catch (Exception $e) {
+				echo 'RouteProcessor not found: '.$e->getMessage();
+			}
+		}
 		$this->parseUrl();
 	}
 
@@ -19,7 +27,7 @@ class Kernel_Router {
 	}
 
 	protected function setDefaultRoute() {
-		$defaultRoutes = $routeProcessor->loadDefaultRoutes();
+		$defaultRoutes = $this->_processor->loadDefaultConfigs();
 	}
 
 	public function addRoute($name, Kernel_Core_Route $route) {
