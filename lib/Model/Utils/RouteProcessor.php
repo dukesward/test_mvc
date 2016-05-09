@@ -11,7 +11,7 @@ class Model_Utils_RouteProcessor extends Model_CoreProcessor {
 			$this->_table = $table;
 		}else {
 			$this->_table = Kernel_Db_Adapter::getDbConfigs();
-			var_dump($this->_table);
+			//var_dump($this->_table);
 		}
 	}
 

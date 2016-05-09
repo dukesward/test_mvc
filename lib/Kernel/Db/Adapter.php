@@ -17,18 +17,25 @@ class Kernel_Db_Adapter {
 	}
 
 	protected function getDefaultAdapter() {
-		$defaultAdapter = Kernel_Registry_Configs::loadKernelConfig('model', 'default_db_adapter');
+		$defaultAdapter = Kernel_Registry_Configs::loadKernelConfig('model');
 		return $defaultAdapter;
 	}
 
 	protected function getDbConfigFromAdapter($adapter) {
-		if(is_string($adapter)) {
-			$adapterName = $this->_nameSpace . ucwords($adapter);
+		if(is_string($name = $adapter->getContentAttribute('default_db_adapter'))) {
+			$adapterName = $this->_nameSpace . ucwords($name);
 		}else {
 			throw new Kernel_Exception_Standard();
 		}
 
-		$dbAdapter = new $adapterName();
+		$config = array(
+			'host' => $adapter->getContentAttribute('use_db_host'),
+			'username' => $adapter->getContentAttribute('use_db_username'),
+			'password' => $adapter->getContentAttribute('use_db_password'),
+			'db' => $adapter->getContentAttribute('use_db_name'),
+		);
+
+		$dbAdapter = new $adapterName($config);
 		return $dbAdapter;
 	}
 
