@@ -11,17 +11,41 @@ class Kernel_Db_Adapter_Mysqli {
 	protected $_username;
 	protected $_password;
 	protected $_db;
+	protected $_dsn;
 
-	protected function _connect() {
+	protected function _connect($pdo = false) {
 		if(Kernel_Db_Adapter_Mysqli::$_isConnected) {
 			return;
 		}
+		
+		if($this->_dsn) {
+			$dsn = $this->_dsn;
+		}else {
 
-		Kernel_Db_Adapter_Mysqli::$_isConnected = true;
+		}
 
-		$this->_connection = mysqli_init();
-		if(!$this->_connection->real_connect($this->_host, $this->_username, $this->_password, $this->_db)) {
-			$this->closeConnection();
+		if($pdo) {
+			try {
+				$this->_connection = new PDO(
+					$dsn,
+					$this->_host,
+					$this->_username,
+					$this->_password,
+					$this->_options
+				);
+			}catch (PDOException $e) {
+
+			}
+
+			Kernel_Db_Adapter_Mysqli::$_isConnected = true;
+		}else {
+			$this->_connection = mysqli_init();
+
+			if(!$this->_connection->real_connect($this->_host, $this->_username, $this->_password, $this->_db)) {
+				$this->closeConnection();
+			}
+
+			Kernel_Db_Adapter_Mysqli::$_isConnected = true;
 		}
 	}
 
@@ -45,9 +69,8 @@ class Kernel_Db_Adapter_Mysqli {
 	public function prepare($sql = null, $type = 'select') {
 		if(!Kernel_Db_Adapter_Mysqli::$_isConnected) {
 			$this->_connect();
-			
-			$stmt = new Kernel_Db_Statement_Mysqli($sql);
 		}
+		$stmt = new Kernel_Db_Statement_Mysqli($sql, $type);
 		return $stmt;
 	}
 

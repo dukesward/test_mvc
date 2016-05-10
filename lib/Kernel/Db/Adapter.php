@@ -56,9 +56,9 @@ class Kernel_Db_Adapter {
 
 		if($configs) {
 
-		}else {
-			$stmt = $stmt->getTable();
 		}
+		
+		$stmt = $stmt->execute($this->_db);
 
 		return $stmt;
 	}
