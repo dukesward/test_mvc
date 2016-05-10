@@ -43,11 +43,23 @@ class Kernel_Db_Adapter {
 
 	}
 
-	public static function getDbConfigs($adapter = null) {
+	public static function getDbAdapter($adapter = null) {
 		if(!isset(self::$_instance)) {
 			self::$_instance = new Kernel_Db_Adapter($adapter);
 		}
 
 		return self::$_instance;
+	}
+
+	public function getDbConfigTable($configs = null) {
+		$stmt = $this->_db->prepare();
+
+		if($configs) {
+
+		}else {
+			$stmt = $stmt->getTable();
+		}
+
+		return $stmt;
 	}
 }

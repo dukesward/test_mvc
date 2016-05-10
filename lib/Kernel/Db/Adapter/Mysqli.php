@@ -6,6 +6,7 @@ class Kernel_Db_Adapter_Mysqli {
 	protected static $_instance;
 
 	protected $_connection;
+
 	protected $_host;
 	protected $_username;
 	protected $_password;
@@ -41,11 +42,13 @@ class Kernel_Db_Adapter_Mysqli {
 		}
 	}
 
-	public function prepare() {
+	public function prepare($sql = null, $type = 'select') {
 		if(!Kernel_Db_Adapter_Mysqli::$_isConnected) {
 			$this->_connect();
 			
+			$stmt = new Kernel_Db_Statement_Mysqli($sql);
 		}
+		return $stmt;
 	}
 
 	public function closeConnection() {
