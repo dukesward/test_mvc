@@ -46,7 +46,8 @@ class Kernel_Router {
 		$useRoute = $this->setDefaultRoute();
 
 		foreach (array_reverse($this->_routes, true) as $name => $route) {
-			$path = $request.getPathInfo();
+			$path = $request->getPathInfo();
+
 			if($route->matchRoute($path)) {
 				$useRoute = $route;
 				break;

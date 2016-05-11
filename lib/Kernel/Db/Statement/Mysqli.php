@@ -6,10 +6,13 @@ class Kernel_Db_Statement_Mysqli {
 	protected $_stmt;
 	protected $_class;
 	protected $_sqlConsts = array(
-		'SQL_SELECT'     => Kernel_Constants::SELECT,
-		'SQL_SELECT_ALL' => Kernel_Constants::SELECT_ALL,
-		'SQL_FROM'       => Kernel_Constants::FROM,
-		'SQL_WHERE'      => Kernel_Constants::WHERE,
+		'SQL_SELECT'     => Kernel_Constants::DB_SQL_SELECT,
+		'SQL_SELECT_ALL' => Kernel_Constants::DB_SQL_SELECT_ALL,
+		'SQL_FROM'       => Kernel_Constants::DB_SQL_FROM,
+		'SQL_WHERE'      => Kernel_Constants::DB_SQL_WHERE,
+		'SQL_DELIMITER'  => Kernel_Constants::DB_SQL_DELIMITER,
+		'SQL_WRAPPER'    => Kernel_Constants::DB_SQL_WRAPPER,
+		'SQL_TOKENS'     => array('type', 'select', 'sql_from', 'from', 'sql_where', 'where'),
 	);
 
 	protected function fetchAll() {
@@ -52,9 +55,11 @@ class Kernel_Db_Statement_Mysqli {
 		}
 	}
 
-	public function from($name, $schema = null) {
-		if($name) {
-			$this->_stmt['from'] = $name;
+	public function from($table = null, $schema = null) {
+		if($table) {
+			if(is_string($table)) {
+				$this->_stmt['from'] = Kernel_Utils::_wrapStr($table, $this->_sqlConsts['SQL_WRAPPER']);
+			}
 		}else {
 
 		}
@@ -71,22 +76,74 @@ class Kernel_Db_Statement_Mysqli {
 	}
 
 	public function assemble() {
-		$query = $this->_stmt['type']; 
-
-		$query = $query . $this->_stmt['select'] . $this->_sqlConsts['FROM'] . $this->_stmt['from'];
-
-		if($this->_stmt['where']) {
-			$query = $query . $this->_sqlConsts['WHERE'] . $this->_stmt['where'];
+		if(isset($this->_stmt['from'])) {
+			$this->_stmt['sql_from'] = $this->_sqlConsts['SQL_FROM'];
 		};
+		
+		if(isset($this->_stmt['where'])) {
+			$this->_stmt['sql_where'] = $this->_sqlConsts['SQL_WHERE'];
+		};
+
+		$query = Kernel_Utils::_concat($this->_stmt, $this->_sqlConsts['SQL_TOKENS'], $this->_sqlConsts['SQL_DELIMITER'], 'each');
 
 		$this->_query = $query;
 	}
 
-	public function execute($db) {
+	public function resolveTableConfigs($configs) {
+		if(is_array($configs)) {
+			if($configs['table']) {
+				$this->from($configs['table']);
+			}
+		}
+	}
+
+	public function execute($connection, $cols = null) {
+		$fields = array();
+		$_fields = &$fields;
+		$table = new Kernel_Db_Table($this->_class, $_fields);
+
 		if(!$this->_query) {
 			$this->assemble();
 		}
 
-		var_dump($this->_query);
+		$stmt = $connection->prepare($this->_query);
+
+		try {
+			if($stmt != NULL && $result = $stmt->execute()) {
+				$meta = $stmt->result_metadata();
+				$keys = array();
+
+				foreach ($meta->fetch_fields() as $col) {
+					//fill table fields with metadata
+					$keys[$col->name] = $col;
+				}
+
+				$table->generateFields($keys);
+				$data = array();
+
+				$stmt->store_result();
+
+				call_user_func_array(
+					array($stmt, 'bind_result'),
+					$data
+				);
+
+				$index = 0;
+
+				while ($row = $stmt->fetch()) {
+					foreach ($data as $key => $value) {
+						$table->fillData($key, $value, $index);
+					}
+					$index ++;
+				}
+
+				$stmt->close();
+			}
+		}catch (Exception $e) {
+
+		}
+		
+		return $table;
+
 	}
 }

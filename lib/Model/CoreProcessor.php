@@ -4,6 +4,7 @@ class Model_CoreProcessor {
 
 	protected static $_instance;
 	protected static $_className = 'Model_CoreProcessor';
+	protected $_default;
 	protected $_table;
 
 	public static function getInstance($table = null) {
@@ -14,6 +15,9 @@ class Model_CoreProcessor {
 	}
 
 	public function loadDefaultConfigs() {
+		//fetch default config from binded table
+		$config = $this->_table->_fetchData($this->_default);
 
+		return $config;
 	}
 }

@@ -55,10 +55,10 @@ class Kernel_Db_Adapter {
 		$stmt = $this->_db->prepare();
 
 		if($configs) {
-
+			$stmt->resolveTableConfigs($configs);
 		}
 		
-		$stmt = $stmt->execute($this->_db);
+		$stmt = $stmt->execute($this->_db->getConnection());
 
 		return $stmt;
 	}

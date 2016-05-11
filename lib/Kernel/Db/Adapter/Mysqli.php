@@ -66,12 +66,18 @@ class Kernel_Db_Adapter_Mysqli {
 		}
 	}
 
-	public function prepare($sql = null, $type = 'select') {
+	public function prepare($sql = null, $type = 'SELECT') {
 		if(!Kernel_Db_Adapter_Mysqli::$_isConnected) {
 			$this->_connect();
 		}
 		$stmt = new Kernel_Db_Statement_Mysqli($sql, $type);
 		return $stmt;
+	}
+
+	public function getConnection() {
+		if($this->_connection) {
+			return $this->_connection;
+		}
 	}
 
 	public function closeConnection() {
