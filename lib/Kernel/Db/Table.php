@@ -12,22 +12,26 @@ class Kernel_Db_Table {
 		$this->_fields = $fields;
 	}
 
+	public function setPrime($prime) {
+		$this->_prime = $prime;
+	}
+
 	public function fetchData($prime = null, $key = null) {
 		$output = $this->_data;
 
-		if($prime && $this->_keys[$prime]) {
-			foreach ($this->_data as $i => $d) {
-				if($d[$this->_prime] === $prime) {
+		if($prime && $this->_prime) {
+			for ($i=0; $i<count($this->_data); $i++) {
+				if($this->_data[$i][$this->_fields[$this->_prime]->id] === $prime) {
 					$output = $output[$i];
 				}
 			}
 		}
-
+		
 		return $output;
 	}
 
 	public function fillData($col, $row, $index = null, $type = null) {
-		if($index) {
+		if($index !== NULL) {
 			$this->_data[$index][$col] = $row;
 		}else {
 
@@ -39,6 +43,12 @@ class Kernel_Db_Table {
 		if(is_array($keys)) {
 			$this->_fields = $keys;
 			//$this->_data = array_fill(0, count($keys), null);
+		}
+	}
+
+	public function resolveConfigs($configs) {
+		if(isset($configs['prime']) && is_string($configs['prime'])) {
+			$this->_prime = $configs['prime'];
 		}
 	}
 }

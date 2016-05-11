@@ -16,7 +16,7 @@ class Model_CoreProcessor {
 
 	public function loadDefaultConfigs() {
 		//fetch default config from binded table
-		$config = $this->_table->_fetchData($this->_default);
+		$config = $this->_table->fetchData($this->_default);
 
 		return $config;
 	}

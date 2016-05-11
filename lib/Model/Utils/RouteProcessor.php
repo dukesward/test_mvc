@@ -15,10 +15,11 @@ class Model_Utils_RouteProcessor extends Model_CoreProcessor {
 		}else {
 			$this->_configs = array(
 				'table' => Model_Utils_RouteProcessor::$_db,
+				'prime' => Kernel_Constants::MODEL_ROUTES_PRIME,
 			);
 
 			$this->_default = Kernel_Constants::MODEL_ROUTES_DEFAULT;
-			$this->_table = Kernel_Db_Adapter::getDbAdapter()->getDbConfigTable($configs);
+			$this->_table = Kernel_Db_Adapter::getDbAdapter()->getDbConfigTable($this->_configs);
 		}
 	}
 

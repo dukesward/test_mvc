@@ -5,6 +5,7 @@ class Kernel_Db_Statement_Mysqli {
 	protected $_query;
 	protected $_stmt;
 	protected $_class;
+	protected $_configs;
 	protected $_sqlConsts = array(
 		'SQL_SELECT'     => Kernel_Constants::DB_SQL_SELECT,
 		'SQL_SELECT_ALL' => Kernel_Constants::DB_SQL_SELECT_ALL,
@@ -94,6 +95,8 @@ class Kernel_Db_Statement_Mysqli {
 			if($configs['table']) {
 				$this->from($configs['table']);
 			}
+
+			$this->_configs = $configs;
 		}
 	}
 
@@ -101,6 +104,10 @@ class Kernel_Db_Statement_Mysqli {
 		$fields = array();
 		$_fields = &$fields;
 		$table = new Kernel_Db_Table($this->_class, $_fields);
+
+		if($this->_configs) {
+			$table->resolveConfigs($this->_configs);
+		}
 
 		if(!$this->_query) {
 			$this->assemble();
@@ -113,13 +120,22 @@ class Kernel_Db_Statement_Mysqli {
 				$meta = $stmt->result_metadata();
 				$keys = array();
 
+				$keyId = 0;
+
 				foreach ($meta->fetch_fields() as $col) {
 					//fill table fields with metadata
 					$keys[$col->name] = $col;
+					$keys[$col->name]->id = $keyId;
+					$keyId ++;
 				}
 
 				$table->generateFields($keys);
-				$data = array();
+				$data = array_fill(0, count($keys), null);
+
+				$refs = array();
+	            foreach ($data as $i => &$f) {
+	                $refs[$i] = &$f;
+	            }
 
 				$stmt->store_result();
 
