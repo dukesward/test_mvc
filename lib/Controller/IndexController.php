@@ -9,7 +9,7 @@ class Controller_IndexController extends Controller_BaseController {
 	}
 
 	public function generateData() {
-		$template = new Template
+		$config = new Template_Config();
 	}
 
 	public function render($content) {
