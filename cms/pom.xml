@@ -7,6 +7,11 @@
     <packaging>jar</packaging>
     <version>0.1.0</version>
 
+    <properties>
+        <springVersion>4.1.7.RELEASE</springVersion>
+        <javax.servlet-api-version>3.1.0</javax.servlet-api-version>
+    </properties>
+
     <build>
         <plugins>
             <plugin>
@@ -32,4 +37,25 @@
             </plugin>
         </plugins>
     </build>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-orm</artifactId>
+            <version>${springVersion}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-webmvc</artifactId>
+            <version>${springVersion}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+            <version>${javax.servlet-api-version}</version>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
 </project>
