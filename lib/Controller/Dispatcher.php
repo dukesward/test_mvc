@@ -26,8 +26,14 @@ class Controller_Dispatcher {
 		if(!$request) {
 			$request = $this->_request;
 		}
+
 		$controllerName = $request->getControllerName();
-		$controller = new $controllerName($request, $this->_response);
+		
+		try {
+			$controller = new $controllerName($request, $this->_response);
+		}catch (Exception $e) {
+
+		}
 
 		try {
 			$controller->dispatch();

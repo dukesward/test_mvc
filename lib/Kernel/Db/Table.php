@@ -7,6 +7,20 @@ class Kernel_Db_Table {
 	protected $_data;
 	protected $_db;
 
+	protected function _createTable($data) {
+		$table = array();
+		$i = 0;
+
+		foreach ($this->_fields as $key => $value) {
+			if(isset($data[$i])) {
+				$table[$key] = $data[$i];
+			}
+			$i ++;
+		}
+
+		return $table;
+	}
+
 	public function __construct($db, $fields) {
 		$this->_db = $db;
 		$this->_fields = $fields;
@@ -26,8 +40,8 @@ class Kernel_Db_Table {
 				}
 			}
 		}
-		
-		return $output;
+
+		return $this->_createTable($output);
 	}
 
 	public function fillData($col, $row, $index = null, $type = null) {

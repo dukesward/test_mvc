@@ -2,6 +2,11 @@
 
 class Kernel_Utils {
 
+	public static function _assembleController($name) {
+		$controller = 'Controller_' . $name . Kernel_Constants::KERNEL_ROUTE_CONTROLLER;
+		return $controller;
+	}
+
 	public static function _concat($source, $tokens, $delimiter, $type) {
 		$output = '';
 

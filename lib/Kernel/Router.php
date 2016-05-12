@@ -28,6 +28,7 @@ class Kernel_Router {
 
 	protected function setDefaultRoute() {
 		$defaultRoutes = $this->_processor->loadDefaultConfigs();
+		return $defaultRoutes;
 	}
 
 	public function addRoute($name, Kernel_Core_Route $route) {
