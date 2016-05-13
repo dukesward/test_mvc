@@ -1,2 +1,2 @@
-com\cms\kingdom\BootstrapInitializer.class
 MysqliAdapter.class
+com\cms\kingdom\controller\IndexController.class
