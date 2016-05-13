@@ -18,7 +18,7 @@
       <load-on-startup>1</load-on-startup>
   </servlet>
   <servlet-mapping>
-        <servlet-name>cms</servlet-name>
-        <url-pattern>/home.jsp</url-pattern>
-    </servlet-mapping>
+      <servlet-name>cms</servlet-name>
+      <url-pattern>/home.jsp</url-pattern>
+  </servlet-mapping>
 </web-app>
