@@ -10,9 +10,23 @@
         http://www.springframework.org/schema/context 
         http://www.springframework.org/schema/context/spring-context.xsd">
  	
+ 	<!-- Scans the classpath of this application for @Components to deploy as beans -->
     <context:component-scan base-package="com.cms.kingdom.controller" />
 
+    <!-- Configures resources and static contents -->
+    <mvc:resources location="/WEB-INF/views/include/" mapping="/include/**" />
+    <mvc:resources location="/resources/static/lib/" mapping="/utils/**" />
+    <mvc:resources location="/resources/static/styles/" mapping="/css/**" />
+    <mvc:resources location="/resources/static/scripts/" mapping="/js/**" />
+
+    <!-- Configures the @Controller programming model -->
+    <mvc:annotation-driven/>
+
+    <bean class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter"></bean>
+	<bean class="org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping"></bean>
+
 	<bean id="index" class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<property name="viewClass" value="org.springframework.web.servlet.view.JstlView" />
 		<property name="prefix" value="/WEB-INF/views/" />
 		<property name="suffix" value=".jsp" />
 	</bean>

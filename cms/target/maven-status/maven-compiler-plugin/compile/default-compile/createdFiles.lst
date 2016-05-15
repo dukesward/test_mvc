@@ -1,2 +1,3 @@
 MysqliAdapter.class
 com\cms\kingdom\controller\IndexController.class
+com\cms\kingdom\test\UnitTest.class

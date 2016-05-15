@@ -48,6 +48,8 @@
     </build>
 
     <dependencies>
+
+        <!-- spring -->
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-core</artifactId>
@@ -66,10 +68,18 @@
             <version>${springVersion}</version>
             <scope>compile</scope>
         </dependency>
+
+        <!-- javax -->
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
             <version>${javax.servlet-api-version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>javax.servlet.jsp</groupId>
+            <artifactId>jsp-api</artifactId>
+            <version>2.1</version>
             <scope>provided</scope>
         </dependency>
 
