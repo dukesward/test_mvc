@@ -17,15 +17,16 @@ import org.apache.commons.logging.LogFactory;
 
 import java.io.IOException;
 
+//apply request mapping to each method for a multi-action controller
 @Controller
 public class IndexController {
 
-	private static final String VIEW_INDEX = "index";
+	private static final ModelAndView model = new ModelAndView("index");
 	protected final Log logger = LogFactory.getLog(getClass());
 	
 	@RequestMapping("/home")
-	public String init(ModelMap model) {
-		model.addAttribute("message", "Welcome!");
-		return VIEW_INDEX;
+	public ModelAndView init() {
+		model.addObject("message", "Welcome!");
+		return model;
 	}
 }
