@@ -8,8 +8,14 @@ import javax.sql.DataSource;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 
+
 @Configuration
 @PropertySource("classpath:application.properties")
 public class ApplicationConfig {
 	private static final String SQL_DRIVER = "db.driver";
+
+	@Bean
+	public static PropertySourcePlaceholderConfigurer Pspc() {
+		return new PropertySourcePlaceholderConfigurer();
+	}
 }
