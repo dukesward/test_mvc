@@ -12,13 +12,12 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 
 @Configuration
-@ComponentScan(basePackages = "com.cms.kingdom")
-@PropertySource(value = { "classpath:application.properties" })
+@ComponentScan(basePackages = "com.cms.kingdom.*")
+@PropertySource(value="classpath:config/application.properties", ignoreResourceNotFound=true)
 public class ApplicationConfig {
-	private static final String SQL_DRIVER = "db.driver";
 
 	@Bean
-	public static PropertySourcesPlaceholderConfigurer Pspc() {
+	public static PropertySourcesPlaceholderConfigurer properties() {
 		return new PropertySourcesPlaceholderConfigurer();
 	}
 }
