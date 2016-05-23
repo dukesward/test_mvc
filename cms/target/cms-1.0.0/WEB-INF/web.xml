@@ -11,14 +11,22 @@
   <mvc:annotation-driven/>
 
   <context-param>
-    <param-name>contextConfigLocation</param-name>
-    <param-value>/WEB-INF/cms-servlet.xml</param-value>
+    <param-name>contextClass</param-name>
+    <param-value>org.springframework.web.context.support.AnnotationConfigWebApplicationContext</param-value>
   </context-param>
 
   <servlet>
       <servlet-name>cms</servlet-name>
       <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
       <load-on-startup>1</load-on-startup>
+      <init-param>
+        <param-name>contextClass</param-name>
+        <param-value>org.springframework.web.context.support.AnnotationConfigWebApplicationContext</param-value>
+      </init-param>
+      <init-param>
+        <param-name>contextConfigLocation</param-name>
+        <param-value>com.cms.kingdom</param-value>
+      </init-param>
   </servlet>
 
   <servlet-mapping>

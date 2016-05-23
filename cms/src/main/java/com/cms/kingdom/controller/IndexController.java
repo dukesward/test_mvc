@@ -3,6 +3,12 @@ package com.cms.kingdom.controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.stereotype.Controller;
 
+import org.springframework.core.env.Environment;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.context.support.AbstractApplicationContext;
+
+import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -23,10 +29,15 @@ public class IndexController {
 
 	private static final ModelAndView model = new ModelAndView("index");
 	protected final Log logger = LogFactory.getLog(getClass());
+
+	@Autowired
+	private Environment env;
 	
 	@RequestMapping("/home")
 	public ModelAndView init() {
-		model.addObject("message", "Welcome!");
+		model.addObject("message", "welcome");
+		model.addObject("driver", env.getProperty("db.driver"));
+		model.setViewName("index");
 		return model;
 	}
 }

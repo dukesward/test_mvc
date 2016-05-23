@@ -26,7 +26,7 @@
 			</div>
 		</div>
 		<div id="col2">
-			<div class="nav"></div>
+			<div class="nav">Print=>Driver: <c:out value="${driver}"/></div>
 		</div>
 	</body>
 </html>

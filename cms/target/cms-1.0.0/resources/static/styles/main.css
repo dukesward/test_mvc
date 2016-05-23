@@ -19,6 +19,10 @@ body {
 	position: fixed;
 }
 
+#col2 {
+	margin-left: 253px;
+}
+
 #logo {
     margin-left: 8px;
     float: left;
