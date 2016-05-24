@@ -5,6 +5,7 @@ class Controller_BaseController {
 	protected $_action;
 	protected $_request;
 	protected $_response;
+	protected $_config;
 	protected $_unableHtmlCache;
 
 	public function __construct(Kernel_Request $request, Kernel_Response $response) {
@@ -15,6 +16,16 @@ class Controller_BaseController {
 
 	protected function _init() {
 		$this->_action = $this->_request->getAction();
+		
+		try {
+			$processor = Controller_Administrator::getModel('nodeProcessor');
+		}catch (Exception $e) {
+			echo 'Processor not found: '.$e->getMessage();
+		}
+
+		if(isset($processor)) {
+			$this->_config = $processor->loadNodeConfig($this->_request->getPathInfo());
+		}
 	}
 
 	protected function indexAction() {
@@ -30,7 +41,7 @@ class Controller_BaseController {
 	}
 
 	public function dispatch() {
-		$action = $this->_action . 'Action';
+		$action = $this->_action;
 
 		if($this->_unableHtmlCache) {
 
@@ -43,11 +54,11 @@ class Controller_BaseController {
 	}
 
 	public function generateData($dataConfig) {
-		$data = new Template_Transformer($dataConfig);
+		$data = new Template_Config($dataConfig);
 		return $data;
 	}
 
 	public function render($content) {
-		$this->_response->_attachContent($content);
+		$this->_response->attachContent($content);
 	}
 }

@@ -51,8 +51,8 @@ class Kernel_Db_Adapter {
 		return self::$_instance;
 	}
 
-	public function getDbConfigTable($configs = null) {
-		$stmt = $this->_db->prepare();
+	public function getDbConfigTable($configs = null, $db = null) {
+		$stmt = $this->_db->prepare($db);
 
 		if($configs) {
 			$stmt->resolveTableConfigs($configs);

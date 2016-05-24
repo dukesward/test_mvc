@@ -68,6 +68,22 @@ class Kernel_Utils {
 		return $result;
 	}
 
+	public static function _processUrl($url, $type) {
+		$_url = '';
+
+		if(is_string($url)) {
+			$_url = $url;
+		}
+
+		switch($type) {
+			case 'raw':
+				$_url = Kernel_Constants::MODEL_ROUTES_SPLITTER . $_url;
+				break;
+		}
+
+		return $_url;
+	}
+
 	public static function _wrapStr($str, $wrapper) {
 		$output = $str;
 

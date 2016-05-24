@@ -52,4 +52,14 @@ class Kernel_Core_Route {
 		}
 		return $name;
 	}
+
+	public function getActionName() {
+		$name = null;
+
+		if(isset($this->_route['action'])) {
+			$_name = $this->_route['action'];
+			$name = $_name . Kernel_Constants::KERNEL_ROUTE_ACTION;
+		}
+		return $name;
+	}
 }

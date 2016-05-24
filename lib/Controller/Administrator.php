@@ -6,6 +6,7 @@ class Controller_Administrator {
 
 	public static function InitModels($models) {
 		$models['routeProcessor'] = Model_Utils_RouteProcessor::getInstance();
+		$models['nodeProcessor'] = Model_Configs_NodeProcessor::getInstance();
 		self::$_models = $models;
 	}
 

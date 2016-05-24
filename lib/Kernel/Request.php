@@ -62,6 +62,6 @@ class Kernel_Request {
 	}
 
 	public function getAction() {
-		return $this->_routeInfo['action'];
+		return $this->_routeInfo->getActionName();
 	}
 }

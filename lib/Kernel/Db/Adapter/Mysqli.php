@@ -66,7 +66,12 @@ class Kernel_Db_Adapter_Mysqli {
 		}
 	}
 
-	public function prepare($sql = null, $type = 'SELECT') {
+	public function prepare($db = null, $sql = null, $type = 'SELECT') {
+		//if different db is provided, use that
+		if($db && is_string($db)) {
+			$this->_db = $db;
+		}
+
 		if(!Kernel_Db_Adapter_Mysqli::$_isConnected) {
 			$this->_connect();
 		}

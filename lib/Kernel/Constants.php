@@ -15,7 +15,11 @@ class Kernel_Constants {
 	const DB_SQL_DELIMITER        = " ";
 
 	const MODEL_ROUTES            = "kernel_model_routes";
+	const MODEL_ROUTES_SPLITTER   = "/";
 	const MODEL_ROUTES_DEFAULT    = "default";
 	const MODEL_ROUTES_EXCEPTION  = "exception";
 	const MODEL_ROUTES_PRIME      = "name";
+
+	const MODEL_NODE_DETAILS      = "cms_node_details";
+	const MODEL_NODE_ROUTE_PRIME  = "pattern";
 }

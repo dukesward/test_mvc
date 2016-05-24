@@ -1,4 +1,5 @@
-replace into kernel_model_routes (name, controller, action, params, defaults)
+replace into kernel_model_routes (name, pattern, controller, action, params, defaults)
 values
-('default', 'index', 'index', null, null)
-('exception', 'exception', 'index', null, null);
+('default', null, 'index', 'index', null, null),
+('exception', null, 'exception', 'index', null, null),
+('flashcard', 'flashcard/', 'flash_card', 'index', null, null);

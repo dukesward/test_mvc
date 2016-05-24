@@ -30,7 +30,7 @@ class Kernel_Db_Statement_Mysqli {
 	}
 
 	protected function select($sql = null) {
-
+		var_dump(debug_backtrace());
 		$preparedSql = $sql;
 		if(!$preparedSql) {
 			$preparedSql = $this->fetchAll();
@@ -69,6 +69,10 @@ class Kernel_Db_Statement_Mysqli {
 	}
 
 	public function where($condition = null) {
+		if($condition) {
+
+		}
+
 		return $this;
 	}
 
