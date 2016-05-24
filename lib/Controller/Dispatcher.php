@@ -22,6 +22,7 @@ class Controller_Dispatcher {
 	}
 
 	protected function dispatch(Kernel_Request $request = null) {
+
 		//controllerName should be a className registered
 		if(!$request) {
 			$request = $this->_request;

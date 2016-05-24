@@ -3,7 +3,7 @@
 class Kernel_Router {
 
 	protected static $_instance;
-	protected $_routes = array();
+	protected $_routes = null;
 	protected $_processor;
 	private $_path;
 
@@ -16,26 +16,19 @@ class Kernel_Router {
 				echo 'RouteProcessor not found: '.$e->getMessage();
 			}
 		}
-		$this->parseUrl();
-	}
-
-	protected function parseUrl() {
-		$path = trim(parse_url($_SERVER["REQUEST_URI"], PHP_URL_PATH), "/");
-		$path = preg_replace('/[^a-zA-Z0-9]\//', "", $path);
-
-		$this->_path = $path;
+		//$this->parseUrl();
 	}
 
 	protected function prepareRoutes() {
-		$routes = explode('/', $this->_path);
-		
-		if(is_string($routes[0])) {
-			$this->_routes['controller'] = $routes[0];
+		//load all route configs with non-null pattern
+		$_routes = $this->_processor->loadStandardRouteConfigs();
+		$routes = array();
+
+		foreach ($_routes as $pattern => $_route) {
+			$routes[$pattern] = new Kernel_Core_Route($_route);
 		}
 
-		if(is_string($routes[1])) {
-			$this->_routes['action'] = $routes[1];
-		}
+		return $routes;
 	}
 
 	protected function setDefaultRoute() {
@@ -61,16 +54,18 @@ class Kernel_Router {
 	}
 
 	public function route(Kernel_Request $request) {
-		if($this->_path) {
-			$this->_routes = $this->prepareRoutes();
+
+		$path = $request->getPathInfo();
+
+		if(null === $this->_routes) {
+			$this->_routes = $this->prepareRoutes($request);
 		}
 
-		if(count($this->_routes) == 0) {
-			$useRoute = $this->setDefaultRoute();
+		if(!$path) {
+			$route = $this->setDefaultRoute();
+			$useRoute = new Kernel_Core_Route($route[0]);
 		}else {
-			foreach (array_reverse($this->_routes, true) as $name => $route) {
-				$path = $request->getPathInfo();
-
+			foreach (array_reverse($this->_routes, true) as $index => $route) {
 				if($route->matchRoute($path)) {
 					$useRoute = $route;
 					break;

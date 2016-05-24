@@ -27,8 +27,25 @@ class Model_Utils_RouteProcessor extends Model_CoreProcessor {
 		$config = null;
 
 		if(is_string($route)) {
+			$query = array(
+				'prime' => $route,
+			);
+			$config = $this->_table->fetchData($query);
+		}else if(is_array($route)) {
 			$config = $this->_table->fetchData($route);
 		}
+		return $config;
+	}
+
+	public function loadStandardRouteConfigs() {
+		//fetch standard route with non-null pattern
+		$query = array(
+			'keys' => array(
+				'pattern' => '*',
+			),
+		);
+		
+		$config = $this->_table->fetchData($query);
 		return $config;
 	}
 

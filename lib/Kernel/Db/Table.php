@@ -10,14 +10,18 @@ class Kernel_Db_Table {
 	protected function _createTable($data) {
 		$table = array();
 		$i = 0;
+		$ii = 0;
 
-		foreach ($this->_fields as $key => $value) {
-			if(isset($data[$i])) {
-				$table[$key] = $data[$i];
+		foreach($data as $id => $config) {
+			$table[$i] = array();
+			foreach ($this->_fields as $key => $value) {
+				if(isset($config[$ii])) {
+					$table[$i][$key] = $config[$ii];
+				}
+				$ii ++;
 			}
 			$i ++;
 		}
-
 		return $table;
 	}
 
@@ -30,13 +34,32 @@ class Kernel_Db_Table {
 		$this->_prime = $prime;
 	}
 
-	public function fetchData($prime = null, $key = null) {
-		$output = $this->_data;
+	public function fetchData($query = null) {
+		$data = $this->_data;
+		$output = array();
 
-		if($prime && $this->_prime) {
-			for ($i=0; $i<count($this->_data); $i++) {
-				if($this->_data[$i][$this->_fields[$this->_prime]->id] === $prime) {
-					$output = $output[$i];
+		if(isset($query['prime']) && $this->_prime) {
+			for ($i=0; $i<count($data); $i++) {
+				if($data[$i][$this->_fields[$this->_prime]->id] === $query['prime']) {
+					$output[$query['prime']] = $data[$i];
+				}
+			}
+		}
+
+		if(isset($query['keys'])) {
+			for ($i=0; $i<count($data); $i++) {
+				$matched = true;
+				foreach ($query['keys'] as $key => $value) {
+					$to_match = $data[$i][$this->_fields[$key]->id];
+					if(!Kernel_Utils::_match($to_match, $value)) {
+						$matched = false;
+						break;
+					}
+				}
+				if($matched) {
+					$_id = $this->_fields[$this->_prime]->id;
+					$id = $data[$i][$_id];
+					$output[$id] = $data[$i];
 				}
 			}
 		}

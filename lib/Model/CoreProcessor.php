@@ -16,7 +16,10 @@ class Model_CoreProcessor {
 
 	public function loadDefaultConfigs() {
 		//fetch default config from binded table
-		$config = $this->_table->fetchData($this->_default);
+		$query = array(
+			'prime' => $this->_default,
+		);
+		$config = $this->_table->fetchData($query);
 
 		return $config;
 	}

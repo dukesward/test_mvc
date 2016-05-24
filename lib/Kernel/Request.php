@@ -4,7 +4,7 @@ class Kernel_Request {
 
 	private $_state;
 	private $_pathInfo = array();
-	private $_routeInfo = array();
+	private $_routeInfo;
 
 	public function __construct($url = null) {
 		if(null !== $url) {
@@ -14,24 +14,21 @@ class Kernel_Request {
 		}
 	}
 
+	public function setPathInfo() {
+		$path = trim(parse_url($_SERVER["REQUEST_URI"], PHP_URL_PATH), "/");
+		$path = preg_replace('/[^a-zA-Z0-9]\//', "", $path);
+		$this->_pathInfo = $path;
+	}
+
 	public function getPathInfo() {
+		if(!$this->_pathInfo) {
+			$this->setPathInfo();
+		}
 		return $this->_pathInfo;
 	}
 
-	public function setRouteInfo($route) {
-		if($route && is_array($route)) {
-			if(isset($route['controller'])) {
-				$this->_routeInfo['controller'] = Kernel_Utils::_assembleController($route['controller']);
-			}
-
-			if(isset($route['action'])) {
-				$this->_routeInfo['action'] = $route['action'];
-			}
-
-			if(isset($route['params'])) {
-				$this->_routeInfo['params'] = $route['params'];
-			}
-		}
+	public function setRouteInfo(Kernel_Core_Route $route) {
+		$this->_routeInfo = $route;
 	}
 
 	public function setRequestUrl($url = null) {
@@ -42,13 +39,13 @@ class Kernel_Request {
 		$this->_state = $state;
 	}
 
-	public function getControllerName() {
-		$controller = null;
-		
-		if(isset($this->_routeInfo['controller'])) {
-			$controller = $this->_routeInfo['controller'];
-		}
+	public function isDispatched() {
+		$isDispatched = $this->_state === 'dispatched';
+		return $isDispatched;
+	}
 
+	public function getControllerName() {
+		$controller = $this->_routeInfo->getControllerName();
 		return $controller;
 	}
 

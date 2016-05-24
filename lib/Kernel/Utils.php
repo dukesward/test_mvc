@@ -7,6 +7,24 @@ class Kernel_Utils {
 		return $controller;
 	}
 
+	public static function _camelStyleString($string, $delimiter = null) {
+		$result = '';
+
+		if(null === $delimiter) {
+			$delimiter = '_';
+		}
+
+		if(is_string($string)) {
+			$tokens = explode($delimiter, $string);
+
+			foreach ($tokens as $token) {
+				$result = $result . ucfirst($token);
+			}
+		}
+
+		return $result;
+	}
+
 	public static function _concat($source, $tokens, $delimiter, $type) {
 		$output = '';
 
@@ -35,6 +53,19 @@ class Kernel_Utils {
 		}
 
 		return $key;
+	}
+
+	public static function _match($str, $match) {
+		$result = false;
+
+		if(null !== $str && is_string($str) && is_string($match)) {
+			if($match === '*') {
+				$result = true;
+			}else {
+				$result = ($str === $match);
+			}
+		}
+		return $result;
 	}
 
 	public static function _wrapStr($str, $wrapper) {

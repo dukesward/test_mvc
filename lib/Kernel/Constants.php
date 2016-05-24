@@ -3,6 +3,7 @@
 class Kernel_Constants {
 
 	const KERNEL_ROUTE_CONTROLLER = "Controller";
+	const KERNEL_ROUTE_CONTROLLER_NAMESPACE = "Controller_";
 	const KERNEL_ROUTE_ACTION     = "Action";
 	
 	const DB_SQL_FROM             = "FROM";
