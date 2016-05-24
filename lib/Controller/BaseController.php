@@ -2,8 +2,10 @@
 
 class Controller_BaseController {
 
+	protected $_action;
 	protected $_request;
 	protected $_response;
+	protected $_unableHtmlCache;
 
 	public function __construct(Kernel_Request $request, Kernel_Response $response) {
 		$this->_setRequest($request);
@@ -12,7 +14,11 @@ class Controller_BaseController {
 	}
 
 	protected function _init() {
+		$this->_action = $this->_request->getAction();
+	}
 
+	protected function indexAction() {
+		//all actions are abstract
 	}
 
 	protected function _setRequest(Kernel_Request $request) {
@@ -24,6 +30,24 @@ class Controller_BaseController {
 	}
 
 	public function dispatch() {
+		$action = $this->_action . 'Action';
 
+		if($this->_unableHtmlCache) {
+
+		}else {
+			$dataConfig = call_user_func(array($this, $action));
+			$content = Template_Engine::prepareContent($this->generateData($dataConfig));
+		}
+		
+		$this->render($content);
+	}
+
+	public function generateData($dataConfig) {
+		$data = new Template_Transformer($dataConfig);
+		return $data;
+	}
+
+	public function render($content) {
+		$this->_response->_attachContent($content);
 	}
 }

@@ -23,4 +23,13 @@ class Model_Utils_RouteProcessor extends Model_CoreProcessor {
 		}
 	}
 
+	public function loadRouteConfigs($route) {
+		$config = null;
+
+		if(is_string($route)) {
+			$config = $this->_table->fetchData($route);
+		}
+		return $config;
+	}
+
 }

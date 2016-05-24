@@ -45,8 +45,12 @@ class Controller_Dispatcher {
 		$controller = null;
 	}
 
-	public function setRequest($request) {
+	public function setRequest(Kernel_Request $request) {
 		$this->_request = $request;
+	}
+
+	public function setResponse(Kernel_Response $response) {
+		$this->_response = $response;
 	}
 
 	public static function getInstance() {
@@ -61,6 +65,11 @@ class Controller_Dispatcher {
 			$request = new Kernel_Request();
 		}
 		$this->setRequest($request);
+
+		if(null == $response) {
+			$response = new Kernel_Response();
+		}
+		$this->setResponse($response);
 
 		try {
 			try {

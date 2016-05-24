@@ -15,5 +15,6 @@ class Kernel_Constants {
 
 	const MODEL_ROUTES            = "kernel_model_routes";
 	const MODEL_ROUTES_DEFAULT    = "default";
+	const MODEL_ROUTES_EXCEPTION  = "exception";
 	const MODEL_ROUTES_PRIME      = "name";
 }

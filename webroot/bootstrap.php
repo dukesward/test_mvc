@@ -10,6 +10,7 @@ $autoLoader->registerNamespace('Controller');
 $autoLoader->registerNamespace('Helper');
 $autoLoader->registerNamespace('Kernel');
 $autoLoader->registerNamespace('Model');
+$autoLoader->registerNamespace('Template');
 
 Kernel_Registry_Configs::initConfigRegistry();
 
