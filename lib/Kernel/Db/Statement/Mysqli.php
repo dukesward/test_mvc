@@ -30,7 +30,6 @@ class Kernel_Db_Statement_Mysqli {
 	}
 
 	protected function select($sql = null) {
-		var_dump(debug_backtrace());
 		$preparedSql = $sql;
 		if(!$preparedSql) {
 			$preparedSql = $this->fetchAll();
@@ -70,7 +69,7 @@ class Kernel_Db_Statement_Mysqli {
 
 	public function where($condition = null) {
 		if($condition) {
-
+			var_dump($condition);
 		}
 
 		return $this;
@@ -96,8 +95,18 @@ class Kernel_Db_Statement_Mysqli {
 
 	public function resolveTableConfigs($configs) {
 		if(is_array($configs)) {
-			if($configs['table']) {
+			if(isset($configs['table'])) {
 				$this->from($configs['table']);
+			}
+
+			if(isset($configs['query'])) {
+				foreach ($configs['query'] as $key => $config) {
+					switch ($key) {
+						case 'where':
+							$this->where($config);
+							break;
+					}
+				}
 			}
 
 			$this->_configs = $configs;

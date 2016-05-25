@@ -50,6 +50,7 @@ class Kernel_Db_Table {
 			for ($i=0; $i<count($data); $i++) {
 				$matched = true;
 				foreach ($query['keys'] as $key => $value) {
+					var_dump($this->_fields);
 					$to_match = $data[$i][$this->_fields[$key]->id];
 					if(!Kernel_Utils::_match($to_match, $value)) {
 						$matched = false;

@@ -13,7 +13,7 @@ class Model_Configs_NodeProcessor extends Model_CoreProcessor {
 			'table' => Kernel_Constants::MODEL_NODE_DETAILS,
 			'query' => array(
 				'where' => 'pattern =' . Kernel_Utils::_processUrl($path, 'raw'),
-			);
+			),
 		);
 
 		$adapter = Kernel_Db_Adapter::getDbAdapter();
