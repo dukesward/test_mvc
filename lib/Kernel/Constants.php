@@ -2,6 +2,8 @@
 
 class Kernel_Constants {
 
+	const UTIL_STRING_WRAPPER     = "'";
+
 	const KERNEL_ROUTE_CONTROLLER = "Controller";
 	const KERNEL_ROUTE_CONTROLLER_NAMESPACE = "Controller_";
 	const KERNEL_ROUTE_ACTION     = "Action";

@@ -7,6 +7,7 @@ class Kernel_Db_Statement_Mysqli {
 	protected $_class;
 	protected $_configs;
 	protected $_sqlConsts = array(
+		'STRING_WRAPPER' => Kernel_Constants::UTIL_STRING_WRAPPER,
 		'SQL_SELECT'     => Kernel_Constants::DB_SQL_SELECT,
 		'SQL_SELECT_ALL' => Kernel_Constants::DB_SQL_SELECT_ALL,
 		'SQL_FROM'       => Kernel_Constants::DB_SQL_FROM,
@@ -70,6 +71,9 @@ class Kernel_Db_Statement_Mysqli {
 	public function where($condition = null) {
 		if($condition) {
 			var_dump($condition);
+			$key = Kernel_Utils::_wrapStr($condition['key'], $this->_sqlConsts['SQL_WRAPPER']);
+			$value = Kernel_Utils::_wrapStr($condition['value'], $this->_sqlConsts['STRING_WRAPPER']);
+			$this->_stmt['where'] = $key . ' = ' . $value;
 		}
 
 		return $this;
@@ -89,7 +93,7 @@ class Kernel_Db_Statement_Mysqli {
 		};
 
 		$query = Kernel_Utils::_concat($this->_stmt, $this->_sqlConsts['SQL_TOKENS'], $this->_sqlConsts['SQL_DELIMITER'], 'each');
-
+		var_dump($query);
 		$this->_query = $query;
 	}
 

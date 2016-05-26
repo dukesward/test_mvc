@@ -8,11 +8,15 @@ class Model_Configs_NodeProcessor extends Model_CoreProcessor {
 	protected $_table;
 
 	public function loadNodeConfig($path) {
-		var_dump($path);
+		$where = array(
+			'key' => 'pattern',
+			'value' => Kernel_Utils::_processUrl($path, 'raw'), 
+		);
+
 		$this->_configs = array(
 			'table' => Kernel_Constants::MODEL_NODE_DETAILS,
 			'query' => array(
-				'where' => 'pattern =' . Kernel_Utils::_processUrl($path, 'raw'),
+				'where' => $where,
 			),
 		);
 
