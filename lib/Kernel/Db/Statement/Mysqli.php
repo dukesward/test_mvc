@@ -70,7 +70,7 @@ class Kernel_Db_Statement_Mysqli {
 
 	public function where($condition = null) {
 		if($condition) {
-			var_dump($condition);
+			//var_dump($condition);
 			$key = Kernel_Utils::_wrapStr($condition['key'], $this->_sqlConsts['SQL_WRAPPER']);
 			$value = Kernel_Utils::_wrapStr($condition['value'], $this->_sqlConsts['STRING_WRAPPER']);
 			$this->_stmt['where'] = $key . ' = ' . $value;
@@ -93,7 +93,7 @@ class Kernel_Db_Statement_Mysqli {
 		};
 
 		$query = Kernel_Utils::_concat($this->_stmt, $this->_sqlConsts['SQL_TOKENS'], $this->_sqlConsts['SQL_DELIMITER'], 'each');
-		var_dump($query);
+		//var_dump($query);
 		$this->_query = $query;
 	}
 

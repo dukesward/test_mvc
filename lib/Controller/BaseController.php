@@ -46,7 +46,9 @@ class Controller_BaseController {
 		if($this->_unableHtmlCache) {
 
 		}else {
+			//call corresponding action to get data config
 			$dataConfig = call_user_func(array($this, $action));
+			//use data config to generate data, then compile corresponding template with it
 			$content = Template_Engine::prepareContent($this->generateData($dataConfig));
 		}
 		
@@ -54,7 +56,7 @@ class Controller_BaseController {
 	}
 
 	public function generateData($dataConfig) {
-		$data = new Template_Config($dataConfig);
+		$data = new Template_Config($dataConfig[0]);
 		return $data;
 	}
 

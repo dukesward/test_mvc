@@ -22,7 +22,10 @@ class Model_Configs_NodeProcessor extends Model_CoreProcessor {
 
 		$adapter = Kernel_Db_Adapter::getDbAdapter();
 		$this->_table = $adapter->getDbConfigTable($this->_configs);
-		var_dump($this->_table);
+		$config = $this->_table->fetchData();
+		//var_dump($this->_table);
+		var_dump($config);
+		return $config;
 	}
 
 }

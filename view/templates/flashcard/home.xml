@@ -1,0 +1,3 @@
+<inherit>flashcard/root</inherit>
+
+<node name='div'>Hello World</node>

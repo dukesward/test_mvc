@@ -36,7 +36,12 @@ class Kernel_Db_Table {
 
 	public function fetchData($query = null) {
 		$data = $this->_data;
-		$output = array();
+
+		if(null === $query) {
+			$output = $data;
+		}else {
+			$output = array();
+		}
 
 		if(isset($query['prime']) && $this->_prime) {
 			for ($i=0; $i<count($data); $i++) {
