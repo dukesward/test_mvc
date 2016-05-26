@@ -24,7 +24,6 @@ class Model_Configs_NodeProcessor extends Model_CoreProcessor {
 		$this->_table = $adapter->getDbConfigTable($this->_configs);
 		$config = $this->_table->fetchData();
 		//var_dump($this->_table);
-		var_dump($config);
 		return $config;
 	}
 
