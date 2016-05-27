@@ -29,7 +29,7 @@ class Controller_BaseController {
 	}
 
 	protected function indexAction() {
-		//all actions are abstract
+		return $this->_config;
 	}
 
 	protected function _setRequest(Kernel_Request $request) {

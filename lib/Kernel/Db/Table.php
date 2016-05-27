@@ -11,7 +11,7 @@ class Kernel_Db_Table {
 		$table = array();
 		$i = 0;
 		$ii = 0;
-
+		
 		foreach($data as $id => $config) {
 			$table[$i] = array();
 			foreach ($this->_fields as $key => $value) {

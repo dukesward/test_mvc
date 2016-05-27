@@ -7,6 +7,17 @@ class Kernel_Utils {
 		return $controller;
 	}
 
+	public static function _assembleFilePath($path, $ext) {
+		$file;
+
+		if(is_string($path)) {
+			$file = $path . Kernel_Constants::MODEL_ROUTES_EXT . $ext;
+		}else if(is_array($path)) {
+
+		}
+		return $file;
+	}
+
 	public static function _camelStyleString($string, $delimiter = null) {
 		$result = '';
 

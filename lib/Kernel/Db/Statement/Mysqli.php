@@ -99,6 +99,7 @@ class Kernel_Db_Statement_Mysqli {
 
 	public function resolveTableConfigs($configs) {
 		if(is_array($configs)) {
+
 			if(isset($configs['table'])) {
 				$this->from($configs['table']);
 			}
