@@ -1,6 +1,6 @@
-<inherit>flashcard/root</inherit>
-
-<node type='div'>
-	<content type='text'>Hello World</content>
-	<data></data>
-</node>
+<inherit template='flashcard/root'>
+	<node type='div'>
+		<content type='text'>Hello World</content>
+		<data></data>
+	</node>
+</inherit>

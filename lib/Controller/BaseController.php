@@ -57,6 +57,7 @@ class Controller_BaseController {
 
 	public function generateData($dataConfig) {
 		$data = new Template_Config($dataConfig[0]);
+		$data->injectGlobalHeader();
 		return $data;
 	}
 

@@ -85,7 +85,8 @@ class Controller_Dispatcher {
 				try{
 					$this->dispatch();
 				}catch (Exception $e) {
-					$this->_response->setException($e);
+					echo $e->getMessage();
+					//$this->_response->setException($e);
 				}
 
 			}while (!$this->_request->isDispatched());
