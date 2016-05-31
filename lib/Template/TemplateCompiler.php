@@ -5,14 +5,13 @@ class Template_TemplateCompiler {
 	const TEMP_PATH        = Kernel_Constants::KERNEL_ROUTES_TEMPLATE_ROOT;
 	const TEMP_DEFAULT_EXT = Kernel_Constants::KERNEL_ROUTES_TEMPLATE_DEFAULT_EXT;
 
-	protected $_markers = array();
-
 	protected $_loader;
 	protected $_template;
 	protected $_transformer;
 	protected $_parsed;
 	protected $_content;
 	protected $_config;
+	protected $_processor;
 
 	public function __construct($data) {
 		$this->_config = $data;
@@ -24,6 +23,9 @@ class Template_TemplateCompiler {
 
 		$this->_parsed = $this->_parseXmlContent();
 		$this->_content = '';
+
+		$this->_processor = new Template_TemplateProcessor();
+		$this->_processor->addTask($file);
 	}
 
 	protected function _loadTemplateRawData($templateName, $ext) {
@@ -76,7 +78,20 @@ class Template_TemplateCompiler {
 			$ext = self::TEMP_DEFAULT_EXT;
 		}
 
+		$this->_processor->addTask($template);
 		$raw = $this->_loadTemplateRawData($template, $ext);
+	}
+
+	protected function _processNodeAttrs($el) {
+		//var_dump($this->_config->header->getContentAttribute()['root']);
+		$attrs = $this->_getTagAttribute($el);
+
+		foreach ($attrs as $attr => $val) {
+			switch ($attr) {
+				case 'BLOCK':
+					break;
+			}
+		}
 	}
 
 	protected function _processRootConfig($el, $parsed = null) {
@@ -93,8 +108,12 @@ class Template_TemplateCompiler {
 				$element = 'root:' . $type . ':attrs:' . $key;
 				$header->setTemplateAttribute($element, $val);
 			}
+			//record basic type which is either head or body
+			$this->_processor->addTaskAttr('target', $type);
 		}
-		var_dump($this->_config->header);
+
+		$this->_processNodeAttrs($el);
+		$this->_processor->addTaskAttr('root', 'init');
 	}
 
 	public function generateContent($parsed = null) {
@@ -103,28 +122,51 @@ class Template_TemplateCompiler {
 			$parsed = $this->_parsed;
 		}
 		//var_dump($this->_parsed);
-		foreach($parsed as $el) {
+		foreach($parsed as $i => $el) {
+			$attributes = Kernel_Utils::_getArrayElement($el, 'attributes');
+			$level = $this->_processor->hasTaskAttr('level');
+
 			if($el['type'] === 'open' || $el['type'] === 'complete') {
+				if(null !== $level && $level = $el['level'] - 1) {
+					
+				}
+
 				$trigger = 'on';
 				switch(strtolower($el['tag'])) {
 					case 'inherit':
-						$this->_markers['inherit'] = true;
-						$this->_processInherit($el['attributes']);
-						break;
-					case 'root':
-						$this->_markers['root'] = true;
-						break;
-					case 'node':
-						if(isset($this->_markers['root'])) {
-							$this->_processRootConfig($el, $parsed);
+						//$this->_markers['inherit'] = true;
+						if(null !== $attributes && isset($attributes['TEMPLATE'])) {
+							$this->_processor->addTaskAttr('inherit', $attributes['TEMPLATE']);
+							$this->_processInherit($attributes);
 						}
 						break;
-					case 'block':
+					case 'root':
+						//$this->_markers['root'] = true;
+						$this->_processor->addTaskAttr('root', 'begin', 1);
+						break;
+					case 'node':
+						//assures that root can only be inited once 
+						if('begin' === $this->_processor->hasTaskAttr('root')) {
+							$this->_processRootConfig($el, $parsed);
+							var_dump($this->_processor);
+						}
+
+						//var_dump($this->_processor->hasTaskAttr('parent'));
 						break;
 				}
 			}else if($el['type'] === 'close') {
-
+				switch(strtolower($el['tag'])) {
+					case 'root':
+						$this->_processor->addTaskAttr('root', 'end');
+						break;
+				}
 			}
+
+			if($i === (count($parsed) - 1)) {
+				$this->_processor->shiftTask();
+			}
+
+			$this->_processor->addTaskAttr('level', $el['level']);
 		}
 
 		return $this->_content;

@@ -107,11 +107,15 @@ class Util_ConfigFile {
 		return $this;
 	}
 
-	public function getContentAttribute($attr) {
-		$value = null;
+	public function getContentAttribute($attr = null) {
+		if(null === $attr) {
+			$value = $this->_content;
+		}else {
+			$value = null;
 
-		if($this->_content[$attr]) {
-			$value = $this->_content[$attr];
+			if($this->_content[$attr]) {
+				$value = $this->_content[$attr];
+			}
 		}
 
 		return $value;
