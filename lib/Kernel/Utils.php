@@ -66,6 +66,16 @@ class Kernel_Utils {
 		return $key;
 	}
 
+	public static function _getArrayElement($arr, $key) {
+		$el = null;
+
+		if(isset($arr[$key])) {
+			$el = $arr[$key];
+		}
+
+		return $el;
+	}
+
 	public static function _match($str, $match) {
 		$result = false;
 

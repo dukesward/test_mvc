@@ -42,7 +42,7 @@ class Controller_Dispatcher {
 			throw $e;
 		}
 
-		$this->_response->attachContent();
+		//$this->_response->attachContent();
 		$controller = null;
 	}
 

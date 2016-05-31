@@ -19,7 +19,7 @@ class Template_Config {
 		$this->_data['path'] = $root . Kernel_Utils::_concat($config, $tokens, $delimiter, 'each');
 
 		$this->_setUpTemplateConfig($config);
-		$this->_type = $config['template_type'];
+		//$this->_type = $config['template_type'];
 	}
 
 	protected function _setUpTemplateConfig($config) {
@@ -50,9 +50,9 @@ class Template_Config {
 		if(!isset($this->_data['header'])) {
 			$loader = Util_AutoLoader::getInstance();
 			$path = self::HEADER_ROOT . self::HEADER_PATH;
-			$file = new Util_ConfigFile();
+			$file = new Util_ConfigFile($this->_data);
 			$this->_data['header'] = $loader->getFileContent($path, self::CONFIG_EXT, $file);
-
+			//var_dump($this->_data);
 		}
 	}
 }

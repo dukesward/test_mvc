@@ -11,6 +11,7 @@ class Kernel_Constants {
 	const KERNEL_ROUTES_TEMPLATE_CONFIG_ROOT = "view\\configs\\";
 	const KERNEL_ROUTES_CONFIG_ROOT          = "config\\";
 	const KERNEL_ROUTES_CONFIG_EXT           = "conf";
+	const KERNEL_ROUTES_TEMPLATE_DEFAULT_EXT = "xml";
 	
 	const DB_SQL_FROM                        = "FROM";
 	const DB_SQL_SELECT                      = "SELECT";
