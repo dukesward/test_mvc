@@ -3,9 +3,11 @@
 class Template_TemplateProcessor {
 
 	protected $_queue;
+	protected $_paths;
 
 	public function __construct() {
 		$this->_queue = array();
+		$this->_paths = array();
 	}
 
 	public function addTask($task) {
@@ -50,5 +52,27 @@ class Template_TemplateProcessor {
 		if(count($this->_queue) > 0) {
 			array_shift($this->_queue);
 		}
+	}
+
+	public function registerPath($name, $val) {
+		if(!isset($this->_paths[$name])) {
+			$this->_paths[$name] = array();
+		}
+
+		$path = &$this->_paths[$name];
+		$path[$val] = $this->hasTaskAttr('target');
+	}
+
+	public function searchPath($name, $val) {
+		$path = null;
+
+		if(isset($this->_paths[$name])) {
+			foreach ($this->_paths[$name] as $v => $p) {
+				if($val === $v) {
+					$path = $p;
+				}
+			}
+		}
+		return $path;
 	}
 }

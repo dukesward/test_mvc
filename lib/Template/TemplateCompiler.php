@@ -4,6 +4,7 @@ class Template_TemplateCompiler {
 
 	const TEMP_PATH        = Kernel_Constants::KERNEL_ROUTES_TEMPLATE_ROOT;
 	const TEMP_DEFAULT_EXT = Kernel_Constants::KERNEL_ROUTES_TEMPLATE_DEFAULT_EXT;
+	const ROOT_BASE        = 'root:';
 
 	protected $_loader;
 	protected $_template;
@@ -82,6 +83,27 @@ class Template_TemplateCompiler {
 		$raw = $this->_loadTemplateRawData($template, $ext);
 	}
 
+	protected function _checkForNodeInherit($level, $override) {
+		$result = false;
+		$header = $this->_config->header;
+
+		if($this->_processor->hasTaskAttr('inherit') && $level === 1) {
+			$result = true;
+			$base = self::ROOT_BASE;
+
+			if(null !== $override) {
+				$path = $this->_processor->searchPath('block', $override);
+				$base = $base . $path;
+			}
+
+			var_dump($base);
+			//$header->
+			//var_dump($this->_processor);
+			//var_dump($header);
+		}
+		return $result;
+	}
+
 	protected function _processNodeAttrs($el) {
 		//var_dump($this->_config->header->getContentAttribute()['root']);
 		$attrs = $this->_getTagAttribute($el);
@@ -92,6 +114,10 @@ class Template_TemplateCompiler {
 					break;
 			}
 		}
+	}
+
+	protected function _processNodeConfig() {
+
 	}
 
 	protected function _processRootConfig($el, $parsed = null) {
@@ -127,15 +153,12 @@ class Template_TemplateCompiler {
 			$level = $this->_processor->hasTaskAttr('level');
 
 			if($el['type'] === 'open' || $el['type'] === 'complete') {
-				if(null !== $level && $level = $el['level'] - 1) {
-					
-				}
-
 				$trigger = 'on';
 				switch(strtolower($el['tag'])) {
 					case 'inherit':
 						//$this->_markers['inherit'] = true;
-						if(null !== $attributes && isset($attributes['TEMPLATE'])) {
+						//inherit tag must be the root tag of a template
+						if($el['level'] === 1 && null !== $attributes && isset($attributes['TEMPLATE'])) {
 							$this->_processor->addTaskAttr('inherit', $attributes['TEMPLATE']);
 							$this->_processInherit($attributes);
 						}
@@ -148,9 +171,20 @@ class Template_TemplateCompiler {
 						//assures that root can only be inited once 
 						if('begin' === $this->_processor->hasTaskAttr('root')) {
 							$this->_processRootConfig($el, $parsed);
-							var_dump($this->_processor);
+							//var_dump($this->_processor);
+						}else {
+							if($level === $el['level'] - 1) {
+								var_dump($el);
+								!$this->_checkForNodeInherit($level, Kernel_Utils::_getArrayElement($attributes, 'OVERRIDE'));
+							}
+
+							$this->_processNodeConfig();
 						}
 
+						if(isset($attributes['BLOCK'])) {
+							//var_dump($el);
+							$this->_processor->registerPath('block', $attributes['BLOCK']);
+						}
 						//var_dump($this->_processor->hasTaskAttr('parent'));
 						break;
 				}

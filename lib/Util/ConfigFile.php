@@ -86,6 +86,10 @@ class Util_ConfigFile {
 		$_temp = $val;
 	}
 
+	public function setTemplateAttributeByArray($arr, $base = null) {
+
+	}
+
 	public function setAttributes($content) {
 		//var_dump($content);
 		//$refl = new ReflectionClass($this);
