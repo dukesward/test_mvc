@@ -69,7 +69,8 @@ class Util_ConfigFile {
 		return $data;
 	}
 
-	public function setTemplateAttribute($tokens, $val) {
+	public function setTemplateAttribute($tokens, $val = null) {
+		//var_dump($tokens);
 		if(is_string($tokens)) {
 			$tokens = explode(':', $tokens);
 		}
@@ -78,16 +79,29 @@ class Util_ConfigFile {
 
 		foreach ($tokens as $t) {
 			if(!isset($_temp[$t])) {
+				//if(is_string($_temp)) {var_dump($this->_content['root']['body']);}
 				$_temp[$t] = array();
 			}
 			$_temp = &$_temp[$t];
 		}
-		$val = $this->_parseAttributes($val);
-		$_temp = $val;
+
+		if(null !== $val) {
+			$val = $this->_parseAttributes($val);
+			$_temp = $val;
+		}
+		return $_temp;
 	}
 
 	public function setTemplateAttributeByArray($arr, $base = null) {
-
+		//var_dump($base);
+		foreach ($arr as $key => $val) {
+			//$base = $base . ':' . $key;
+			if(is_array($val)) {
+				$this->setTemplateAttributeByArray($val, $base . ':' . $key);
+			}else {
+				$this->setTemplateAttribute($base . ':' . $key, $val);
+			}
+		}
 	}
 
 	public function setAttributes($content) {
@@ -123,6 +137,17 @@ class Util_ConfigFile {
 		}
 
 		return $value;
+	}
+
+	public function getNumOfElements($path) {
+		$num = 0;
+		$target = $this->setTemplateAttribute($path);
+
+		if(null !== $target && is_array($target)) {
+			$num = count($target);
+		}
+
+		return $num;
 	}
 
 	public function getDataObject() {

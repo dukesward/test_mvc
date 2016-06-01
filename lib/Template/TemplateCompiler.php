@@ -93,12 +93,8 @@ class Template_TemplateCompiler {
 
 			if(null !== $override) {
 				$path = $this->_processor->searchPath('block', $override);
-				$base = $base . $path;
+				$result = $base . $path;
 			}
-
-			var_dump($base);
-			//$header->
-			//var_dump($this->_processor);
 			//var_dump($header);
 		}
 		return $result;
@@ -116,8 +112,23 @@ class Template_TemplateCompiler {
 		}
 	}
 
-	protected function _processNodeConfig() {
+	protected function _processNodeConfig($el) {
+		$header = $this->_config->header;
+		$base = $this->_processor->hasTaskAttr('parent');
+		
+		if(null === $base) {
+			$base = '';
+		}
 
+		$numOfChildren = $header->getNumOfElements($base . ':children');
+		$config = array(
+			'parent'     => $this->_processor->hasTaskAttr('parent'),
+			'attributes' => Kernel_Utils::_getArrayElement($el, 'attributes'),
+			'level'      => $el['level'],
+		);
+
+		$header->setTemplateAttributeByArray($config, $base . ':children:' . $numOfChildren);
+		//var_dump($header->getContentAttribute()['root']['body']);
 	}
 
 	protected function _processRootConfig($el, $parsed = null) {
@@ -174,11 +185,14 @@ class Template_TemplateCompiler {
 							//var_dump($this->_processor);
 						}else {
 							if($level === $el['level'] - 1) {
-								var_dump($el);
-								!$this->_checkForNodeInherit($level, Kernel_Utils::_getArrayElement($attributes, 'OVERRIDE'));
+								$block = $this->_checkForNodeInherit($level, Kernel_Utils::_getArrayElement($attributes, 'OVERRIDE'));
+								if(null !== $block) {
+									$this->_processor->addTaskAttr('parent', $block);
+								}
+								//var_dump($this->_processor);
 							}
 
-							$this->_processNodeConfig();
+							$this->_processNodeConfig($el);
 						}
 
 						if(isset($attributes['BLOCK'])) {
