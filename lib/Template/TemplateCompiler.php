@@ -128,6 +128,7 @@ class Template_TemplateCompiler {
 		);
 
 		$header->setTemplateAttributeByArray($config, $base . ':children:' . $numOfChildren);
+		$this->_processor->addTaskAttr('target', $base . ':children:' . $numOfChildren);
 		//var_dump($header->getContentAttribute()['root']['body']);
 	}
 
@@ -191,7 +192,6 @@ class Template_TemplateCompiler {
 								}
 								//var_dump($this->_processor);
 							}
-
 							$this->_processNodeConfig($el);
 						}
 
@@ -200,6 +200,17 @@ class Template_TemplateCompiler {
 							$this->_processor->registerPath('block', $attributes['BLOCK']);
 						}
 						//var_dump($this->_processor->hasTaskAttr('parent'));
+						break;
+					case 't':
+						$value = Kernel_Utils::_getArrayElement($el, 'value');
+						$target = $this->_processor->hasTaskAttr('target');
+						$path = $target . ':text';
+
+						if(null !== $target) {
+							$this->_config->header->setTemplateAttribute($path, $value);
+						}
+						
+						var_dump($this->_config->header->getContentAttribute()['root']['body']);
 						break;
 				}
 			}else if($el['type'] === 'close') {

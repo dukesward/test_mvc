@@ -1,5 +1,5 @@
 <inherit template='flashcard\root' ext='xml'>
 	<node type='div' override='content'>
-		<t>Hello World! </t><d>message</d>
+		<t>Hello World! [*title]</t>
 	</node>
 </inherit>
