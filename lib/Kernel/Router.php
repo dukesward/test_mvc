@@ -8,7 +8,7 @@ class Kernel_Router {
 	private $_path;
 
 	private function __construct() {
-		echo ' start routing ';
+		//echo ' start routing ';
 		if(!isset($this->_processor)) {
 			try {
 				$this->_processor = Controller_Administrator::getModel('routeProcessor');

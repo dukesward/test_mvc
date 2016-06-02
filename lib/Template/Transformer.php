@@ -19,15 +19,26 @@ class Template_Transformer {
 		return self::$_instance;
 	}
 
+	protected function _createCloseTag($tag) {
+		$close = '</' . $tag . '>';
+		return $close;
+	}
+
 	protected function _createClosedElement($tag, $configs = null, $closed = true) {
+		//var_dump($tag);
 		$open = '<' . $tag;
+		$close = '';
 
 		if(null !== $configs && is_array($configs) && isset($configs['attrs'])) {
 			$this->_injectElementAttrs($open, $configs['attrs']);
 		}
 
-		$close = '</' . $tag . '>';
-		return $open . '>' . $close;
+		if($closed) {
+			$close .= $this->_createCloseTag($tag);
+		}
+
+		$element = $open . '>' . $close;
+		return $element;
 	}
 
 	protected function _injectElementAttrs($el, $attrs) {
@@ -36,21 +47,61 @@ class Template_Transformer {
 		}
 	}
 
-	public function createHtmlRoot($configs = null) {
-		//var_dump($configs);
-		$root = '';
-		$type = 'HTML_5_DOCTYPE';
+	protected function _createHTMLFromConfig($config, $close = array()) {
+		//var_dump($config);
+		$content = '';
+		$i = 0;
 
-		if(null !== $configs && isset($configs['docType'])) {
-			$doc = constant(self::SELF_STR . $configs['docType']);
-		}else {
-			$doc = self::HTML_5_DOCTYPE;
+		if(is_array($config)) {
+			//var_dump($config);
+			foreach ($config as $key => $node) {
+				$type = Kernel_Utils::_getArrayElement($node, 'attributes->TYPE');
+				//var_dump($type);
+				$children = Kernel_Utils::_getArrayElement($node, 'children');
+
+				if(null !== $type) {
+					if(Kernel_Utils::_elementInArray($this->_singleClose, $type) || null === $children) {
+						$content .= $this->_createClosedElement($type, $node);
+					}else {
+						if(null !== $children && is_array($children)) {
+							array_unshift($close, $this->_createCloseTag($type));
+
+							$content .= $this->_createClosedElement($type, $node, false);
+							$content .= $this->_createHTMLFromConfig($children, $close);
+						}
+					}
+
+					if($i === count($config) - 1 && count($close) > 0) {
+						var_dump($config);
+						var_dump($i);
+						$closeTag = array_shift($close);
+						$content .= $closeTag;
+					}
+				}
+
+				$i++;
+			}
 		}
 
-		$html = $this->_createClosedElement('html', Kernel_Utils::_getArrayElement($configs, 'html'));
-		$head = $this->_createClosedElement('head', Kernel_Utils::_getArrayElement($configs, 'head'), false);
-		$root = $root . $doc . $html;
+		return $content;
+	}
 
-		return $root;
+	public function render($config) {
+		$root = Kernel_Utils::_getArrayElement($config, 'root');
+		$content = '';
+
+		if(null !== $config && isset($config['docType'])) {
+			$content .= constant(self::SELF_STR . $configs['docType']);
+		}else {
+			$content .= self::HTML_5_DOCTYPE;
+		}
+
+		if(null !== $root && is_array($root)) {
+			if(isset($root['html'])) {
+				$content .= $this->_createHTMLFromConfig($root);
+			}
+		}
+
+		return $content;
 	}
 }

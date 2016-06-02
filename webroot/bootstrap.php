@@ -1,6 +1,6 @@
 <?php
 
-echo 'hello';
+//echo 'hello';
 
 require_once "../lib/Util/AutoLoader.php";
 

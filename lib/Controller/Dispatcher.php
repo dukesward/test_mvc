@@ -11,7 +11,7 @@ class Controller_Dispatcher {
 	private $_router;
 
 	private function __construct() {
-		echo ' start dispatching ';
+		//echo ' start dispatching ';
 		$this->getRouter();
 	}
 

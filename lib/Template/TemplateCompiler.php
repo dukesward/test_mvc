@@ -140,6 +140,7 @@ class Template_TemplateCompiler {
 		$header = $this->_config->header;
 		$rootConfig = $header->getContentAttribute('root');
 		$type = $this->_getTagAttribute($el, 'TYPE');
+
 		if($type === 'head' || $type === 'body') {
 			//$rootConfig[$type]['attrs'] = $this->_getTagAttribute($el);
 			foreach ($this->_getTagAttribute($el) as $key => $val) {
@@ -154,7 +155,7 @@ class Template_TemplateCompiler {
 		$this->_processor->addTaskAttr('root', 'init');
 	}
 
-	public function generateContent($parsed = null) {
+	public function generateContent($parsed = null, $render = null) {
 		$trigger = null;
 		if(null === $parsed) {
 			$parsed = $this->_parsed;
@@ -210,7 +211,7 @@ class Template_TemplateCompiler {
 							$this->_config->header->setTemplateAttribute($path, $value);
 						}
 						
-						var_dump($this->_config->header->getContentAttribute()['root']['body']);
+						//var_dump($this->_config->header->getContentAttribute()['root']['body']);
 						break;
 				}
 			}else if($el['type'] === 'close') {
@@ -228,6 +229,8 @@ class Template_TemplateCompiler {
 			$this->_processor->addTaskAttr('level', $el['level']);
 		}
 
-		return $this->_content;
+		if(null !== $render) {
+			return $this->_transformer->render($this->_config->header->getContentAttribute());
+		}
 	}
 }

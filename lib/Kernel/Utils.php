@@ -67,10 +67,16 @@ class Kernel_Utils {
 	}
 
 	public static function _getArrayElement($arr, $key) {
+		$tokens = explode('->', $key);
 		$el = null;
 
-		if(isset($arr[$key])) {
-			$el = $arr[$key];
+		foreach ($tokens as $token) {
+			if(isset($arr[$token])) {
+				$el = $arr[$token];
+				$arr = $arr[$token];
+			}else {
+				$el = null;
+			}
 		}
 
 		return $el;
@@ -85,6 +91,15 @@ class Kernel_Utils {
 			}else {
 				$result = ($str === $match);
 			}
+		}
+		return $result;
+	}
+
+	public static function _elementInArray($arr, $el) {
+		$result = false;
+
+		foreach ($arr as $e) {
+			if($el === $e) $result = true;
 		}
 		return $result;
 	}
