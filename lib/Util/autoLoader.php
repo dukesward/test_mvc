@@ -46,27 +46,33 @@ class Util_AutoLoader {
 
 	private function parseFileContent($content) {
 		$key;
+		$base = array();
 		$output = array();
 		$contents = preg_split("/\r\n|\n|\r/", $content);
 		
 		foreach ($contents as $c) {
-			if($c && $c[0] !== "#") {
+			if($c) {
 				if($c[0] === "@") {
 					$key = substr($c, 1);
 					$output['_'.$key] = array();
+				}else if($c[0] === "#") {
+					$base = array();
+				}else if($c[0] === "<") {
+					array_pop($base);
 				}else {
 					$pairs = explode("=", $c);
 					
 					if(sizeof($pairs) == 2) {
-						$_key = trim($pairs[0]);
+						$_key = implode('', $base) . trim($pairs[0]);
 						$_value = trim($pairs[1]);
 
 						$output['_'.$key][$_key] = $_value;
+					}else if(sizeof($pairs) == 1) {
+						array_push($base, $pairs[0]);
 					}
 				}
 			}
 		}
-
 		return $output;
 	}
 

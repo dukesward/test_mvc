@@ -108,7 +108,7 @@ class Util_ConfigFile {
 
 	public function setAttributes($content) {
 		//var_dump($content);
-		//$refl = new ReflectionClass($this);
+		//parse the content according to annotations
 		foreach ($content as $key => $value) {
 			if(property_exists($this, $key)) {
 				$property = $this->$key;
@@ -131,11 +131,7 @@ class Util_ConfigFile {
 		if(null === $attr) {
 			$value = $this->_content;
 		}else {
-			$value = null;
-
-			if($this->_content[$attr]) {
-				$value = $this->_content[$attr];
-			}
+			$value = Kernel_Utils::_getArrayElement($this->_content, $attr);
 		}
 
 		return $value;

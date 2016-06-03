@@ -84,7 +84,7 @@ class Template_TemplateCompiler {
 	}
 
 	protected function _checkForNodeInherit($level, $override) {
-		$result = false;
+		$result = null;
 		$header = $this->_config->header;
 
 		if($this->_processor->hasTaskAttr('inherit') && $level === 1) {
@@ -129,7 +129,7 @@ class Template_TemplateCompiler {
 
 		$header->setTemplateAttributeByArray($config, $base . ':children:' . $numOfChildren);
 		$this->_processor->addTaskAttr('target', $base . ':children:' . $numOfChildren);
-		//var_dump($header->getContentAttribute()['root']['body']);
+		//var_dump($header->getContentAttribute('root->html->children->body'));
 	}
 
 	protected function _processRootConfig($el, $parsed = null) {
@@ -189,7 +189,10 @@ class Template_TemplateCompiler {
 							if($level === $el['level'] - 1) {
 								$block = $this->_checkForNodeInherit($level, Kernel_Utils::_getArrayElement($attributes, 'OVERRIDE'));
 								if(null !== $block) {
+									//var_dump($block);
 									$this->_processor->addTaskAttr('parent', $block);
+								}else {
+									$this->_processor->addTaskAttr('parent', $this->_processor->hasTaskAttr('target'));
 								}
 								//var_dump($this->_processor);
 							}

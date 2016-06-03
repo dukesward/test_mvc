@@ -1,9 +1,21 @@
 <inherit template='flashcard\root' ext='xml'>
 	<var name='message' value='Welcome'></var>
 	<node type='div' override='content'>
-		<t filter='first-capital'>Hello World! [*title]</t>
 		<node type='div' id='cards'>
 			<t>CARDS</t>
+			<node type='div' class='tab-container'>
+				<node type='ul'>
+					<node type='li'>
+						<t>Word</t>
+					</node>
+					<node type='li'>
+						<t>Meaning</t>
+					</node>
+					<node type='li'>
+						<t>Example</t>
+					</node>
+				</node>
+			</node>
 		</node>
 	</node>
 </inherit>

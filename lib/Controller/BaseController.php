@@ -50,7 +50,7 @@ class Controller_BaseController {
 			$dataConfig = call_user_func(array($this, $action));
 			//use data config to generate data, then compile corresponding template with it
 			$content = Template_Engine::prepareContent($this->generateData($dataConfig));
-			var_dump($content);
+			//var_dump($content);
 		}
 		
 		$this->render($content);
