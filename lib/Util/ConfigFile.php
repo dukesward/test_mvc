@@ -94,12 +94,14 @@ class Util_ConfigFile {
 
 	public function setTemplateAttributeByArray($arr, $base = null) {
 		//var_dump($base);
-		foreach ($arr as $key => $val) {
-			//$base = $base . ':' . $key;
-			if(is_array($val)) {
-				$this->setTemplateAttributeByArray($val, $base . ':' . $key);
-			}else {
-				$this->setTemplateAttribute($base . ':' . $key, $val);
+		if(null !== $arr && is_array($arr)) {
+			foreach ($arr as $key => $val) {
+				//$base = $base . ':' . $key;
+				if(is_array($val)) {
+					$this->setTemplateAttributeByArray($val, $base . ':' . $key);
+				}else {
+					$this->setTemplateAttribute($base . ':' . $key, $val);
+				}
 			}
 		}
 	}

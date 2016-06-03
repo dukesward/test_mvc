@@ -4,12 +4,14 @@ class Template_Transformer {
 	
 	const SELF_STR       = 'self::';
 	const HTML_5_DOCTYPE = '<!DOCTYPE html>';
+	const FIRST_CAPITAL    = 'first-capital';
 
 	protected static $_instance;
 	protected $_singleClose = 
 		array(
 			'img',
 		);
+	protected $_close = array();
 
 	public static function getInstance() {
 		if(!self::$_instance) {
@@ -17,6 +19,24 @@ class Template_Transformer {
 		}
 
 		return self::$_instance;
+	}
+
+	public function _applyContentModifier($attrs, $text) {
+		$content = $text;
+
+		if(null !== $attrs) {
+			foreach ($attrs as $attr => $val) {
+				switch (strtolower($attr)) {
+					case 'filter':
+						if($val === self::FIRST_CAPITAL) {
+							$content = Kernel_Utils::_camelStyleString($content, '_', ' ', 1);
+							//var_dump($content);
+						}
+						break;
+				}
+			}
+		}
+		return $content;
 	}
 
 	protected function _createCloseTag($tag) {
@@ -27,17 +47,23 @@ class Template_Transformer {
 	protected function _createClosedElement($tag, $configs = null, $closed = true) {
 		//var_dump($tag);
 		$open = '<' . $tag;
+		$text = '';
 		$close = '';
 
-		if(null !== $configs && is_array($configs) && isset($configs['attrs'])) {
-			$this->_injectElementAttrs($open, $configs['attrs']);
+		if(null !== $configs && is_array($configs) && isset($configs['attributes'])) {
+			$this->_injectElementAttrs($open, $configs['attributes']);
+		}
+
+		if(isset($configs['text'])) {
+			$attrs = Kernel_Utils::_getArrayElement($configs, 'attributes');
+			$text .= $this->_applyContentModifier($attrs, $configs['text']);
 		}
 
 		if($closed) {
 			$close .= $this->_createCloseTag($tag);
 		}
 
-		$element = $open . '>' . $close;
+		$element = $open . '>' . $text . $close;
 		return $element;
 	}
 
@@ -64,17 +90,17 @@ class Template_Transformer {
 						$content .= $this->_createClosedElement($type, $node);
 					}else {
 						if(null !== $children && is_array($children)) {
-							array_unshift($close, $this->_createCloseTag($type));
+							//var_dump(111);
+							array_unshift($this->_close, $this->_createCloseTag($type));
 
 							$content .= $this->_createClosedElement($type, $node, false);
-							$content .= $this->_createHTMLFromConfig($children, $close);
+							$content .= $this->_createHTMLFromConfig($children);
 						}
 					}
 
-					if($i === count($config) - 1 && count($close) > 0) {
-						var_dump($config);
-						var_dump($i);
-						$closeTag = array_shift($close);
+					if($i === count($config) - 1 && count($this->_close) > 0) {
+						//var_dump($close);
+						$closeTag = array_shift($this->_close);
 						$content .= $closeTag;
 					}
 				}
@@ -87,6 +113,7 @@ class Template_Transformer {
 	}
 
 	public function render($config) {
+		//var_dump($config);
 		$root = Kernel_Utils::_getArrayElement($config, 'root');
 		$content = '';
 

@@ -18,7 +18,7 @@ class Kernel_Utils {
 		return $file;
 	}
 
-	public static function _camelStyleString($string, $delimiter = null) {
+	public static function _camelStyleString($string, $delimiter = null, $connector = '', $firstCapital = 0) {
 		$result = '';
 
 		if(null === $delimiter) {
@@ -28,9 +28,14 @@ class Kernel_Utils {
 		if(is_string($string)) {
 			$tokens = explode($delimiter, $string);
 
-			foreach ($tokens as $token) {
-				$result = $result . ucfirst($token);
+			if($firstCapital) {
+				$result = ucwords(implode($connector, $tokens));
+			}else {
+				foreach ($tokens as $token) {
+					$result = $result . ucfirst($token);
+				}
 			}
+			
 		}
 
 		return $result;

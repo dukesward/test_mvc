@@ -144,11 +144,11 @@ class Template_TemplateCompiler {
 		if($type === 'head' || $type === 'body') {
 			//$rootConfig[$type]['attrs'] = $this->_getTagAttribute($el);
 			foreach ($this->_getTagAttribute($el) as $key => $val) {
-				$element = 'root:' . $type . ':attrs:' . $key;
+				$element = 'root:html:children:' . $type . ':attributes:' . $key;
 				$header->setTemplateAttribute($element, $val);
 			}
 			//record basic type which is either head or body
-			$this->_processor->addTaskAttr('target', $type);
+			$this->_processor->addTaskAttr('target', 'html:children:' . $type);
 		}
 
 		$this->_processNodeAttrs($el);
@@ -209,6 +209,7 @@ class Template_TemplateCompiler {
 
 						if(null !== $target) {
 							$this->_config->header->setTemplateAttribute($path, $value);
+							$this->_config->header->setTemplateAttributeByArray($attributes, $target . ':attributes');
 						}
 						
 						//var_dump($this->_config->header->getContentAttribute()['root']['body']);
