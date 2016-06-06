@@ -29,14 +29,17 @@ class Kernel_Core_Route {
 		}else {
 			$tokens = explode('/', $pattern);
 
-			switch(count($tokens)) {
-				case 1:
-					if($pattern === $this->_pattern) {
-						$match = true;
-					}
-					break;
-				default:
-					break;
+			if(count($tokens) === 1) {
+				if($pattern === $this->_pattern) {
+					$match = true;
+				}
+			}else {
+				//var_dump($this->_pattern);
+				if(array_shift($tokens) === $this->_pattern) {
+					$this->setActionName(array_shift($tokens));
+					$this->setParameters($tokens);
+					$match = true;
+				}
 			}
 		}
 
@@ -61,5 +64,30 @@ class Kernel_Core_Route {
 			$name = $_name . Kernel_Constants::KERNEL_ROUTE_ACTION;
 		}
 		return $name;
+	}
+
+	public function setActionName($action) {
+		$this->_route['action'] = $action;
+	}
+
+	public function getParams() {
+		$params = null;
+
+		if(isset($this->_route['params'])) {
+			$params = $this->_route['params'];
+		}
+		return $params;
+	}
+
+	public function setParameters($params) {
+		if(!isset($this->_route['params'])) {
+			$this->_route['params'] = array();
+		}
+
+		if(is_string($params)) {
+			array_push($this->_route['params'], $params);
+		}else if(is_array($params)) {
+			$this->_route['params'] = array_merge($this->_route['params'], $params);
+		}
 	}
 }

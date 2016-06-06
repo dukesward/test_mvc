@@ -60,7 +60,7 @@ class Kernel_Router {
 		if(null === $this->_routes) {
 			$this->_routes = $this->prepareRoutes($request);
 		}
-
+		//var_dump($this->_routes);
 		if(!$path) {
 			$route = $this->setDefaultRoute();
 			$useRoute = new Kernel_Core_Route($route[0]);

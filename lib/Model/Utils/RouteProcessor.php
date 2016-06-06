@@ -44,7 +44,7 @@ class Model_Utils_RouteProcessor extends Model_CoreProcessor {
 				'pattern' => '*',
 			),
 		);
-		
+
 		$config = $this->_table->fetchData($query);
 		return $config;
 	}

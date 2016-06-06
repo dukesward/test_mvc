@@ -11,17 +11,21 @@ class Kernel_Db_Table {
 		$table = array();
 		$i = 0;
 		$ii = 0;
-		
-		foreach($data as $id => $config) {
-			$table[$i] = array();
-			foreach ($this->_fields as $key => $value) {
-				if(isset($config[$ii])) {
-					$table[$i][$key] = $config[$ii];
+
+		if(is_array($data)) {
+			foreach($data as $id => $config) {
+				$ii = 0;
+				$table[$i] = array();
+				foreach ($this->_fields as $key => $value) {
+					if(isset($config[$ii])) {
+						$table[$i][$key] = $config[$ii];
+					}
+					$ii ++;
 				}
-				$ii ++;
+				$i ++;
 			}
-			$i ++;
 		}
+		
 		return $table;
 	}
 
@@ -35,6 +39,7 @@ class Kernel_Db_Table {
 	}
 
 	public function fetchData($query = null) {
+		//var_dump($query);
 		$data = $this->_data;
 
 		if(null === $query) {

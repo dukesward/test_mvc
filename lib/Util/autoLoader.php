@@ -26,6 +26,8 @@ class Util_AutoLoader {
 	}
 
 	private function loadFile($file, $ext = null) {
+		$contents = null;
+
 		if(!$ext) {
 			$parts = explode('_', $file);
 			$path = __DIR__ . BASE_PATH;
@@ -39,9 +41,12 @@ class Util_AutoLoader {
 		}else {
 			$path = __DIR__ . ROOT_PATH;
 			$ext = '.' . $ext;
-			$contents = file_get_contents($path . $file . $ext);
-			return $contents;
+
+			if(file_exists($path . $file . $ext)) {
+				$contents = file_get_contents($path . $file . $ext);
+			}
 		}
+		return $contents;
 	}
 
 	private function parseFileContent($content) {

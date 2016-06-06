@@ -10,6 +10,7 @@ class Model_Configs_NodeProcessor extends Model_CoreProcessor {
 	public function loadNodeConfig($path) {
 		$config = array();
 		$adapter = Kernel_Db_Adapter::getDbAdapter();
+		$node_template_config = null;
 
 		$node_details = array(
 			'table' => Kernel_Constants::MODEL_NODE_DETAILS,
@@ -25,19 +26,21 @@ class Model_Configs_NodeProcessor extends Model_CoreProcessor {
 		$this->_table['details'] = $adapter->getDbConfigTable($node_details);
 		$node_details_config = $this->_table['details']->fetchData();
 
-		$node_template = array(
-			'table' => Kernel_Constants::MODEL_NODE_TEMPLATE,
-			'query' => array(
-				'where' => array(
-					'key' => 'id',
-					'value' => $node_details_config[0]['nid'],
+		if(count($node_details_config) > 0) {
+			$node_template = array(
+				'table' => Kernel_Constants::MODEL_NODE_TEMPLATE,
+				'query' => array(
+					'where' => array(
+						'key' => 'id',
+						'value' => $node_details_config[0]['nid'],
+					),
 				),
-			),
-		);
+			);
 
-		$this->_table['template'] = $adapter->getDbConfigTable($node_template);
-		$node_template_config = $this->_table['template']->fetchData();
-
+			$this->_table['template'] = $adapter->getDbConfigTable($node_template);
+			$node_template_config = $this->_table['template']->fetchData();
+		}
+		
 		return $node_template_config;
 	}
 

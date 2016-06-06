@@ -129,7 +129,7 @@ class Kernel_Utils {
 		$output = $str;
 
 		if(is_string($wrapper)) {
-			 $output = $wrapper . $output . $wrapper;
+			$output = $wrapper . $output . $wrapper;
 		}
 
 		return $output;

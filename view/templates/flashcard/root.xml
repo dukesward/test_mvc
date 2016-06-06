@@ -1,3 +1,6 @@
 <root>
+	<node type='head'>
+		<node type='link' _rel='stylesheet' _href='staticcontent/styles/flashcard/main'></node>
+	</node>
 	<node type='body' block='content'></node>
 </root>

@@ -128,8 +128,8 @@ class Template_TemplateCompiler {
 		);
 
 		$header->setTemplateAttributeByArray($config, $base . ':children:' . $numOfChildren);
+		//var_dump($header->getContentAttribute('root->html->children->head'));
 		$this->_processor->addTaskAttr('target', $base . ':children:' . $numOfChildren);
-		//var_dump($header->getContentAttribute('root->html->children->body'));
 	}
 
 	protected function _processRootConfig($el, $parsed = null) {
@@ -142,17 +142,23 @@ class Template_TemplateCompiler {
 		$type = $this->_getTagAttribute($el, 'TYPE');
 
 		if($type === 'head' || $type === 'body') {
-			//$rootConfig[$type]['attrs'] = $this->_getTagAttribute($el);
 			foreach ($this->_getTagAttribute($el) as $key => $val) {
 				$element = 'root:html:children:' . $type . ':attributes:' . $key;
 				$header->setTemplateAttribute($element, $val);
 			}
 			//record basic type which is either head or body
-			$this->_processor->addTaskAttr('target', 'html:children:' . $type);
+			if($type === 'head') {
+				$base = 'root:html:children:';
+			}else {
+				$base = 'html:children:';
+			}
+			$this->_processor->addTaskAttr('target', $base . $type);
+		}else {
+			$this->_processNodeConfig($el);
 		}
 
 		$this->_processNodeAttrs($el);
-		$this->_processor->addTaskAttr('root', 'init');
+		//$this->_processor->addTaskAttr('root', 'init');
 	}
 
 	public function generateContent($parsed = null, $render = null) {
@@ -184,9 +190,11 @@ class Template_TemplateCompiler {
 						//assures that root can only be inited once 
 						if('begin' === $this->_processor->hasTaskAttr('root')) {
 							$this->_processRootConfig($el, $parsed);
+							$this->_processor->addTaskAttr('parent', $this->_processor->hasTaskAttr('target'));
 							//var_dump($this->_processor);
 						}else {
 							if($level === $el['level'] - 1) {
+								//var_dump($level);
 								$block = $this->_checkForNodeInherit($level, Kernel_Utils::_getArrayElement($attributes, 'OVERRIDE'));
 								if(null !== $block) {
 									//var_dump($block);
@@ -197,6 +205,7 @@ class Template_TemplateCompiler {
 								//var_dump($this->_processor);
 							}
 							$this->_processNodeConfig($el);
+							//var_dump($this->_config->header->getContentAttribute());
 						}
 
 						if(isset($attributes['BLOCK'])) {
@@ -224,12 +233,14 @@ class Template_TemplateCompiler {
 						$this->_processor->addTaskAttr('root', 'end');
 						break;
 				}
+
+				$this->_processor->addTaskAttr('target', $this->_processor->hasTaskAttr('parent'));
 			}
 
 			if($i === (count($parsed) - 1)) {
 				$this->_processor->shiftTask();
 			}
-
+			//var_dump($level);
 			$this->_processor->addTaskAttr('level', $el['level']);
 		}
 

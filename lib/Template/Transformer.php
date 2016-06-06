@@ -9,7 +9,7 @@ class Template_Transformer {
 	protected static $_instance;
 	protected $_singleClose = 
 		array(
-			'img',
+			'link', 'img',
 		);
 	protected $_close = array();
 
@@ -51,7 +51,7 @@ class Template_Transformer {
 		$close = '';
 
 		if(null !== $configs && is_array($configs) && isset($configs['attributes'])) {
-			$this->_injectElementAttrs($open, $configs['attributes']);
+			$open = $this->_injectElementAttrs($open, $configs['attributes']);
 		}
 
 		if(isset($configs['text'])) {
@@ -69,8 +69,12 @@ class Template_Transformer {
 
 	protected function _injectElementAttrs($el, $attrs) {
 		foreach ($attrs as $key => $val) {
-			$el .= ' ' . $key . '="' . $val . '"';
+			if($key[0] === '_') {
+				$key = substr($key, 1);
+				$el .= ' ' . strtolower($key) . '="' . $val . '"';
+			}
 		}
+		return $el;
 	}
 
 	protected function _createHTMLFromConfig($config, $close = array()) {
@@ -90,7 +94,6 @@ class Template_Transformer {
 						$content .= $this->_createClosedElement($type, $node);
 					}else {
 						if(null !== $children && is_array($children)) {
-							//var_dump(111);
 							array_unshift($this->_close, $this->_createCloseTag($type));
 
 							$content .= $this->_createClosedElement($type, $node, false);

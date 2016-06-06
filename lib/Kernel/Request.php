@@ -54,7 +54,7 @@ class Kernel_Request {
 	}
 
 	public function getParams() {
-
+		return $this->_routeInfo->getParams();
 	}
 
 	public function setParams() {

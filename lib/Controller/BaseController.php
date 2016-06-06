@@ -49,7 +49,11 @@ class Controller_BaseController {
 			//call corresponding action to get data config
 			$dataConfig = call_user_func(array($this, $action));
 			//use data config to generate data, then compile corresponding template with it
-			$content = Template_Engine::prepareContent($this->generateData($dataConfig));
+			if(is_string($dataConfig)) {
+				$content = $dataConfig;
+			}else {
+				$content = Template_Engine::prepareContent($this->generateData($dataConfig));
+			}
 			//var_dump($content);
 		}
 		
@@ -57,8 +61,11 @@ class Controller_BaseController {
 	}
 
 	public function generateData($dataConfig) {
+		$data = null;
+
 		$data = new Template_Config($dataConfig[0]);
 		$data->injectGlobalHeader();
+		
 		return $data;
 	}
 
