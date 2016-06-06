@@ -56,7 +56,7 @@ class Controller_BaseController {
 			}
 			//var_dump($content);
 		}
-		
+		var_dump($content);
 		$this->render($content);
 	}
 

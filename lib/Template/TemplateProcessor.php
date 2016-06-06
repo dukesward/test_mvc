@@ -18,13 +18,28 @@ class Template_TemplateProcessor {
 		array_unshift($this->_queue, $task);
 	}
 
-	public function addTaskAttr($attr, $val, $uniqueness = 0, $template = null) {
-		if(!isset($this->_queue[$attr]) || $uniqueness !== 1) {
+	public function addTaskAttr($attr, $val, $accumulative = 0, $template = null) {
+		if($attr === 'parent') {
+			//var_dump(111);
+		}
+		$current = &$this->_queue[0];
+
+		if(!isset($current[$attr])) {
 			if(null === $template) {
-				$current = &$this->_queue[0];
-				$current[$attr] = $val;
+				
+				if($accumulative) {
+					$current[$attr] = array();
+					array_push($current[$attr], $val);
+				}else {
+					$current[$attr] = $val;
+				}
 			}else {
 
+			}
+		}else {
+			if($accumulative) {
+				//var_dump($val);
+				array_push($current[$attr], $val);
 			}
 		}
 	}
@@ -38,12 +53,21 @@ class Template_TemplateProcessor {
 		return $task;
 	}
 
-	public function hasTaskAttr($attr, $val = null) {
+	public function hasTaskAttr($attr, $target = null) {
 		$result = null;
-		$current = &$this->_queue[0];
 
-		if(isset($current[$attr])) {
-			$result = $current[$attr];
+		if(null === $target) {
+			$target = &$this->_queue[0];
+		}else {
+			//var_dump($this->_queue);
+		}
+		
+		if(isset($target[$attr])) {
+			if(is_string($target[$attr])) {
+				$result = $target[$attr];
+			}else if(is_array($target[$attr])) {
+				$result = implode('', $target[$attr]);
+			}
 		}
 		return $result;
 	}

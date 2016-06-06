@@ -184,13 +184,13 @@ class Template_TemplateCompiler {
 						break;
 					case 'root':
 						//$this->_markers['root'] = true;
-						$this->_processor->addTaskAttr('root', 'begin', 1);
+						$this->_processor->addTaskAttr('root', 'begin');
 						break;
 					case 'node':
 						//assures that root can only be inited once 
 						if('begin' === $this->_processor->hasTaskAttr('root')) {
 							$this->_processRootConfig($el, $parsed);
-							$this->_processor->addTaskAttr('parent', $this->_processor->hasTaskAttr('target'));
+							$this->_processor->addTaskAttr('parent', $this->_processor->hasTaskAttr('target'), 1);
 							//var_dump($this->_processor);
 						}else {
 							if($level === $el['level'] - 1) {
@@ -198,9 +198,9 @@ class Template_TemplateCompiler {
 								$block = $this->_checkForNodeInherit($level, Kernel_Utils::_getArrayElement($attributes, 'OVERRIDE'));
 								if(null !== $block) {
 									//var_dump($block);
-									$this->_processor->addTaskAttr('parent', $block);
+									$this->_processor->addTaskAttr('parent', $block, 1);
 								}else {
-									$this->_processor->addTaskAttr('parent', $this->_processor->hasTaskAttr('target'));
+									$this->_processor->addTaskAttr('parent', $this->_processor->hasTaskAttr('target'), 1);
 								}
 								//var_dump($this->_processor);
 							}
@@ -235,6 +235,7 @@ class Template_TemplateCompiler {
 				}
 
 				$this->_processor->addTaskAttr('target', $this->_processor->hasTaskAttr('parent'));
+				//var_dump($this->_processor->hasTaskAttr('parent'));
 			}
 
 			if($i === (count($parsed) - 1)) {
