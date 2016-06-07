@@ -128,7 +128,7 @@ class Template_TemplateCompiler {
 		);
 
 		$header->setTemplateAttributeByArray($config, $base . ':children:' . $numOfChildren);
-		//var_dump($header->getContentAttribute('root->html->children->head'));
+		//var_dump($header->getContentAttribute($base));
 		$this->_processor->addTaskAttr('target', $base . ':children:' . $numOfChildren);
 	}
 
@@ -170,7 +170,7 @@ class Template_TemplateCompiler {
 		foreach($parsed as $i => $el) {
 			$attributes = Kernel_Utils::_getArrayElement($el, 'attributes');
 			$level = $this->_processor->hasTaskAttr('level');
-
+			var_dump($level);
 			if($el['type'] === 'open' || $el['type'] === 'complete') {
 				$trigger = 'on';
 				switch(strtolower($el['tag'])) {

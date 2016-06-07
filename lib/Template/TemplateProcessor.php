@@ -61,12 +61,12 @@ class Template_TemplateProcessor {
 		}else {
 			//var_dump($this->_queue);
 		}
-		
+
 		if(isset($target[$attr])) {
-			if(is_string($target[$attr])) {
-				$result = $target[$attr];
-			}else if(is_array($target[$attr])) {
+			if(is_array($target[$attr])) {
 				$result = implode('', $target[$attr]);
+			}else {
+				$result = $target[$attr];
 			}
 		}
 		return $result;
