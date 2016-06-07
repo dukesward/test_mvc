@@ -170,7 +170,7 @@ class Template_TemplateCompiler {
 		foreach($parsed as $i => $el) {
 			$attributes = Kernel_Utils::_getArrayElement($el, 'attributes');
 			$level = $this->_processor->hasTaskAttr('level');
-			var_dump($level);
+			//var_dump($level);
 			if($el['type'] === 'open' || $el['type'] === 'complete') {
 				$trigger = 'on';
 				switch(strtolower($el['tag'])) {
@@ -242,6 +242,7 @@ class Template_TemplateCompiler {
 				$this->_processor->shiftTask();
 			}
 			//var_dump($level);
+			//var_dump($el['level']);
 			$this->_processor->addTaskAttr('level', $el['level']);
 		}
 

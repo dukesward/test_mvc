@@ -19,14 +19,11 @@ class Template_TemplateProcessor {
 	}
 
 	public function addTaskAttr($attr, $val, $accumulative = 0, $template = null) {
-		if($attr === 'parent') {
-			//var_dump(111);
-		}
+
 		$current = &$this->_queue[0];
 
 		if(!isset($current[$attr])) {
 			if(null === $template) {
-				
 				if($accumulative) {
 					$current[$attr] = array();
 					array_push($current[$attr], $val);
@@ -40,6 +37,8 @@ class Template_TemplateProcessor {
 			if($accumulative) {
 				//var_dump($val);
 				array_push($current[$attr], $val);
+			}else {
+				$current[$attr] = $val;
 			}
 		}
 	}
