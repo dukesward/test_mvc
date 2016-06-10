@@ -126,7 +126,7 @@ class Template_TemplateCompiler {
 			'attributes' => Kernel_Utils::_getArrayElement($el, 'attributes'),
 			'level'      => $el['level'],
 		);
-
+		//var_dump($base . ':children:' . $numOfChildren);
 		$header->setTemplateAttributeByArray($config, $base . ':children:' . $numOfChildren);
 		//var_dump($header->getContentAttribute($base));
 		$this->_processor->addTaskAttr('target', $base . ':children:' . $numOfChildren);
@@ -205,7 +205,7 @@ class Template_TemplateCompiler {
 								//var_dump($this->_processor);
 							}
 							$this->_processNodeConfig($el);
-							//var_dump($this->_config->header->getContentAttribute());
+							//var_dump($this->_config->header->getContentAttribute('root->html->children->body'));
 						}
 
 						if(isset($attributes['BLOCK'])) {
