@@ -93,7 +93,7 @@ class Util_ConfigFile {
 	}
 
 	public function setTemplateAttributeByArray($arr, $base = null) {
-		var_dump($base);
+		//var_dump($base);
 		if(null !== $arr && is_array($arr)) {
 			foreach ($arr as $key => $val) {
 				//$base = $base . ':' . $key;
@@ -131,7 +131,8 @@ class Util_ConfigFile {
 		if(null === $attr) {
 			$value = $this->_content;
 		}else {
-			$value = Kernel_Utils::_getArrayElement($this->_content, $attr);
+			$attr = explode(':', $attr);
+			$value = Kernel_Utils::_getArrayElement($this->_content, implode('->', $attr));
 		}
 
 		return $value;

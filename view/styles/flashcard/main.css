@@ -1,3 +1,35 @@
+body {
+	background-color: #BEACC5;
+	font-family: Lato, sans-serif;
+}
+
+ul {
+    list-style-type: none;
+}
+
 #cards {
 	color: #000;
+}
+
+.tab-container ul {
+	display: inline-block;
+}
+
+.tab-container ul li {
+	float: left;
+	padding: 10px 25px;
+	background-color: #E3E3E3;
+	cursor: pointer;
+}
+
+.tab-container ul li:first-child {
+	border-radius: 5px 0 0 0;
+}
+
+.tab-container ul li:last-child {
+	border-radius: 0 5px 0 0;
+}
+
+.tab-body {
+
 }

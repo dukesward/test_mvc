@@ -10,8 +10,8 @@ class Controller_StaticController extends Controller_BaseController {
 	protected $_loader;
 	protected $base_static = Kernel_Constants::KERNEL_ROUTES_VIEW_ROOT;
 
-	public function __construct() {
-		parent::_init();
+	public function __construct(Kernel_Request $request, Kernel_Response $response) {
+		parent::__construct($request, $response);
 		$this->_loader = Util_AutoLoader::getInstance();
 	}
 
@@ -26,7 +26,7 @@ class Controller_StaticController extends Controller_BaseController {
 		}
 
 		$this->_response->setHeader(self::CONTENT, 'text/css');
-		$content = $loader->getFileContent($base, self::STYLE_EXT);
+		$content = $this->_loader->getFileContent($base, self::STYLE_EXT);
 
 		return $content;
 	}
@@ -42,7 +42,7 @@ class Controller_StaticController extends Controller_BaseController {
 		}
 
 		$this->_response->setHeader(self::CONTENT, 'text/javascript');
-		$content = $loader->getFileContent($base, self::SCRIPT_EXT);
+		$content = $this->_loader->getFileContent($base, self::SCRIPT_EXT);
 
 		return $content;
 	}

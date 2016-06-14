@@ -116,7 +116,7 @@ class Template_Transformer {
 	}
 
 	public function render($config) {
-		//var_dump($config);
+		//var_dump($config['root']['html']['children']['head']);
 		$root = Kernel_Utils::_getArrayElement($config, 'root');
 		$content = '';
 

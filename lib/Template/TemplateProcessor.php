@@ -41,6 +41,7 @@ class Template_TemplateProcessor {
 				$current[$attr] = $val;
 			}
 		}
+		if($accumulative) var_dump($this->_queue[0]);
 	}
 
 	public function currentTask() {
@@ -69,6 +70,20 @@ class Template_TemplateProcessor {
 			}
 		}
 		return $result;
+	}
+
+	public function cutOffAttr($attr, $num) {
+		$str = $attr;
+		$attr = $this->hasTaskAttr($attr);
+		
+		$tokens = explode(':', $attr);
+		for ($i=0; $i<$num; $i++) {
+			array_pop($tokens);
+		}
+
+		$attr = implode(':', $tokens);
+		$this->addTaskAttr($str, $attr);
+		return $attr;
 	}
 
 	public function shiftTask() {
