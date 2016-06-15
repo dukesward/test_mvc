@@ -86,10 +86,19 @@ class Template_TemplateProcessor {
 		return $attr;
 	}
 
-	public function shiftTask() {
+	public function shiftTask($transfer = null) {
 		if(count($this->_queue) > 0) {
+			if(null !== $transfer && is_array($transfer) && count($this->_queue) > 1) {
+				$current = $this->_queue[0];
+				foreach ($transfer as $attr) {
+					if(isset($current[$attr])) {
+						$this->_queue[1][$attr] = $current[$attr];
+					}
+				}
+			}
 			array_shift($this->_queue);
 		}
+		//var_dump($this->_queue);
 	}
 
 	public function registerPath($name, $val) {

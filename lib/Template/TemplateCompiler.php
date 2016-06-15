@@ -87,7 +87,7 @@ class Template_TemplateCompiler {
 		$result = null;
 		$header = $this->_config->header;
 
-		if($this->_processor->hasTaskAttr('inherit') && $level === 1) {
+		if($this->_processor->hasTaskAttr('inherit') && (int)$level === 1) {
 			$result = true;
 			$base = self::ROOT_BASE;
 
@@ -115,7 +115,7 @@ class Template_TemplateCompiler {
 	protected function _processNodeConfig($el) {
 		$header = $this->_config->header;
 		$base = $this->_processor->hasTaskAttr('parent');
-		if($el['attributes']['TYPE'] === 'link') var_dump($base);
+		//if($el['attributes']['TYPE'] === 'link') var_dump($base);
 		
 		if(null === $base) {
 			$base = '';
@@ -154,7 +154,8 @@ class Template_TemplateCompiler {
 				$base = 'html:children:';
 			}
 			$this->_processor->addTaskAttr('target', $base . $type);
-			$header->setTemplateAttribute('level', 2);
+			$this->_processor->addTaskAttr('parent', 'root:html');
+			$header->setTemplateAttribute('root:html:children:' . $type . ':level', 2);
 		}else {
 			$this->_processNodeConfig($el);
 		}
@@ -176,7 +177,7 @@ class Template_TemplateCompiler {
 			$target = $header->getContentAttribute($targetStr);
 			$level = Kernel_Utils::_getArrayElement($target, 'level');
 
-			var_dump($target);
+			//if(null === $level) var_dump($this->_processor);
 			if($el['type'] === 'open' || $el['type'] === 'complete') {
 				$trigger = 'on';
 				switch(strtolower($el['tag'])) {
@@ -191,22 +192,21 @@ class Template_TemplateCompiler {
 					case 'root':
 						//$this->_markers['root'] = true;
 						$this->_processor->addTaskAttr('root', 'begin');
+						$this->_processor->addTaskAttr('target', 'root:html');
 						break;
 					case 'node':
-						//assures that root can only be inited once 
+						//assures that root can only be inited once
 						if('begin' === $this->_processor->hasTaskAttr('root')) {
-							$this->_processRootConfig($el, $parsed);
-
-							if($level === $el['level'] - 1) {
+							if((int)$level === $el['level'] - 1) {
 								$this->_processor->addTaskAttr('parent', $this->_processor->hasTaskAttr('target'), 0);
 							}
+
+							$this->_processRootConfig($el, $parsed);
 							//var_dump($this->_processor);
 						}else {
-							if($level === $el['level'] - 1) {
-								//var_dump($level);
+							if((int)$level === $el['level'] - 1) {
 								$block = $this->_checkForNodeInherit($level, Kernel_Utils::_getArrayElement($attributes, 'OVERRIDE'));
 								if(null !== $block) {
-									//var_dump($block);
 									$this->_processor->addTaskAttr('parent', $block, 0);
 								}else {
 									$this->_processor->addTaskAttr('parent', $this->_processor->hasTaskAttr('target'), 0);
@@ -242,6 +242,8 @@ class Template_TemplateCompiler {
 						$this->_processor->addTaskAttr('root', 'end');
 						break;
 				}
+				//var_dump($el);
+				//var_dump($this->_processor);
 				//switch target to be the current parent
 				$this->_processor->addTaskAttr('target', $this->_processor->hasTaskAttr('parent'));
 				//now the current parent needs to go a level up
@@ -249,7 +251,11 @@ class Template_TemplateCompiler {
 			}
 
 			if($i === (count($parsed) - 1)) {
-				$this->_processor->shiftTask();
+				$transfer = array(
+					'target',
+					'parent',
+				);
+				$this->_processor->shiftTask($transfer);
 			}
 
 			$this->_processor->addTaskAttr('level', $el['level']);
