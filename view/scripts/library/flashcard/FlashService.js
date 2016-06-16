@@ -1,0 +1,2 @@
+var FlashCard = FlashCard || {};
+

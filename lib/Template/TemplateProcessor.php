@@ -79,6 +79,10 @@ class Template_TemplateProcessor {
 		$tokens = explode(':', $attr);
 		for ($i=0; $i<$num; $i++) {
 			array_pop($tokens);
+			//if the path ends with :children, drop it
+			while (end($tokens) === 'children') {
+				array_pop($tokens);
+			}
 		}
 
 		$attr = implode(':', $tokens);

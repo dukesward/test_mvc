@@ -16,7 +16,9 @@
 					</node>
 				</node>
 			</node>
-			<node type='test' _class='card-container'></node>
+			<node type='div' _class='card-container'></node>
 		</node>
 	</node>
+	<node type='script' _src='staticcontent/scripts/library/jquery/jquery-min'></node>
+	<node type='script' _src='staticcontent/scripts/library/flashcard/FlashService'></node>
 </inherit>

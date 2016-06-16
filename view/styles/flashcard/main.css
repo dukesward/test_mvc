@@ -13,6 +13,7 @@ ul {
 
 .tab-container ul {
 	display: inline-block;
+	margin-bottom: -5px;
 }
 
 .tab-container ul li {
@@ -32,4 +33,12 @@ ul {
 
 .tab-body {
 
+}
+
+.card-container {
+	background: #fff;
+    padding: 10px;
+    width: 299px;
+    margin-left: 40px;
+    border-radius: 0 0 5px 5px;
 }
