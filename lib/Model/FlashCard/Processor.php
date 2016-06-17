@@ -17,6 +17,8 @@ class Model_FlashCard_Processor extends Model_CoreProcessor {
 		);
 
 		$this->_table = $adapter->getDbConfigTable($card_details);
-		var_dump($this->_table);
+		$data = $this->_table->fetchData();
+		//var_dump($data);
+		return $data;
 	}
 }

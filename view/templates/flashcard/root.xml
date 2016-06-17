@@ -1,5 +1,6 @@
 <root>
 	<node type='head'>
+		<node type='meta' _http-equiv='Content-type' _content='text/html' _charset='utf-8'></node>
 		<node type='link' _rel='stylesheet' _href='staticcontent/styles/flashcard/main'></node>
 		<node type='link' _href='https://fonts.googleapis.com/css?family=Raleway' _rel='stylesheet' _type='text/css'></node>
 	</node>

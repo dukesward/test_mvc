@@ -17,8 +17,14 @@
 				</node>
 			</node>
 			<node type='div' _class='card-container'></node>
+			<node type='ul' _class='handlers'>
+				<node type='li'>
+					<t>Next</t>
+				</node>
+			</node>
 		</node>
 	</node>
 	<node type='script' _src='staticcontent/scripts/library/jquery/jquery-min'></node>
 	<node type='script' _src='staticcontent/scripts/library/flashcard/FlashService'></node>
+	<node type='script' _src='staticcontent/scripts/library/flashcard/main'></node>
 </inherit>

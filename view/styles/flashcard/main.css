@@ -42,3 +42,11 @@ ul {
     margin-left: 40px;
     border-radius: 0 0 5px 5px;
 }
+
+.handlers li {
+	float: left;
+	padding: 5px 10px;
+	background-color: #fff;
+	border-radius: 3px;
+	cursor: pointer;
+}

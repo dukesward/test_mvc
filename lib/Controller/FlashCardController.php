@@ -3,6 +3,7 @@
 class Controller_FlashCardController extends Controller_BaseController {
 	
 	public function getAction() {
+		$details = null;
 		$params = $this->_request->getParams();
 
 		try {
@@ -14,5 +15,7 @@ class Controller_FlashCardController extends Controller_BaseController {
 		if(isset($processor)) {
 			$details = $processor->loadCardDetails($params);
 		}
+		//var_dump(json_encode($details));
+		return json_encode($details);
 	}
 }
