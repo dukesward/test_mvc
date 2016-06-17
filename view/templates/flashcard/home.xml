@@ -16,7 +16,10 @@
 					</node>
 				</node>
 			</node>
-			<node type='div' _class='card-container'></node>
+			<node type='div' _class='card-container'>
+				<node type='ul' _class='star-list'></node>
+				<node type='div' _class='word-container'></node>
+			</node>
 			<node type='ul' _class='handlers'>
 				<node type='li'>
 					<t>Next</t>
