@@ -51,19 +51,27 @@ class Kernel_Db_Adapter_Mysqli {
 
 	public function __construct($config) {
 		if(Kernel_Db_Adapter_Mysqli::$_instance) {
-			return Kernel_Db_Adapter_Mysqli::$_instance;
-		}else {
-			Kernel_Db_Adapter_Mysqli::$_instance = $this;
+			if($this->_host === $config['host'] && $this->_db === $config['db']) {
+				return Kernel_Db_Adapter_Mysqli::$_instance;
+			}
 		}
+
+		Kernel_Db_Adapter_Mysqli::$_instance = $this;
 
 		$this->_host = $config['host'];
 		$this->_username = $config['username'];
 		$this->_password = $config['password'];
 		$this->_db = $config['db'];
 
-		if(!Kernel_Db_Adapter_Mysqli::$_isConnected) {
-			$this->_connect();
+		while(Kernel_Db_Adapter_Mysqli::$_isConnected) {
+			if(null !== $this->_connection) {
+				$this->closeConnection();
+			}else {
+				Kernel_Db_Adapter_Mysqli::$_isConnected = false;
+			}
 		}
+
+		$this->_connect();
 	}
 
 	public function prepare($db = null, $sql = null, $type = 'SELECT') {
@@ -89,6 +97,7 @@ class Kernel_Db_Adapter_Mysqli {
         if (Kernel_Db_Adapter_Mysqli::$_isConnected) {
             $this->_connection->close();
         }
+        Kernel_Db_Adapter_Mysqli::$_isConnected = false;
         $this->_connection = null;
     }
 	

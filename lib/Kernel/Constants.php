@@ -34,4 +34,7 @@ class Kernel_Constants {
 	const MODEL_NODE_TEMPLATE                = "cms_node_template";
 	const MODEL_NODE_ROUTE_PRIME             = "pattern";
 	const MODEL_NODE_DETAILS_PRIME           = "nid";
+
+	const MODEL_CARD_DETAILS                 = "words_general";
+	const MODEL_CARD_DETAILS_PRIME           = "id";
 }

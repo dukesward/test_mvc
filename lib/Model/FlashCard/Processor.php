@@ -8,6 +8,15 @@ class Model_FlashCard_Processor extends Model_CoreProcessor {
 	protected $_table = array();
 	
 	public function loadCardDetails($params) {
+		$condig = array();
+		$adapter = Kernel_Db_Adapter::getDbAdapter(null, 'flashcard');
 
+		$card_details = array(
+			'table' => Kernel_Constants::MODEL_CARD_DETAILS,
+			'prime' => Kernel_Constants::MODEL_CARD_DETAILS_PRIME,
+		);
+
+		$this->_table = $adapter->getDbConfigTable($card_details);
+		var_dump($this->_table);
 	}
 }
