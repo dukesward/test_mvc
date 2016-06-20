@@ -24,8 +24,10 @@ class Controller_BaseController {
 		}
 
 		if(isset($processor)) {
-			$this->_config = $processor->loadNodeConfig($this->_request->getPathInfo());
+			$this->_config = $processor->loadNodeConfig($this->_request->getPathInfo())[0];
+			$this->_config['queryParams'] = $this->_request->getQueryParams();
 		}
+		//var_dump($this->_config);
 	}
 
 	protected function indexAction() {
@@ -49,21 +51,22 @@ class Controller_BaseController {
 			//call corresponding action to get data config
 			$dataConfig = call_user_func(array($this, $action));
 			//use data config to generate data, then compile corresponding template with it
-			if(is_string($dataConfig)) {
-				$content = $dataConfig;
-			}else {
-				$content = Template_Engine::prepareContent($this->generateData($dataConfig));
+			if(null !== $dataConfig) {
+				if(is_string($dataConfig)) {
+					$content = $dataConfig;
+				}else {
+					$content = Template_Engine::prepareContent($this->generateData($dataConfig));
+				}
+
+				$this->render($content);
 			}
-			//var_dump($content);
 		}
-		//var_dump($content);
-		$this->render($content);
 	}
 
 	public function generateData($dataConfig) {
 		$data = null;
 
-		$data = new Template_Config($dataConfig[0]);
+		$data = new Template_Config($dataConfig);
 		$data->injectGlobalHeader();
 		
 		return $data;

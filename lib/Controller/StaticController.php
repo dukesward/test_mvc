@@ -9,6 +9,7 @@ class Controller_StaticController extends Controller_BaseController {
 
 	protected $_loader;
 	protected $base_static = Kernel_Constants::KERNEL_ROUTES_VIEW_ROOT;
+	protected $base_cache = Kernel_Constants::CACHE_CACHE_BASE;
 
 	public function __construct(Kernel_Request $request, Kernel_Response $response) {
 		parent::__construct($request, $response);
@@ -36,6 +37,22 @@ class Controller_StaticController extends Controller_BaseController {
 		$params = $this->_request->getParams();
 
 		$base = $this->base_static . 'scripts';
+		foreach ($params as $param) {
+			$base .= self::FILE_SPLITTER;
+			$base .= $param;
+		}
+
+		$this->_response->setHeader(self::CONTENT, 'text/javascript');
+		$content = $this->_loader->getFileContent($base, self::SCRIPT_EXT);
+
+		return $content;
+	}
+
+	public function cscriptsAction() {
+		//var_dump($this->_request->getParams());
+		$params = $this->_request->getParams();
+
+		$base = 'cache';
 		foreach ($params as $param) {
 			$base .= self::FILE_SPLITTER;
 			$base .= $param;

@@ -39,6 +39,7 @@ class Util_ConfigFile {
 					$left = $left . substr($attr, $i+1);
 					break;
 				}else {
+					//var_dump($record);
 					$record = $record . $char;
 				}
 			}
@@ -65,8 +66,20 @@ class Util_ConfigFile {
 			if(null !== $this->_config && isset($this->_config[$mapped])) {
 				$data = $this->_config[$mapped];
 			}
+		}else {
+			if(null !== Kernel_Utils::_getArrayElement($this->_data, 'variable->' . $data)) {
+				$data = $this->_data['variable'][$data];
+			}
 		}
 		return $data;
+	}
+
+	public function setupVariable($key, $value) {
+		if(!isset($this->_data['variable'])) {
+			$this->_data['variable'] = array();
+		}
+
+		$this->_data['variable'][$key] = $this->_parseAttributes($value);
 	}
 
 	public function setTemplateAttribute($tokens, $val = null) {
@@ -125,6 +138,10 @@ class Util_ConfigFile {
 		}
 		//var_dump($this->_content);
 		return $this;
+	}
+
+	public function getDataVariable($variable) {
+		return Kernel_Utils::_getArrayElement($this->_data, 'variable->' . $variable);
 	}
 
 	public function getContentAttribute($attr = null) {

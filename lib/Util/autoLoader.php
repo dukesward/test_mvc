@@ -81,8 +81,20 @@ class Util_AutoLoader {
 		return $output;
 	}
 
+	public function writeFile($file, $content = null) {
+		$path = __DIR__ . ROOT_PATH . $file;
+
+		$handle = fopen($path, 'w') or die('Cannot open file:  ' . $path);
+		if(null !== $content) {
+			if(is_string($content)) {
+				fwrite($handle, $content);
+			}
+		}
+	}
+
 	public function getFileContent($file, $ext, $output = null) {
 		if(!$file || !$ext) {
+			//var_dump(debug_backtrace());
 			throw new Exception('File name and extension must be specified');
 		}else {
 			$content = Util_AutoLoader::loadFile($file, $ext);

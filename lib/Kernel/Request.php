@@ -6,6 +6,10 @@ class Kernel_Request {
 	private $_pathInfo = array();
 	private $_routeInfo;
 
+	protected function setRequestUrl() {
+
+	}
+	
 	public function __construct($url = null) {
 		if(null !== $url) {
 			$this->setRequestUrl($url);
@@ -15,12 +19,31 @@ class Kernel_Request {
 	}
 
 	public function setPathInfo() {
-		$path = trim(parse_url($_SERVER["REQUEST_URI"], PHP_URL_PATH), "/");
+		$url = $_SERVER["REQUEST_URI"];
+
+		$tokens = explode('?', $url);
+		$path = trim(parse_url($tokens[0], PHP_URL_PATH), "/");
 		$path = preg_replace('/[^a-zA-Z0-9]\//', "", $path);
+
+		if(count($tokens) > 1) {
+			$query = $tokens[1];
+			$path .= ('?' . $query);
+		}
+
 		$this->_pathInfo = $path;
 	}
 
 	public function getPathInfo() {
+		if(!$this->_pathInfo) {
+			$this->setPathInfo();
+		}
+
+		$pathInfo = explode('?', $this->_pathInfo)[0];
+		//var_dump($this->_routeInfo);
+		return $pathInfo;
+	}
+
+	public function getFullPathInfo() {
 		if(!$this->_pathInfo) {
 			$this->setPathInfo();
 		}
@@ -29,10 +52,6 @@ class Kernel_Request {
 
 	public function setRouteInfo(Kernel_Core_Route $route) {
 		$this->_routeInfo = $route;
-	}
-
-	public function setRequestUrl($url = null) {
-
 	}
 
 	public function setState($state) {
@@ -49,19 +68,15 @@ class Kernel_Request {
 		return $controller;
 	}
 
-	public function setControllerName() {
-
+	public function getAction() {
+		return $this->_routeInfo->getActionName();
 	}
 
 	public function getParams() {
 		return $this->_routeInfo->getParams();
 	}
 
-	public function setParams() {
-		
-	}
-
-	public function getAction() {
-		return $this->_routeInfo->getActionName();
+	public function getQueryParams() {
+		return $this->_routeInfo->getQueryParams();
 	}
 }

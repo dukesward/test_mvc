@@ -5,29 +5,55 @@
 			<t>CARDS</t>
 			<node type='div' _class='tab-container'>
 				<node type='ul'>
-					<node type='li'>
+					<node type='li' _class='active' _util='word'>
 						<t>Word</t>
 					</node>
-					<node type='li'>
+					<node type='li' _util='meaning'>
 						<t>Meaning</t>
 					</node>
-					<node type='li'>
+					<node type='li' _util='example'>
 						<t>Example</t>
 					</node>
 				</node>
 			</node>
 			<node type='div' _class='card-container'>
 				<node type='ul' _class='star-list'></node>
-				<node type='div' _class='word-container'></node>
+				<node type='div' _class='type'></node>
+				<node type='div' _class='word-container word'></node>
+				<node type='div' _class='word-container meaning'>
+					<node type='div' _class='wrapper'></node>
+				</node>
+				<node type='div' _class='word-container example'>
+					<node type='div' _class='wrapper'></node>
+				</node>
+				<node type='div' _class='exp-container'>
+					<node type='div' _class='wrapper'>
+						<node type='span' _class='exp title'>
+							<t>EXP: </t>
+						</node>
+						<node type='span' _class='exp current'></node>
+						<node type='span'>
+							<t>/</t>
+						</node>
+						<node type='span' _class='exp next'></node>
+					</node>
+				</node>
 			</node>
 			<node type='ul' _class='handlers'>
-				<node type='li'>
+				<node type='li' _util='next'>
 					<t>Next</t>
+				</node>
+				<node type='li' _util='earn'>
+					<t>Earn Exp</t>
+				</node>
+				<node type='li' _util='update'>
+					<t>Update</t>
+				</node>
+				<node type='li' _util='add'>
+					<t>Add</t>
 				</node>
 			</node>
 		</node>
 	</node>
-	<node type='script' _src='staticcontent/scripts/library/jquery/jquery-min'></node>
-	<node type='script' _src='staticcontent/scripts/library/flashcard/FlashService'></node>
-	<node type='script' _src='staticcontent/scripts/library/flashcard/main'></node>
+	<static type='script' name='global'></static>
 </inherit>

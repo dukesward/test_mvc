@@ -83,6 +83,7 @@ class Kernel_Db_Adapter_Mysqli {
 		if(!Kernel_Db_Adapter_Mysqli::$_isConnected) {
 			$this->_connect();
 		}
+
 		$stmt = new Kernel_Db_Statement_Mysqli($sql, $type);
 		return $stmt;
 	}

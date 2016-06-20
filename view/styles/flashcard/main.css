@@ -31,8 +31,8 @@ ul {
 	border-radius: 0 5px 0 0;
 }
 
-.tab-body {
-
+.tab-container ul li.active {
+	background-color: #fff;
 }
 
 .card-container {
@@ -43,10 +43,69 @@ ul {
     border-radius: 0 0 5px 5px;
 }
 
+.star-list {
+	padding: 0;
+    margin-top: 0;
+    margin-bottom: 0;
+    color: #b40ac7;
+}
+
+.type {
+	font-family: 'Microsoft Yahei';
+	float: right;
+    margin-top: -20px;
+}
+
+.word-container {
+	overflow: hidden;
+	font-family: 'Microsoft Yahei';
+	display: none;
+	margin: 15px auto;
+}
+
+.word-container .word {
+	float: left;
+}
+
+.word-container .word.kanji {
+	text-align: center;
+	font-size: 22px;
+	cursor: pointer;
+}
+
+.word-container .word.hiro {
+	font-size: 22px;
+	padding-top: 16px;
+}
+
+.word-container .word .label {
+	display: block;
+	font-size: 10px;
+	opacity: 0;
+	transition: all 0.2s linear;
+}
+
+.word-container .word .label.display {
+	opacity: 1;
+}
+
+.exp-container {
+	overflow: hidden;
+}
+
+.exp-container .wrapper {
+	float: right;
+}
+
+.exp.title {
+	font-size: 14px;
+}
+
 .handlers li {
 	float: left;
 	padding: 5px 10px;
 	background-color: #fff;
 	border-radius: 3px;
 	cursor: pointer;
+	margin-right: 15px;
 }

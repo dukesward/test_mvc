@@ -10,11 +10,14 @@ class Kernel_Db_Statement_Mysqli {
 		'STRING_WRAPPER' => Kernel_Constants::UTIL_STRING_WRAPPER,
 		'SQL_SELECT'     => Kernel_Constants::DB_SQL_SELECT,
 		'SQL_SELECT_ALL' => Kernel_Constants::DB_SQL_SELECT_ALL,
+		'SQL_REPLACE'    => Kernel_Constants::DB_SQL_REPLACE,
+		'SQL_UPDATE'     => Kernel_Constants::DB_SQL_UPDATE,
 		'SQL_FROM'       => Kernel_Constants::DB_SQL_FROM,
+		'SQL_SET'        => Kernel_Constants::DB_SQL_SET,
 		'SQL_WHERE'      => Kernel_Constants::DB_SQL_WHERE,
 		'SQL_DELIMITER'  => Kernel_Constants::DB_SQL_DELIMITER,
 		'SQL_WRAPPER'    => Kernel_Constants::DB_SQL_WRAPPER,
-		'SQL_TOKENS'     => array('type', 'select', 'sql_from', 'from', 'sql_where', 'where'),
+		'SQL_TOKENS'     => array('type', 'select', 'sql_from', 'from', 'sql_set', 'set', 'sql_where', 'where'),
 	);
 
 	protected function fetchAll() {
@@ -44,6 +47,13 @@ class Kernel_Db_Statement_Mysqli {
 		return $this;
 	}
 
+	protected function update() {
+		$this->set()
+			->where();
+
+		return $this;
+	}
+
 	public function __construct($sql = null, $type) {
 		$this->_class = 'mysqli';
 		$this->_stmt = array();
@@ -68,6 +78,23 @@ class Kernel_Db_Statement_Mysqli {
 		return $this;
 	}
 
+	public function set($attrs = null) {
+		if(is_array($attrs)) {
+			$this->_stmt['set'] = '';
+			foreach ($attrs as $attr => $value) {
+				$st = Kernel_Utils::_wrapStr($attr, $this->_sqlConsts['SQL_WRAPPER'])
+					. '='
+					. Kernel_Utils::_wrapStr($value, $this->_sqlConsts['STRING_WRAPPER'])
+					. ',';
+
+				$this->_stmt['set'] .= $st;
+			}
+			$this->_stmt['set'] = substr($this->_stmt['set'], 0, -1);
+		}
+
+		return $this;
+	}
+
 	public function where($condition = null) {
 		if($condition) {
 			//var_dump($condition);
@@ -85,8 +112,14 @@ class Kernel_Db_Statement_Mysqli {
 
 	public function assemble() {
 		if(isset($this->_stmt['from'])) {
-			$this->_stmt['sql_from'] = $this->_sqlConsts['SQL_FROM'];
+			if($this->_stmt['type'] === 'SELECT') {
+				$this->_stmt['sql_from'] = $this->_sqlConsts['SQL_FROM'];
+			}
 		};
+
+		if(isset($this->_stmt['set'])) {
+			$this->_stmt['sql_set'] = $this->_sqlConsts['SQL_SET'];
+		}
 		
 		if(isset($this->_stmt['where'])) {
 			$this->_stmt['sql_where'] = $this->_sqlConsts['SQL_WHERE'];
@@ -110,6 +143,9 @@ class Kernel_Db_Statement_Mysqli {
 						case 'where':
 							$this->where($config);
 							break;
+						case 'set':
+							$this->set($config);
+							break;
 					}
 				}
 			}
@@ -130,7 +166,7 @@ class Kernel_Db_Statement_Mysqli {
 		if(!$this->_query) {
 			$this->assemble();
 		}
-
+		//var_dump($this->_query);
 		$stmt = $connection->prepare($this->_query);
 
 		try {
@@ -139,38 +175,42 @@ class Kernel_Db_Statement_Mysqli {
 				$keys = array();
 
 				$keyId = 0;
-
-				foreach ($meta->fetch_fields() as $col) {
-					//fill table fields with metadata
-					$keys[$col->name] = $col;
-					$keys[$col->name]->id = $keyId;
-					$keyId ++;
+				
+				if(null !== $meta && $meta) {
+					foreach ($meta->fetch_fields() as $col) {
+						//fill table fields with metadata
+						$keys[$col->name] = $col;
+						$keys[$col->name]->id = $keyId;
+						$keyId ++;
+					}
 				}
 
 				$table->generateFields($keys);
-				$data = array_fill(0, count($keys), null);
 
-				$refs = array();
-	            foreach ($data as $i => &$f) {
-	                $refs[$i] = &$f;
-	            }
+				if(count($keys) > 0) {
+					$data = array_fill(0, count($keys), null);
+					$refs = array();
+		            foreach ($data as $i => &$f) {
+		                $refs[$i] = &$f;
+		            }
 
-				$stmt->store_result();
+		            $stmt->store_result();
 
-				call_user_func_array(
-					array($stmt, 'bind_result'),
-					$data
-				);
+					call_user_func_array(
+						array($stmt, 'bind_result'),
+						$data
+					);
 
-				$index = 0;
+					$index = 0;
 
-				while ($row = $stmt->fetch()) {
-					foreach ($data as $key => $value) {
-						$table->fillData($key, $value, $index);
+					while ($row = $stmt->fetch()) {
+						foreach ($data as $key => $value) {
+							$table->fillData($key, $value, $index);
+						}
+						$index ++;
 					}
-					$index ++;
 				}
-
+				
 				$stmt->close();
 			}
 		}catch (Exception $e) {

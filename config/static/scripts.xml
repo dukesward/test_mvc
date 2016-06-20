@@ -1,0 +1,6 @@
+<files name='global'>
+	<file>library\jquery\jquery-min</file>
+	<file>library\common\utils</file>
+	<file>library\flashcard\FlashService</file>
+	<file>library\flashcard\main</file>
+</files>

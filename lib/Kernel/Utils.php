@@ -75,12 +75,14 @@ class Kernel_Utils {
 		$tokens = explode('->', $key);
 		$el = null;
 
-		foreach ($tokens as $token) {
-			if(isset($arr[$token])) {
-				$el = $arr[$token];
-				$arr = $arr[$token];
-			}else {
-				$el = null;
+		if(is_array($arr)) {
+			foreach ($tokens as $token) {
+				if(isset($arr[$token])) {
+					$el = $arr[$token];
+					$arr = $arr[$token];
+				}else {
+					$el = null;
+				}
 			}
 		}
 
@@ -123,6 +125,19 @@ class Kernel_Utils {
 		}
 
 		return $_url;
+	}
+
+	public static function _templatePathToId($path) {
+		$id = null;
+		$templateRoot = Kernel_Constants::KERNEL_ROUTES_TEMPLATE_ROOT;
+
+		if(is_string($path) && strpos($path, $templateRoot) === 0) {
+			$template = explode($templateRoot, $path);
+			$tokens = explode('\\', $template[1]);
+			$id = 'template_' . implode('_', $tokens);
+		}
+
+		return $id;
 	}
 
 	public static function _wrapStr($str, $wrapper) {

@@ -55,7 +55,7 @@ class Kernel_Router {
 
 	public function route(Kernel_Request $request) {
 
-		$path = $request->getPathInfo();
+		$path = $request->getFullPathInfo();
 
 		if(null === $this->_routes) {
 			$this->_routes = $this->prepareRoutes($request);

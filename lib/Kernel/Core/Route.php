@@ -27,17 +27,27 @@ class Kernel_Core_Route {
 				$match = true;
 			}
 		}else {
-			$tokens = explode('/', $pattern);
+			$tokens = explode('?', $pattern);
+			if(count($tokens) > 1) {
+				$query = $tokens[1];
+			}
 
+			$tokens = explode('/', $tokens[0]);
 			if(count($tokens) === 1) {
-				if($pattern === $this->_pattern) {
+				if($tokens[0] === $this->_pattern) {
+					if(isset($query)) {
+						$this->setQueryParameters($query);
+					}
 					$match = true;
 				}
 			}else {
-				//var_dump($this->_pattern);
 				if(array_shift($tokens) === $this->_pattern) {
 					$this->setActionName(array_shift($tokens));
 					$this->setParameters($tokens);
+					if(isset($query)) {
+						$this->setQueryParameters($query);
+					}
+					
 					$match = true;
 				}
 			}
@@ -88,6 +98,29 @@ class Kernel_Core_Route {
 			array_push($this->_route['params'], $params);
 		}else if(is_array($params)) {
 			$this->_route['params'] = array_merge($this->_route['params'], $params);
+		}
+	}
+
+	public function getQueryParams() {
+		$params = null;
+
+		if(isset($this->_route['queryParams'])) {
+			$params = $this->_route['queryParams'];
+		}
+		return $params;
+	}
+
+	public function setQueryParameters($params) {
+		if(!isset($this->_route['queryParams'])) {
+			$this->_route['queryParams'] = array();
+		}
+		//var_dump($params);
+		$tokens = explode('&', $params);
+		foreach ($tokens as $token) {
+			$pair = explode('=', $token);
+			if(count($pair) > 1) {
+				$this->_route['queryParams'][$pair[0]] = $pair[1];
+			}
 		}
 	}
 }

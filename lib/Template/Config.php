@@ -13,9 +13,11 @@ class Template_Config {
 	protected $_data = array();
 
 	public function __construct($config) {
+		$this->_data['config'] = array();
 		$root = Kernel_Constants::KERNEL_ROUTES_TEMPLATE_ROOT;
 		$delimiter = Kernel_Constants::MODEL_ROUTES_FILE_SPLITTER;
 		$tokens = array('root', 'template');
+
 		$this->_data['path'] = $root . Kernel_Utils::_concat($config, $tokens, $delimiter, 'each');
 
 		$this->_setUpTemplateConfig($config);
@@ -28,6 +30,8 @@ class Template_Config {
 		$file = new Util_ConfigFile();
 		$path = self::CONFIG_PATH . $config['root'] . self::FILE_SPLITTER . $config['template'];
 		$content = $loader->getFileContent($path, self::CONFIG_EXT, $file);
+
+		//var_dump($config);
 
 		foreach ($content->getDataObject() as $key => $val) {
 			if(isset($config[$val])) {

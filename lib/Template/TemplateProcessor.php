@@ -41,7 +41,7 @@ class Template_TemplateProcessor {
 				$current[$attr] = $val;
 			}
 		}
-		if($accumulative) var_dump($this->_queue[0]);
+		//if($accumulative) var_dump($this->_queue[0]);
 	}
 
 	public function currentTask() {

@@ -4,7 +4,13 @@ class Template_TemplateCompiler {
 
 	const TEMP_PATH        = Kernel_Constants::KERNEL_ROUTES_TEMPLATE_ROOT;
 	const TEMP_DEFAULT_EXT = Kernel_Constants::KERNEL_ROUTES_TEMPLATE_DEFAULT_EXT;
+	const CONFIG_PATH      = Kernel_Constants::KERNEL_ROUTES_CONFIG_ROOT;
+	const SCRIPT_PATH      = Kernel_Constants::KERNEL_ROUTES_SCRIPT_ROOT;
+	const DEFAULT_CONFIG   = 'xml';
 	const ROOT_BASE        = 'root:';
+
+	const CONFIG_CONF      = 'FILES';
+	const CONFIG_MOD       = 'FILE';
 
 	protected $_loader;
 	protected $_template;
@@ -13,6 +19,8 @@ class Template_TemplateCompiler {
 	protected $_content;
 	protected $_config;
 	protected $_processor;
+	protected $_cache;
+	protected $_static = array();
 
 	public function __construct($data) {
 		$this->_config = $data;
@@ -27,6 +35,9 @@ class Template_TemplateCompiler {
 
 		$this->_processor = new Template_TemplateProcessor();
 		$this->_processor->addTask($file);
+
+		$this->_cache = Util_FileCache::getInstance();
+		$this->_getStaticFileConfig();
 	}
 
 	protected function _loadTemplateRawData($templateName, $ext) {
@@ -45,6 +56,38 @@ class Template_TemplateCompiler {
 		//var_dump($this->_template);
 		//var_dump($values);
 		return $values;
+	}
+
+	protected function _getValueFromParsedXML($xml, $root = '') {
+		$values = array();
+		$name = null;
+
+		foreach ($xml as $el) {
+			$tag = $el['tag'];
+			if($tag === self::CONFIG_CONF) {
+				if($el['type'] === 'open') {
+					$name = Kernel_Utils::_getArrayElement($el, 'attributes->NAME');
+					$values[$name] = array();
+				}
+			}else if ($tag === self::CONFIG_MOD && null !== $name) {
+				if($el['type'] === 'complete') {
+					array_push($values[$name], $root . Kernel_Utils::_getArrayElement($el, 'value'));
+				}
+			}
+		}
+		return $values;
+	}
+
+	protected function _getStaticFileConfig($type = null) {
+		if(null !== $type) {
+			$this->_static[$type] = array();
+		}else {
+			$script = self::CONFIG_PATH . 'static\\scripts';
+			
+			$scriptConfig = $this->_parseXmlContent($this->_loader->getFileContent($script, self::DEFAULT_CONFIG));
+			$this->_static['script'] = $this->_getValueFromParsedXML($scriptConfig, self::SCRIPT_PATH);
+			//var_dump($this->_static);
+		}
 	}
 
 	protected function _getTagAttribute($tag, $attr = null) {
@@ -232,8 +275,42 @@ class Template_TemplateCompiler {
 							$header->setTemplateAttribute($path, $value);
 							$header->setTemplateAttributeByArray($attributes, $target . ':attributes');
 						}
-						
 						//var_dump($this->_config->header->getContentAttribute()['root']['body']);
+						break;
+					case 'static':
+						//var_dump($this->_config);
+						$type = $attributes['TYPE'];
+						$name = $attributes['NAME'];
+						$query = $this->_config->queryParams;
+
+						if($type === 'script') {
+							$ext = Kernel_Constants::CACHE_SCRIPT_EXT;
+						}
+
+						$file = $this->_cache->setupFileCache(array(
+							'root' => 'static',
+							'file' => $name,
+							'ext' => isset($ext) ? $ext : null,
+						));
+
+						if(null === $file || null !== Kernel_Utils::_getArrayElement($query, 'fc')) {
+							if(!isset($this->_static[$type])) {
+								$this->_getStaticFileConfig($type);
+							}
+							//$id = Kernel_Utils::_templatePathToId($this->_processor->hasTaskAttr('template'));
+							$files = Kernel_Utils::_getArrayElement($this->_static, $type . '->' . $name);
+							//var_dump($this->_static);
+							$this->_cache->createFileCache(self::SCRIPT_PATH, $files, 'static:'.$name, $ext);
+						}
+
+						$path = 'staticcontent/cscripts/static/' . $name;
+						if($type === 'script') {
+							$el['attributes']['_src'] = $path;
+						}
+						$this->_processNodeConfig($el);
+						break;
+					case 'var':
+						$this->_config->header->setupVariable($attributes['NAME'], $attributes['VALUE']);
 						break;
 				}
 			}else if($el['type'] === 'close') {

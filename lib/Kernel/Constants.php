@@ -10,15 +10,22 @@ class Kernel_Constants {
 	const KERNEL_ROUTES_VIEW_ROOT            = "view\\";
 	const KERNEL_ROUTES_TEMPLATE_ROOT        = "view\\templates\\";
 	const KERNEL_ROUTES_TEMPLATE_CONFIG_ROOT = "view\\configs\\";
+	const KERNEL_ROUTES_SCRIPT_ROOT          = "view\\scripts\\";
 	const KERNEL_ROUTES_CONFIG_ROOT          = "config\\";
 	const KERNEL_ROUTES_CONFIG_EXT           = "conf";
 	const KERNEL_ROUTES_TEMPLATE_DEFAULT_EXT = "xml";
+
+	const CACHE_CACHE_BASE                   = "cache\\";
+	const CACHE_SCRIPT_EXT                   = "js";
 	
 	const DB_SQL_FROM                        = "FROM";
 	const DB_SQL_SELECT                      = "SELECT";
 	const DB_SQL_SELECT_ALL                  = "*";
+	const DB_SQL_REPLACE                     = "REPLACE INTO";
+	const DB_SQL_UPDATE                      = "UPDATE";
 	const DB_SQL_VALUE                       = "VALUE";
 	const DB_SQL_WHERE                       = "WHERE";
+	const DB_SQL_SET                         = "SET";
 	const DB_SQL_WRAPPER                     = "`";
 	const DB_SQL_DELIMITER                   = " ";
 
