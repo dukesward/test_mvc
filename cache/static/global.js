@@ -158,21 +158,20 @@ if(typeof jQuery === 'function' && FlashCard) {
 
 			for(var i=0; i<tokens.length; i++) {
 				var token = tokens[i].split(':'),
-					$word = $('<div></div>').addClass('word');
+					$word = $('<div></div>').addClass('word').attr('i', i);
 
 				if(token.length === 2) {
-					$hiroLabel = $('<span></span>').addClass('label').text(token[0]);
+					var $hiroLabel = $('<span></span>').addClass('label').addClass('l' + i).text(token[0]);
 					$word.addClass('kanji').text(token[1]);
-
-					$word.on('click', function() {
-						$hiroLabel.addClass('display');
-					})
-
 					$word.prepend($hiroLabel);
 				}else {
 					$word.addClass('hiro').text(token[0]);
 				}
 				$wordContainer.append($word);
+				$word.on('click', function() {
+					var index = $(this).attr('i');
+					$('.label.l'+index).addClass('display');
+				})
 			}
 		}
 
