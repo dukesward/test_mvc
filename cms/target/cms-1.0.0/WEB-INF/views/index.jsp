@@ -28,5 +28,7 @@
 		<div id="col2">
 			<div class="nav"></div>
 		</div>
+		<script src='<c:url value="/utils/jquery/jquery-min.js"/>'></script>
+		<script src='<c:url value="/js/main.js"/>'></script>
 	</body>
 </html>
