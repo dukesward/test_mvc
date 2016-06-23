@@ -36,13 +36,17 @@ if(typeof jQuery === 'function' && FlashCard) {
 
 					$('.exp.current', $container).text(currentWord['points']);
 					$('.exp.next', $container).text(currentWord['base'] * currentWord['stars']);
-				});
 
-				$("li[util='update']").on('click', function() {
 					flashCard._service.update(function(data) {
 
 					}, currentWord);
 				});
+
+				/*$("li[util='update']").on('click', function() {
+					flashCard._service.update(function(data) {
+
+					}, currentWord);
+				});*/
 
 				appendWord(data, $container);
 				$wordContainer.css('display', 'table');

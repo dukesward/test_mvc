@@ -46,9 +46,6 @@
 				<node type='li' _util='earn'>
 					<t>Earn Exp</t>
 				</node>
-				<node type='li' _util='update'>
-					<t>Update</t>
-				</node>
 				<node type='li' _util='add'>
 					<t>Add</t>
 				</node>
