@@ -25,6 +25,7 @@ public class IndexController {
 	
 	@RequestMapping("/home")
 	public String init(ModelMap model) {
+		System.out.println("test std log out");
 		model.addAttribute("message", "Welcome!");
 		return VIEW_INDEX;
 	}
