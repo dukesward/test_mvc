@@ -17,6 +17,8 @@ import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 
 import org.springframework.core.env.Environment;
 
+import org.springframework.orm.hibernate4.LocalSessionFactoryBean;
+
 @Configuration
 @PropertySource(value = "/resources/config/application.properties")
 public class ApplicationConfig {
@@ -25,5 +27,10 @@ public class ApplicationConfig {
 	private Environment environment;
 	private static final String SQL_DRIVER = "db.driver";
 
+	@Bean
+	public LocalSessionFactoryBean sessionFactory() {
+		LocalSessionFactoryBean sessionFactory = new LocalSessionFactoryBean();
 
+		return sessionFactory;
+	}
 }
