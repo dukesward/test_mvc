@@ -10,7 +10,7 @@
     <properties>
         <spring.version>4.1.7.RELEASE</spring.version>
         <hibernate.version>4.2.0.Final</hibernate.version>
-        <mysql.connector.version>5.1.21</mysql.connector.version>
+        <mysql.connector.version>5.1.39</mysql.connector.version>
         <javax.servlet-api-version>3.1.0</javax.servlet-api-version>
         <jstl.version>1.2</jstl.version>
         <junit.version>4.7</junit.version>
@@ -164,14 +164,6 @@
             <groupId>org.javassist</groupId>
             <artifactId>javassist</artifactId>
             <version>3.18.2-GA</version>
-        </dependency>
-
-        <!-- jars -->
-        <dependency>
-            <groupId>jars</groupId>
-            <artifactId>mysql</artifactId>
-            <version>5.1.39</version>
-            <systemPath>${basedir}\src\main\webap\WEB-INF\lib\mysql-connector-java-5.1.39-bin.jar</systemPath>
         </dependency>
 
     </dependencies>
