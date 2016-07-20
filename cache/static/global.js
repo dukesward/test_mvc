@@ -107,11 +107,11 @@ if(typeof jQuery === 'function' && FlashCard) {
 					}, currentWord);
 				});
 
-				$("li[util='update']").on('click', function() {
+				/*$("li[util='update']").on('click', function() {
 					flashCard._service.update(function(data) {
 
 					}, currentWord);
-				});
+				});*/
 
 				appendWord(data, $container);
 				$wordContainer.css('display', 'table');

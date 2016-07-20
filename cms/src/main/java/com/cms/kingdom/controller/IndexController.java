@@ -1,5 +1,7 @@
 package com.cms.kingdom.controller;
 
+import com.cms.kingdom.lib.db.KingdomDAO;
+
 import org.springframework.ui.ModelMap;
 import org.springframework.stereotype.Controller;
 
@@ -21,6 +23,7 @@ import java.io.IOException;
 public class IndexController {
 
 	private static final String VIEW_INDEX = "index";
+	private KingdomDAO kdao;
 	protected final Log logger = LogFactory.getLog(getClass());
 	
 	@RequestMapping("/home")
@@ -29,4 +32,6 @@ public class IndexController {
 		model.addAttribute("message", "Welcome!");
 		return VIEW_INDEX;
 	}
+
+	
 }
