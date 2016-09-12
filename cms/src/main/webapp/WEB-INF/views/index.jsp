@@ -17,6 +17,7 @@
 	</head>
 	<body>
 		<div id="test-message">Hello World! <c:out value="${message}"/></div>
+		<div>Test Node => <c:out value="${node}"/></div>
 		<div id="col1">
 			<div id="navhead">
 				<div id="search" class="nav-icon"><i class="fa fa-search" aria-hidden="true"></i></div>

@@ -1,2 +1,7 @@
-c:\wamp\www\symfony\projects\test_mvc\cms\src\main\java\com\cms\kingdom\web\BootstrapInitializer.java
-c:\wamp\www\symfony\projects\test_mvc\cms\src\main\java\com\cms\kingdom\lib\db\MysqliAdapter.java
+C:\wamp\www\projects\mvc\test\cms\src\main\java\com\cms\kingdom\model\Node.java
+C:\wamp\www\projects\mvc\test\cms\src\main\java\com\cms\kingdom\test\UnitTest.java
+C:\wamp\www\projects\mvc\test\cms\src\main\java\com\cms\kingdom\config\ApplicationConfig.java
+C:\wamp\www\projects\mvc\test\cms\src\main\java\com\cms\kingdom\controller\IndexController.java
+C:\wamp\www\projects\mvc\test\cms\src\main\java\com\cms\kingdom\lib\db\AbstractDAO.java
+C:\wamp\www\projects\mvc\test\cms\src\main\java\com\cms\kingdom\lib\util\SystemConstants.java
+C:\wamp\www\projects\mvc\test\cms\src\main\java\com\cms\kingdom\lib\db\KingdomDAO.java
