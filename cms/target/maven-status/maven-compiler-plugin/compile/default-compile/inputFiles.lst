@@ -1,7 +1,7 @@
-C:\wamp\www\projects\mvc\test\cms\src\main\java\com\cms\kingdom\model\Node.java
-C:\wamp\www\projects\mvc\test\cms\src\main\java\com\cms\kingdom\test\UnitTest.java
-C:\wamp\www\projects\mvc\test\cms\src\main\java\com\cms\kingdom\config\ApplicationConfig.java
-C:\wamp\www\projects\mvc\test\cms\src\main\java\com\cms\kingdom\controller\IndexController.java
-C:\wamp\www\projects\mvc\test\cms\src\main\java\com\cms\kingdom\lib\db\AbstractDAO.java
-C:\wamp\www\projects\mvc\test\cms\src\main\java\com\cms\kingdom\lib\util\SystemConstants.java
-C:\wamp\www\projects\mvc\test\cms\src\main\java\com\cms\kingdom\lib\db\KingdomDAO.java
+C:\wamp\www\projects\mvc\kingdom\cms\src\main\java\com\cms\kingdom\controller\IndexController.java
+C:\wamp\www\projects\mvc\kingdom\cms\src\main\java\com\cms\kingdom\lib\db\AbstractDAO.java
+C:\wamp\www\projects\mvc\kingdom\cms\src\main\java\com\cms\kingdom\model\Node.java
+C:\wamp\www\projects\mvc\kingdom\cms\src\main\java\com\cms\kingdom\config\ApplicationConfig.java
+C:\wamp\www\projects\mvc\kingdom\cms\src\main\java\com\cms\kingdom\lib\db\KingdomDAO.java
+C:\wamp\www\projects\mvc\kingdom\cms\src\main\java\com\cms\kingdom\lib\util\SystemConstants.java
+C:\wamp\www\projects\mvc\kingdom\cms\src\main\java\com\cms\kingdom\test\UnitTest.java

@@ -41,6 +41,10 @@ class Kernel_Router {
 		return $ExceptionRoutes;
 	}
 
+	protected function throwRouteNotFoundException($route) {
+		echo 'No route is found for the specified path: ' . $route;
+	}
+
 	public function addRoute($name, Kernel_Core_Route $route) {
 		$this->_routes[$name] = $route;
 	}
@@ -75,6 +79,9 @@ class Kernel_Router {
 
 		if(!isset($useRoute)) {
 			$useRoute = $this->setExceptionRoute();
+			if(empty($useRoute)) {
+				$this->throwRouteNotFoundException($path);
+			}
 		}
 
 		$request->setRouteInfo($useRoute);
