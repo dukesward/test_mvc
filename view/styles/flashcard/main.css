@@ -101,6 +101,10 @@ ul {
 	font-size: 14px;
 }
 
+.handlers {
+	height: 30px;
+}
+
 .handlers li {
 	float: left;
 	padding: 5px 10px;
@@ -108,4 +112,27 @@ ul {
 	border-radius: 3px;
 	cursor: pointer;
 	margin-right: 15px;
+}
+
+.create-words {
+	margin-left: 40px;
+	width: 300px;
+    background: #e3e3e3;
+    padding: 10px;
+    border-radius: 5px;
+    min-height: 220px;
+}
+
+.create-input {
+	width: 100%;
+	margin-bottom: 6px;
+	margin-top: 2px;
+}
+
+.send {
+	float: right;
+	padding: 5px 10px;
+	background-color: #fff;
+	border-radius: 3px;
+	cursor: pointer;
 }

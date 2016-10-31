@@ -12,6 +12,7 @@ class Kernel_Db_Statement_Mysqli {
 		'SQL_SELECT_ALL' => Kernel_Constants::DB_SQL_SELECT_ALL,
 		'SQL_REPLACE'    => Kernel_Constants::DB_SQL_REPLACE,
 		'SQL_UPDATE'     => Kernel_Constants::DB_SQL_UPDATE,
+		'SQL_INSERT'     => Kernel_Constants::DB_SQL_INSERT,
 		'SQL_FROM'       => Kernel_Constants::DB_SQL_FROM,
 		'SQL_SET'        => Kernel_Constants::DB_SQL_SET,
 		'SQL_WHERE'      => Kernel_Constants::DB_SQL_WHERE,
@@ -51,6 +52,12 @@ class Kernel_Db_Statement_Mysqli {
 		$this->set()
 			->where();
 
+		return $this;
+	}
+
+	protected function insert() {
+		$this->_stmt['type'] = $this->_sqlConsts['SQL_INSERT'];
+		$this->set();
 		return $this;
 	}
 
@@ -126,7 +133,7 @@ class Kernel_Db_Statement_Mysqli {
 		};
 
 		$query = Kernel_Utils::_concat($this->_stmt, $this->_sqlConsts['SQL_TOKENS'], $this->_sqlConsts['SQL_DELIMITER'], 'each');
-		//var_dump($query);
+		//if($this->_stmt['type'] === 'INSERT INTO') var_dump($query);
 		$this->_query = $query;
 	}
 

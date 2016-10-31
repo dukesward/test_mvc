@@ -4,6 +4,8 @@ import com.cms.kingdom.model.Node;
 import com.cms.kingdom.lib.util.SystemConstants;
 import com.cms.kingdom.lib.db.KingdomDAO;
 import com.cms.kingdom.test.UnitTest;
+import com.utils.general.DateUtils;
+import com.utils.general.StringUtils;
 
 import org.hibernate.Session;
 import org.springframework.ui.ModelMap;
@@ -57,9 +59,22 @@ public class IndexController {
 		return VIEW_INDEX;
 	}
 
-	@RequestMapping("/test/{test_name}")
-	public String test(@PathVariable String test_name, ModelMap model) {
-		model.addAttribute("name", test_name);
+	@RequestMapping(value = "/test/{pkg}/{name}")
+	public String test(@PathVariable String pkg, @PathVariable String name, ModelMap model) {
+		System.out.println(name);
+		String testName = StringUtils.buildClassName(pkg, name);
+		model.addAttribute("name", testName);
+		model.addAttribute("date", DateUtils.getTimeStamp());
+
+		try {
+			UnitTest.prepareTesting(pkg, name);
+			model.addAttribute("code", UnitTest.getTestCode());
+		}catch (ClassNotFoundException cnfe) {
+			System.out.println("exception");
+			model.addAttribute("exception_test", true);
+			model.addAttribute("exception", "cannot find specified class: " + testName);
+		}
+
 		return VIEW_TEST;
 	}
 }

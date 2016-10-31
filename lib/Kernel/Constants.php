@@ -23,6 +23,7 @@ class Kernel_Constants {
 	const DB_SQL_SELECT_ALL                  = "*";
 	const DB_SQL_REPLACE                     = "REPLACE INTO";
 	const DB_SQL_UPDATE                      = "UPDATE";
+	const DB_SQL_INSERT                      = "INSERT INTO";
 	const DB_SQL_VALUE                       = "VALUE";
 	const DB_SQL_WHERE                       = "WHERE";
 	const DB_SQL_SET                         = "SET";

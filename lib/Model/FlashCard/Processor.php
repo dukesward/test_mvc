@@ -46,6 +46,21 @@ class Model_FlashCard_Processor extends Model_CoreProcessor {
 			}
 
 			$adapter->getDbConfigTable($card_details, null, 'UPDATE');
+		}else {
+			$card_details = array(
+				'table' => Kernel_Constants::MODEL_CARD_DETAILS,
+				'prime' => $prime,
+				'query' => array()
+			);
+
+			foreach ($card as $key => $value) {
+				if($key !== $prime) {
+					$card_details['query']['set'][$key] = $value;
+				}
+			}
+			$card_details['query']['set']['pub_date'] = date('Y-m-d H:i:s');
+
+			$adapter->getDbConfigTable($card_details, null, 'INSERT');
 		}
 
 		return $data;

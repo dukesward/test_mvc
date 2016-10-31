@@ -50,6 +50,17 @@
 					<t>Add</t>
 				</node>
 			</node>
+			<node type='div' _class='create-words'>
+				<node type='span' ><t>Word</t></node>
+				<node type='input' _type='text' _class='create-input' _name='word'></node>
+				<node type='span' ><t>Meaning</t></node>
+				<node type='input' _type='text' _class='create-input' _name='meaning'></node>
+				<node type='span' ><t>Base</t></node>
+				<node type='input' _type='text' _class='create-input' _name='base'></node>
+				<node type='span' ><t>Type</t></node>
+				<node type='input' _type='text' _class='create-input' _name='type'></node>
+				<node type='span' _util='send' _class='send'><t>Send</t></node>
+			</node>
 		</node>
 	</node>
 	<static type='script' name='global'></static>

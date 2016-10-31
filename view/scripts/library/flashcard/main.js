@@ -11,7 +11,8 @@ if(typeof jQuery === 'function' && FlashCard) {
 			var $container = $('.card-container'),
 				$wordContainer = $('.word-container.word', $container),
 				$handlers = $('.handlers', $container),
-				$tabs = $('ul li', $('.tab-container'));
+				$tabs = $('ul li', $('.tab-container')),
+				$createWords = $('.create-words');
 				
 			if(Common_Utils.isArray(data) && data.length > 0) {
 				//refresh word container on click
@@ -42,11 +43,23 @@ if(typeof jQuery === 'function' && FlashCard) {
 					}, currentWord);
 				});
 
-				/*$("li[util='update']").on('click', function() {
+				$(".send", $createWords).on('click', function() {
+					var dataPool = {};
+					$('.create-input', $createWords).each(function(i, el) {
+						var $input = $(el),
+							id = $input.attr('name');
+
+						dataPool[id] = $input.val();
+						//console.log($input.val());
+					});
+
+					dataPool['stars'] = 1;
+					dataPool['points'] = 0;
+
 					flashCard._service.update(function(data) {
 
-					}, currentWord);
-				});*/
+					}, dataPool);
+				});
 
 				appendWord(data, $container);
 				$wordContainer.css('display', 'table');
