@@ -3,6 +3,8 @@
 class Kernel_Constants {
 
 	const UTIL_STRING_WRAPPER                = "'";
+	
+	const HTML_5_DOCTYPE                     = '<!DOCTYPE html>';
 
 	const KERNEL_ROUTE_CONTROLLER            = "Controller";
 	const KERNEL_ROUTE_CONTROLLER_NAMESPACE  = "Controller_";
@@ -43,6 +45,15 @@ class Kernel_Constants {
 	const MODEL_NODE_ROUTE_PRIME             = "pattern";
 	const MODEL_NODE_DETAILS_PRIME           = "nid";
 
+	const MODEL_COMMON                       = "common_node_config";
+	const MODEL_COMMON_PRIME                 = "config";
+
 	const MODEL_CARD_DETAILS                 = "words_general";
 	const MODEL_CARD_DETAILS_PRIME           = "id";
+
+	const MODEL_MALL_DB                      = "mall";
+	const MODEL_MALL_GENERAL                 = "general";
+	const MODEL_MALL_GENERAL_PRIME           = "name";
+	const MODEL_MALL_DATA                    = "mall_data";
+	const MODEL_MALL_DATA_PRIME              = "name";
 }

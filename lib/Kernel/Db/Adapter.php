@@ -63,12 +63,14 @@ class Kernel_Db_Adapter {
 
 	public function getDbConfigTable($configs = null, $db = null, $type = 'SELECT') {
 		$stmt = $this->_db->prepare($db, null, $type);
+		$debug = false;
 
 		if($configs) {
 			$stmt->resolveTableConfigs($configs);
+			if(isset($configs['debug'])) $debug = true;
 		}
 
-		$stmt = $stmt->execute($this->_db->getConnection());
+		$stmt = $stmt->execute($this->_db->getConnection(), $debug);
 
 		return $stmt;
 	}

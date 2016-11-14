@@ -1,6 +1,15 @@
-<files name='global'>
-	<file>library\jquery\jquery-min</file>
-	<file>library\common\utils</file>
-	<file>library\flashcard\FlashService</file>
-	<file>library\flashcard\main</file>
-</files>
+<config>
+	<files name='global'>
+		<file>library\jquery\jquery-min</file>
+		<file>library\common\utils</file>
+		<file>library\flashcard\FlashService</file>
+		<file>library\flashcard\main</file>
+	</files>
+
+	<files name='chart'>
+		<file>library\jquery\jquery-min</file>
+		<file>library\chart\ChartUtils</file>
+		<file>library\chart\DataUtils</file>
+		<file>library\chart\init</file>
+	</files>
+</config>

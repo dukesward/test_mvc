@@ -1,0 +1,15 @@
+body {
+	background-color: #444;
+	font-family: "Raleway";
+}
+
+#chart_test {
+	margin: 25px;
+	width: 800px;
+	height: 300px;
+}
+
+.canvas_custom {
+	border-left: solid 2px #000;
+	border-bottom: solid 2px #000;
+}

@@ -12,7 +12,7 @@ class Util_ConfigFile {
 		}
 	}
 
-	protected function _parseAttributes($attr) {
+	public function _parseAttributes($attr) {
 		$flag = 'off';
 		$location = 0;
 		$record = '';
@@ -79,7 +79,7 @@ class Util_ConfigFile {
 			$this->_data['variable'] = array();
 		}
 
-		$this->_data['variable'][$key] = $this->_parseAttributes($value);
+		$this->_data['variable'][$key] = $value;
 	}
 
 	public function setTemplateAttribute($tokens, $val = null) {
@@ -119,6 +119,12 @@ class Util_ConfigFile {
 		}
 	}
 
+	public function fetchConfigProp($config) {
+		$common = Controller_Administrator::getModel('commonProcessor');
+		$value = $common->getConfig($config);
+		return $value;
+	}
+
 	public function setAttributes($content) {
 		//var_dump($content);
 		//parse the content according to annotations
@@ -144,12 +150,16 @@ class Util_ConfigFile {
 		return Kernel_Utils::_getArrayElement($this->_data, 'variable->' . $variable);
 	}
 
-	public function getContentAttribute($attr = null) {
+	public function getContentAttribute($attr = null, $var = null) {
 		if(null === $attr) {
 			$value = $this->_content;
 		}else {
 			$attr = explode(':', $attr);
 			$value = Kernel_Utils::_getArrayElement($this->_content, implode('->', $attr));
+		}
+
+		if($var && isset($value[$var])) {
+			$value = $value[$var];
 		}
 
 		return $value;

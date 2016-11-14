@@ -49,13 +49,6 @@ public class IndexController {
 			System.err.println("Failed reading file: " + ioe);
 		}*/
 
-		Session session = kdao.prepareSession();
-		session.beginTransaction();
-		node = (Node)session.get(Node.class, 1);
-
-		model.addAttribute("node", node.toString());
-		kdao.shutDown();
-
 		return VIEW_INDEX;
 	}
 
@@ -76,5 +69,11 @@ public class IndexController {
 		}
 
 		return VIEW_TEST;
+	}
+	
+	@RequestMapping(value = "/search/{content}")
+	public String search(@PathVariable String content, ModelMap model) {
+		String result = searchController.handleRequests(content, request);
+		return result;
 	}
 }

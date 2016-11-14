@@ -89,6 +89,26 @@ class Kernel_Utils {
 		return $el;
 	}
 
+	public static function _isStringInArray($arr, $str) {
+		$inArr = false;
+		if(is_array($arr) && is_string($str)) {
+			for($i=0; $i<sizeof($arr); $i++) {
+				if($str === $arr[$i]) {
+					$inArr = true;
+					break;
+				}
+			}
+		}
+		return $inArr;
+	}
+
+	public static function _isHtmlSingleTag($tag) {
+		$single_types = array(
+			'link', 'img',
+		);
+		return self::_isStringInArray($single_types, $tag);
+	}
+
 	public static function _match($str, $match) {
 		$result = false;
 
@@ -109,6 +129,16 @@ class Kernel_Utils {
 			if($el === $e) $result = true;
 		}
 		return $result;
+	}
+
+	public static function _expandArray($num, $proto = null) {
+		$expanded = array();
+		if(is_array($proto)) {
+			for($i=0; $i<$num; $i++) {
+				$expanded = array_merge($expanded, $proto);
+			}
+		}
+		return $expanded;
 	}
 
 	public static function _processUrl($url, $type) {

@@ -8,6 +8,7 @@ class Controller_Administrator {
 		$models['routeProcessor'] = Model_Utils_RouteProcessor::getInstance();
 		$models['nodeProcessor'] = Model_Configs_NodeProcessor::getInstance();
 		$models['flashCardProcessor'] = Model_FlashCard_Processor::getInstance();
+		$models['commonProcessor'] = Model_Utils_CommonProcessor::getInstance();
 		self::$_models = $models;
 	}
 

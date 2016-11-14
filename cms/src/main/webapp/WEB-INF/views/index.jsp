@@ -25,6 +25,9 @@
 				<div id="signin" class="nav-icon"><i class="fa fa-user" aria-hidden="true"></i></div>
 				<div id="logo"><span>Kingdo</span><span style="margin-left:-5px;">M</span></div>
 			</div>
+			<div id="searchbox">
+				<input id="search-window search" style="display:none"><span id="search-go">go</span>
+			</div>
 		</div>
 		<div id="col2">
 			<div class="nav"></div>

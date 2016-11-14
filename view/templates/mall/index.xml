@@ -1,0 +1,13 @@
+<inherit template='mall\root' ext='xml'>
+	<node type='div' override='content' _class='plates'>
+		<common name='num_of_plate' value='num_of_plate'></common>
+		<node type='div' _class='test'>
+			<for iterator='[*num_of_plate]' index='i'>
+				<node type='test' _class='test_[*i]'>
+					<t>[*num_of_plate]</t>
+				</node>
+			</for>
+		</node>
+	</node>
+	<static type='script' name='chart'></static>
+</inherit>

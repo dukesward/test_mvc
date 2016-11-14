@@ -161,7 +161,7 @@ class Kernel_Db_Statement_Mysqli {
 		}
 	}
 
-	public function execute($connection, $cols = null) {
+	public function execute($connection, $debug = false) {
 		$fields = array();
 		$_fields = &$fields;
 		$table = new Kernel_Db_Table($this->_class, $_fields);
@@ -174,6 +174,7 @@ class Kernel_Db_Statement_Mysqli {
 			$this->assemble();
 		}
 		//var_dump($this->_query);
+		if($debug) var_dump($this->_query);
 		$stmt = $connection->prepare($this->_query);
 
 		try {

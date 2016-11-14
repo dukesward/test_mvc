@@ -4,6 +4,8 @@ class Model_CoreProcessor {
 
 	protected static $_instance;
 	protected static $_className = 'Model_CoreProcessor';
+	protected static $_db;
+	protected static $_prime;
 	protected $_default;
 	protected $_table;
 
