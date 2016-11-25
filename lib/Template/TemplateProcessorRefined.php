@@ -13,24 +13,26 @@ class Template_TemplateProcessorRefined {
 	}
 
 	public function setRoot($root, $child = null) {
-		$temp = $root;
-		$tempNode = $this->_processNodeElement($temp);
-		//var_dump($tempNode);
-		if($tempNode->getNodeTag() === 'INHERIT') {
-			$template = $tempNode->getNodeAttr('TEMPLATE');
-			$ext = $tempNode->getNodeAttr('EXT');
+		if($root) {
+			$temp = $root;
+			$tempNode = $this->_processNodeElement($temp);
+			if($tempNode->getNodeTag() === 'INHERIT') {
+				$template = $tempNode->getNodeAttr('TEMPLATE');
+				$ext = $tempNode->getNodeAttr('EXT');
 
-			$root = $this->_compiler->loadTemplateConfig($template, $ext);
-			//var_dump($root);
-			if($child) {
-				$temp->setChild($child);
-			}
-			$this->setRoot($root, $tempNode);
-		}else {
-			$rootNode = $tempNode;
-			$this->_root = $rootNode;
-			if($child) {
-				$this->_root->setChild($child);
+				$root = $this->_compiler->loadTemplateConfig($template, $ext);
+				//var_dump($tempNode);
+				if($child) {
+					//var_dump($temp);
+					$temp->setChild($child);
+				}
+				$this->setRoot($root, $tempNode);
+			}else {
+				$rootNode = $tempNode;
+				$this->_root = $rootNode;
+				if($child) {
+					$this->_root->setChild($child);
+				}
 			}
 		}
 	}

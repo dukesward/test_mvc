@@ -4,6 +4,7 @@ class Model_CoreProcessor {
 
 	protected static $_instance;
 	protected static $_className = 'Model_CoreProcessor';
+	protected static $_db_name;
 	protected static $_db;
 	protected static $_prime;
 	protected $_default;
@@ -23,6 +24,20 @@ class Model_CoreProcessor {
 		);
 		$config = $this->_table->fetchData($query);
 
+		return $config;
+	}
+
+	public function getTableCount($db_name, $db) {
+		$query = array(
+			'table' => $db,
+			'query' => array(
+				"as" => "counts"
+			),
+			"debug" => "1"
+		);
+
+		$this->_table = Kernel_Db_Adapter::getDbAdapter($db_name)->getDbConfigCount($query);
+		$config = $this->_table->fetchData();
 		return $config;
 	}
 }

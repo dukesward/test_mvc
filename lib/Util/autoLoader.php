@@ -41,7 +41,7 @@ class Util_AutoLoader {
 		}else {
 			$path = __DIR__ . ROOT_PATH;
 			$ext = '.' . $ext;
-
+			//var_dump($path . $file . $ext);
 			if(file_exists($path . $file . $ext)) {
 				$contents = file_get_contents($path . $file . $ext);
 			}

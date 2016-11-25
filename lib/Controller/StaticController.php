@@ -9,6 +9,7 @@ class Controller_StaticController extends Controller_BaseController {
 
 	protected $_loader;
 	protected $base_static = Kernel_Constants::KERNEL_ROUTES_VIEW_ROOT;
+	protected $base_image = Kernel_Constants::KERNEL_ROUTES_IMAGE_ROOT;
 	protected $base_cache = Kernel_Constants::CACHE_CACHE_BASE;
 
 	public function __construct(Kernel_Request $request, Kernel_Response $response) {
@@ -61,6 +62,35 @@ class Controller_StaticController extends Controller_BaseController {
 		$this->_response->setHeader(self::CONTENT, 'text/javascript');
 		$content = $this->_loader->getFileContent($base, self::SCRIPT_EXT);
 
+		return $content;
+	}
+
+	public function imageAction() {
+		$params = $this->_request->getParams();
+		$ext = 'jpeg';
+		$ext_file = '';
+
+		$base = $this->base_image;
+		foreach ($params as $i => $param) {
+			if($i === sizeof($params) - 1) {
+				$tokens = explode('.', $param);
+				if(sizeof($tokens) > 1) {
+					$index = sizeof($tokens) - 1;
+					if($tokens[$index] !== $ext && $tokens[$index] !== 'jpg') {
+						$ext = $tokens[$index];
+					}
+					$ext_file = $tokens[$index];
+					$base .= self::FILE_SPLITTER;
+					$base .= array_shift($tokens);
+				}
+			}else {
+				$base .= self::FILE_SPLITTER;
+				$base .= $param;
+			}
+		}
+
+		$content = $this->_loader->getFileContent($base, $ext_file);
+		$this->_response->setHeader(self::CONTENT, 'image/' . $ext);
 		return $content;
 	}
 }

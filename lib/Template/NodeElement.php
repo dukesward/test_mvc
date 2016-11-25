@@ -9,6 +9,8 @@ class Template_NodeElement {
 	protected $_attributes;
 	protected $_parent;
 	protected $_children = array();
+	protected $_static = array();
+	protected $_cache;
 
 	public function __construct($node, Template_Config $config) {
 		$this->_config = $config;
@@ -34,6 +36,7 @@ class Template_NodeElement {
 		}
 		//if($this->_tag === 'COMMON') var_dump($this->_attributes);
 		$this->_processSpecialTagFunctions();
+		$this->_cache = Util_FileCache::getInstance();
 	}
 
 	public function isA($tag, $nodeType = null) {
@@ -47,7 +50,21 @@ class Template_NodeElement {
 	}
 
 	public function setChild(Template_NodeElement $node) {
-		array_push($this->_children, $node);
+		switch (strtolower($this->_tag)) {
+			case 'for':
+				$iterator = (int)$this->getNodeAttr('ITERATOR');
+				$index = $this->getNodeAttr('INDEX');
+				for($i=0; $i<$iterator; $i++) {
+					$n = clone $node;
+					$n->setNodeAttr($index, $i);
+					//var_dump($n);
+					array_push($this->_children, $n);
+				}
+				break;
+			default:
+				array_push($this->_children, $node);
+				break;
+		}
 		$node->setParent($this);
 	}
 
@@ -111,9 +128,6 @@ class Template_NodeElement {
 	}
 
 	public function renderNode() {
-		if($this->getNodeAttr('TYPE') === 'test') {
-			var_dump($this->_attributes);
-		}
 		foreach ($this->_attributes as $attr => $val) {
 			//var_dump($attr[0]);
 			if($attr[0] === '_') {
@@ -128,19 +142,12 @@ class Template_NodeElement {
 
 		switch (strtolower($this->_tag)) {
 			case 'for':
-				$iterator = (int)$this->getNodeAttr('ITERATOR');
-				$index = $this->getNodeAttr('INDEX');
-
-				for($i=0; $i<$iterator; $i++) {
-					$this->setStoredVariable($index, $i);
-					foreach ($this->_children as $child) {
-						if($this->_parent) {
-							$child->setParent($this->_parent);
-						}
-						$children .= $child->renderNode();
-					}
-					$content .= $children;
+				//var_dump($this->_children);
+				foreach ($this->_children as $i => $child) {
+					//var_dump($child);
+					$children .= $child->renderNode();
 				}
+				$content = $children;
 				break;
 			case 'node':
 				$tag = $this->getNodeAttr('TYPE');
@@ -167,8 +174,9 @@ class Template_NodeElement {
 				));
 
 				if(null === $file || null !== Kernel_Utils::_getArrayElement($query, 'fc')) {
-					$this->_getStaticFileConfig($type);
-					$files = Kernel_Utils::_getArrayElement($this->_static, $type . '->' . $name);
+					$this->_getStaticFileConfig($tag);
+					$files = Kernel_Utils::_getArrayElement($this->_static, $tag . '->' . $name);
+					//var_dump($this->_static);
 					$this->_cache->createFileCache(Kernel_Constants::KERNEL_ROUTES_SCRIPT_ROOT, $files, 'static:'.$name, $ext);
 				}
 
@@ -208,7 +216,7 @@ class Template_NodeElement {
 
 	public function replaceData($data) {
 		$replaced = $this->trackNodeAttr($data);
-		if(!$replaced) {
+		if(null === $replaced) {
 			$dataObj = $this->_config->header->getDataObject();
 			if(isset($dataObj[$data])) {
 				$d = $dataObj[$data];
@@ -217,7 +225,7 @@ class Template_NodeElement {
 				$replaced = Kernel_Utils::_getArrayElement($dataObj, 'variable->' . $data);
 			}
 		}
-		if(!$replaced) $replaced = $data;
+		if(null === $replaced) $replaced = $data;
 		return $replaced;
 	}
 
@@ -271,13 +279,11 @@ class Template_NodeElement {
 	}
 
 	protected function _getStaticFileConfig($type = null) {
-		$static = array();
-		if(null !== $type) {
-			$static[$type] = array();
-		}else {
+		$loader = Util_AutoLoader::getInstance();
+		if($type === 'script') {
 			$script = Kernel_Constants::KERNEL_ROUTES_CONFIG_ROOT . 'static\\scripts';
-			$scriptConfig = $this->_parseXmlContent($this->_loader->getFileContent($script, 'xml'));
-			$static['script'] = $this->_getValueFromParsedXML($scriptConfig, Kernel_Constants::KERNEL_ROUTES_SCRIPT_ROOT);
+			$scriptConfig = Kernel_Utils::_parseXmlContent($loader->getFileContent($script, 'xml'));
+			$this->_static['script'] = Kernel_Utils::_getValueFromParsedXML($scriptConfig, Kernel_Constants::KERNEL_ROUTES_SCRIPT_ROOT);
 		}
 	}
 

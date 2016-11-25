@@ -49,4 +49,19 @@ class Model_Utils_RouteProcessor extends Model_CoreProcessor {
 		return $config;
 	}
 
+	public function getRouteCount() {
+		$query = array(
+			'table' => self::$_db,
+			'query' => array(
+				"as" => "counts"
+			),
+			"debug" => "1"
+		);
+
+		$this->_table = Kernel_Db_Adapter::getDbAdapter(self::$_db_name)->getDbConfigCount($query);
+		$config = $this->_table->fetchData();
+		//var_dump($this->_table);
+		return $config;
+	}
+
 }

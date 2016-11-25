@@ -27,7 +27,7 @@ class Model_Utils_CommonProcessor extends Model_CoreProcessor {
 			//'debug' => true
 		);
 		//$this->_default = Kernel_Constants::MODEL_ROUTES_DEFAULT;
-		$this->_table = Kernel_Db_Adapter::getDbAdapter(self::$_db_name)->getDbConfigTable($this->_configs);
+		$this->_table = Kernel_Db_Adapter::getDbAdapter(null, self::$_db_name)->getDbConfigTable($this->_configs);
 		$value = $this->_table->fetchData();
 		return Kernel_Utils::_getArrayElement($value, '0->value');
 	}

@@ -10,6 +10,7 @@ class Kernel_Db_Statement_Mysqli {
 		'STRING_WRAPPER' => Kernel_Constants::UTIL_STRING_WRAPPER,
 		'SQL_SELECT'     => Kernel_Constants::DB_SQL_SELECT,
 		'SQL_SELECT_ALL' => Kernel_Constants::DB_SQL_SELECT_ALL,
+		'SQL_AS'         => Kernel_Constants::DB_SQL_AS,
 		'SQL_REPLACE'    => Kernel_Constants::DB_SQL_REPLACE,
 		'SQL_UPDATE'     => Kernel_Constants::DB_SQL_UPDATE,
 		'SQL_INSERT'     => Kernel_Constants::DB_SQL_INSERT,
@@ -18,7 +19,7 @@ class Kernel_Db_Statement_Mysqli {
 		'SQL_WHERE'      => Kernel_Constants::DB_SQL_WHERE,
 		'SQL_DELIMITER'  => Kernel_Constants::DB_SQL_DELIMITER,
 		'SQL_WRAPPER'    => Kernel_Constants::DB_SQL_WRAPPER,
-		'SQL_TOKENS'     => array('type', 'select', 'sql_from', 'from', 'sql_set', 'set', 'sql_where', 'where'),
+		'SQL_TOKENS'     => array('type', 'select', 'sql_as', 'as', 'sql_from', 'from', 'sql_set', 'set', 'sql_where', 'where'),
 	);
 
 	protected function fetchAll() {
@@ -28,16 +29,18 @@ class Kernel_Db_Statement_Mysqli {
 
 	protected function prepareSelect($select) {
 		if(!is_array($select)) {
-			$this->_stmt['select'] = $sql;
+			$this->_stmt['select'] = $select;
 		}
 
 		return $this;
 	}
 
 	protected function select($sql = null) {
-		$preparedSql = $sql;
-		if(!$preparedSql) {
+		//$preparedSql = $sql;
+		if(!$sql) {
 			$preparedSql = $this->fetchAll();
+		}else {
+			$preparedSql = $sql[0];
 		}
 
 		$select = $this->prepareSelect($preparedSql)
@@ -67,7 +70,12 @@ class Kernel_Db_Statement_Mysqli {
 
 		if(method_exists($this, $type)) {
 			$this->_stmt['type'] = $type;
-			call_user_func(array($this, $type));
+			if($sql) {
+				call_user_func(array($this, $type), array($sql));
+			}else {
+				call_user_func(array($this, $type));
+			}
+			
 		}else {
 
 		}
@@ -107,10 +115,34 @@ class Kernel_Db_Statement_Mysqli {
 			//var_dump($condition);
 			$key = Kernel_Utils::_wrapStr($condition['key'], $this->_sqlConsts['SQL_WRAPPER']);
 			$value = Kernel_Utils::_wrapStr($condition['value'], $this->_sqlConsts['STRING_WRAPPER']);
+			
 			$this->_stmt['where'] = $key . ' = ' . $value;
 		}
 
 		return $this;
+	}
+
+	public function whereN($condition = null) {
+		if($condition) {
+			//var_dump($condition);
+			foreach ($condition as $k => $v) {
+				$key = Kernel_Utils::_wrapStr($k, $this->_sqlConsts['SQL_WRAPPER']);
+				$value = Kernel_Utils::_wrapStr($v, $this->_sqlConsts['STRING_WRAPPER']);
+				if(isset($this->_stmt['where'])) {
+					$this->_stmt['where'] .= ' && ' . $key . ' = ' . $value;
+				}else {
+					$this->_stmt['where'] = $key . ' = ' . $value;
+				}
+			}
+
+		}
+		return $this;
+	}
+
+	public function asVar($var = null) {
+		if($var) {
+			$this->_stmt['as'] = $var;
+		}
 	}
 
 	public function accordingTo($condition = null) {
@@ -124,6 +156,10 @@ class Kernel_Db_Statement_Mysqli {
 			}
 		};
 
+		if(isset($this->_stmt['as'])) {
+			$this->_stmt['sql_as'] = $this->_sqlConsts['SQL_AS'];
+		}
+
 		if(isset($this->_stmt['set'])) {
 			$this->_stmt['sql_set'] = $this->_sqlConsts['SQL_SET'];
 		}
@@ -131,7 +167,7 @@ class Kernel_Db_Statement_Mysqli {
 		if(isset($this->_stmt['where'])) {
 			$this->_stmt['sql_where'] = $this->_sqlConsts['SQL_WHERE'];
 		};
-
+		//var_dump($this->_stmt);
 		$query = Kernel_Utils::_concat($this->_stmt, $this->_sqlConsts['SQL_TOKENS'], $this->_sqlConsts['SQL_DELIMITER'], 'each');
 		//if($this->_stmt['type'] === 'INSERT INTO') var_dump($query);
 		$this->_query = $query;
@@ -150,8 +186,14 @@ class Kernel_Db_Statement_Mysqli {
 						case 'where':
 							$this->where($config);
 							break;
+						case 'where_n':
+							$this->whereN($config);
+							break;
 						case 'set':
 							$this->set($config);
+							break;
+						case 'as':
+							$this->asVar($config);
 							break;
 					}
 				}

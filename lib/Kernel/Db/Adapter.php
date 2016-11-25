@@ -61,8 +61,8 @@ class Kernel_Db_Adapter {
 		return self::$_instance;
 	}
 
-	public function getDbConfigTable($configs = null, $db = null, $type = 'SELECT') {
-		$stmt = $this->_db->prepare($db, null, $type);
+	public function getDbConfigTable($configs = null, $db = null, $type = 'SELECT', $sql = null) {
+		$stmt = $this->_db->prepare($db, $sql, $type);
 		$debug = false;
 
 		if($configs) {
@@ -71,7 +71,13 @@ class Kernel_Db_Adapter {
 		}
 
 		$stmt = $stmt->execute($this->_db->getConnection(), $debug);
-
+		//var_dump($stmt);
 		return $stmt;
+	}
+
+	public function getDbConfigCount($configs = null, $db = null) {
+		$type = Kernel_Constants::DB_SQL_SELECT;
+		$sql = Kernel_Constants::DB_SQL_COUNT;
+		return $this->getDbConfigTable($configs, $db, $type, $sql);
 	}
 }

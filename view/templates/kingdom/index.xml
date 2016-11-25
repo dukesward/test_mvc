@@ -1,0 +1,11 @@
+<inherit template='kingdom\base' ext='xml'>
+	<node type='div' override='content' _id='kingdom_left_field'>
+	</node>
+	<node type='div' override='content' _id='kingdom_middle_field'>
+		<node type='div' _class='refresh'>
+			<node type='i' _class='fa fa-refresh'></node>
+		</node>
+		<node type='div' _class='event_board'></node>
+	</node>
+	<static type='script' name='kingdom'></static>
+</inherit>

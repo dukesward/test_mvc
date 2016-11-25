@@ -1,0 +1,11 @@
+<root>
+	<node type='head'>
+		<node type='meta' _http-equiv='Content-type' _content='text/html' _charset='utf-8'></node>
+		<node type='link' _rel='stylesheet' _href='staticcontent/styles/kingdom/main'></node>
+		<node type='link' _href='https://fonts.googleapis.com/css?family=Raleway' _rel='stylesheet' _type='text/css'></node>
+		<node type='link' _href="https://fonts.googleapis.com/css?family=Acme" _rel="stylesheet" _type='text/css'></node>
+		<node type='link' _href='http://fontawesome.io/assets/font-awesome/css/font-awesome.css' _rel='stylesheet' _type='text/css'></node>
+	</node>
+	<var name='templateId' value='template_[*root]_[*template]'></var>
+	<node type='body' block='content' _id='template_[*root]_[*template]'></node>
+</root>
