@@ -303,21 +303,26 @@ class Kernel_Utils {
 		return $_url;
 	}
 
-	public static function _query($arr, $key, $value, $name) {
+	public static function _query($arr, $key, $value, $name = null) {
 		$val = null;
 		foreach($arr as $a) {
 			if(self::_getArrayElement($a, $key) === $value) {
-				$val = self::_getArrayElement($a, $name);
+				if($name) {
+					$val = self::_getArrayElement($a, $name);
+				}else {
+					$val = $a;
+				}
+				
 			}
 		}
 		return $val;
 	}
 
-	public static function _queryAll($arr, $key, $process) {
+	public static function _filter($arr, $key, $obj, $process) {
 		$val = array();
 		foreach($arr as $a) {
 			$value = self::_getArrayElement($a, $key);
-			if(call_user_func($process, $value)) {
+			if(call_user_func($process, $value, $obj)) {
 				//$val = self::_getArrayElement($a, $name);
 				array_push($val, $a);
 			}

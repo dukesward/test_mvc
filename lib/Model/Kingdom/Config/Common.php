@@ -54,12 +54,63 @@ class Model_Kingdom_Config_Common {
 		return $this->_player->getCustomConfig($query);
 	}
 
+	public function getPlayerItems($name) {
+		$query = array(
+			'table' => 'player_items',
+			'query' => array(
+				'where' => array(
+					'key' => 'player_name',
+					'value' => $name
+				)
+			)
+		);
+		return $this->_player->getCustomConfig($query);
+	}
+
 	public function getWorldConfig() {
 		return $this->_player->fetchAll('world_settings');
 	}
 
 	public function getPlayerEvents() {
-		return $this->_player->fetchAll('player_events');
+		$query = array(
+			'table' => 'player_events',
+			'query' => array(
+				"where_n" => array(
+					"is_active" => 'T',
+				)
+			),
+			//"debug" => "1"
+		);
+		return $this->_player->getCustomConfig($query);
+	}
+
+	public function getLocation($name) {
+		$query = array(
+			'table' => 'kingdom_locations',
+			'query' => array(
+				'where' => array(
+					'key' => 'brief',
+					'value' => $name
+				)
+			),
+			//"debug" => true
+		);
+		$locations = $this->_player->getCustomConfig($query);
+		return $locations[0];
+	}
+
+	public function getItemById($id) {
+		$query = array(
+			'table' => 'items',
+			'query' => array(
+				'where' => array(
+					'key' => 'id',
+					'value' => $id
+				)
+			)
+		);
+		$items = $this->_player->getCustomConfig($query);
+		return $items[0];
 	}
 
 	public function getAvailableLocation() {
@@ -172,6 +223,8 @@ class Model_Kingdom_Config_Common {
 		$this->_player->insertData('kingdom_players', $player['player']);
 		$this->_player->insertData('player_attributes', $player['attributes']);
 		$this->_player->insertData('player_equips', $player['equipments']);
+		$this->_player->insertData('player_items', $player['items']);
+		$this->_player->insertData('player_weights', $player['weights']);
 	}
 
 	public function simpleUpdate($table, $data, $prime) {

@@ -21,6 +21,10 @@ class Model_Kingdom_Object_Player implements JsonSerializable {
 
 	protected $_equip_config = array();
 	protected $_equips = array();
+
+	protected $_items = array();
+	protected $_max_items;
+
 	protected $_ability_config = array();
 	protected $_abilities = array();
 	protected $_level;
@@ -42,7 +46,7 @@ class Model_Kingdom_Object_Player implements JsonSerializable {
 			$name = Kernel_Utils::_createRandomEnChar();
 		} while ($this->_db->getPlayerCount($name) > 0);
 
-		//$this->_name = $name;
+		$this->_name = $name;
 		$this->_name = 'test';
 		$this->_gender = Kernel_Utils::_decide() ? 'M' : 'F';
 		$this->_generatePlayerBaseAttrWt();
@@ -86,7 +90,22 @@ class Model_Kingdom_Object_Player implements JsonSerializable {
 		$equips = $this->_db->getPlayerEquips($this->_name)[0];
 		$parts = Kernel_Constants::getEquipParts();
 		foreach ($parts as $p) {
-			$this->_equips[$p] = $equips[$p];
+			if($equips[$p]) {
+				$this->_equips[$p] = $this->_db->getEquipObject($equips[$p]);
+			}else {
+				$this->_equips[$p] = null;
+			}
+			
+		}
+
+		$items = $this->_db->getPlayerItems($this->_name)[0];
+		$this->_max_items = $items['max_items'];
+		for ($i=1; $i<$this->_max_items+1; $i++) {
+			if(isset($items['item_'.$i])) {
+				$item = explode('*', $items['item_'.$i]);
+				//array_push($this->_items, $items['item_'.$i]);
+				$this->_items[$item[0]] = $item[1];
+			}
 		}
 	}
 
@@ -107,16 +126,19 @@ class Model_Kingdom_Object_Player implements JsonSerializable {
 		$serialized = array(
 			"player"     => array(),
 			"attributes" => array(),
-			"equipments" => array()
+			"equipments" => array(),
+			"items"      => array(),
+			"weights"    => array()
 		);
 
-		//$serialized['player']['id'] = $this->_id;
+		$serialized['player']['id'] = $this->_id;
 		$serialized['player']['name'] = $this->_name;
 		$serialized['player']['level'] = $this->_level;
 		$serialized['player']['gender'] = $this->_gender;
 		$serialized['player']['class'] = $this->_class;
 		$serialized['player']['race'] = $this->_race;
 		$serialized['player']['sp_type'] = $this->_sp_type;
+		$serialized['player']['location'] = $this->_location;
 
 		$serialized['attributes']['player_name'] = $this->_name;
 		foreach ($this->_attrs as $attr => $val) {
@@ -131,7 +153,54 @@ class Model_Kingdom_Object_Player implements JsonSerializable {
 		foreach ($this->_equips as $equip => $obj) {
 			$serialized['equipments'][$equip] = $obj['name'];
 		}
+
+		$serialized['weights']['player_name'] = $this->_name;
+		foreach ($this->_attr_wt as $attr => $wt) {
+			$serialized['weights'][$attr.'_wt'] = $wt;
+		}
+
+		$serialized['items']['player_name'] = $this->_name;
+		$serialized['items']['num_items'] = sizeof($this->_items);
+		$counter = 1;
+		foreach ($this->_items as $id => $num) {
+			$serialized['items']['item_'.$counter] = $id.'*'.$num;
+			$counter++;
+		}
 		return $serialized;
+	}
+
+	public function getId() {
+		return $this->_id;
+	}
+
+	public function getLocation() {
+		return $this->_location;
+	}
+
+	public function getClass() {
+		return $this->_class;
+	}
+
+	public function getLevel() {
+		return $this->_level;
+	}
+
+	public function addItem($item) {
+		$items = $this->_items;
+		if(sizeof($items) < $this->_max_items) {
+			//array_push($this->_items, $item);
+			if(isset($this->_items[$item])) {
+				$this->_items[$item]++;
+			}else {
+				$this->_items[$item] = 1;
+			}
+		}
+		//var_dump($this->_items);
+	}
+
+	public function translate($str) {
+		eval('$value='.$this->_translate($str).';');
+		return $value;
 	}
 
 	protected function _preSetFromConfig($config) {
@@ -224,6 +293,7 @@ class Model_Kingdom_Object_Player implements JsonSerializable {
 		}else if(Kernel_Utils::_getArrayElement($this, '_'.$match)) {
 			$replaced = Kernel_Utils::_getArrayElement($this, '_'.$match);
 		}
+		//var_dump($replaced);
 		return $replaced;
 	}
 

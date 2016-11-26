@@ -1,8 +1,7 @@
 ;(function($) {
 
 	$(document).ready(function() {
-		var loader = EventLoader($),
-			renderer = new Renderer(),
+		var renderer = new Renderer(),
 			$refresh = $('.refresh');
 
 		function processPostData(data) {

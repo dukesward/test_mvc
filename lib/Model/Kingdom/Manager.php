@@ -22,6 +22,19 @@ class Model_Kingdom_Manager {
 		return self::$_eventInfo;
 	}
 
+	public static function processDbFetch($config) {
+		self::$_config = Model_Kingdom_Config_Common::getInstance();
+		$data = null;
+
+		switch($config['type']) {
+			case 'item':
+				$id = Kernel_Utils::_getArrayElement($config, 'id');
+				if($id) $data = self::$_config->getItemById($id);
+				break;
+		}
+		return json_encode($data);
+	}
+
 	protected static function _makeBasicEventDecision() {
 		$config = self::$_config;
 		$playerCount = $config->getPlayerCount();
@@ -40,6 +53,10 @@ class Model_Kingdom_Manager {
 			self::$_eventInfo['player'] = self::_createNewPlayer();
 		}else if($decision === 'event') {
 			$event = self::_makeEventDecision();
+			$player = self::$_eventInfo['player'];
+			self::$_eventInfo['type'] = "new_event";
+			self::$_eventInfo['event'] = $event;
+			self::$_eventInfo['location'] = $config->getLocation($player->getLocation());
 		}
 	}
 
@@ -126,8 +143,13 @@ class Model_Kingdom_Manager {
 	protected static function _makeEventDecision() {
 		$player = new Model_Kingdom_Object_Player();
 		$player->initFromDb(self::_lookForOnlinePlayer());
+		self::$_eventInfo['player'] = $player;
+
 		$events = self::$_config->getPlayerEvents();
-		$availableEvents = self::_filterEvents($events, $player);
+		$decidedEvt = self::_filterEvents($events, $player);
+		self::_processEventEffect($decidedEvt, $player);
+
+		return $decidedEvt;
 	}
 
 	protected static function _lookForOnlinePlayer() {
@@ -143,8 +165,50 @@ class Model_Kingdom_Manager {
 	}
 
 	protected static function _filterEvents($events, $player) {
-		$filtered = Kernel_Utils::_queryAll($events, 'location', function($loc) {
+		$filtered = Kernel_Utils::_filter($events, 'location', $player, function($loc, $player) {
 			return $loc === $player->getLocation() || $loc === 'all';
 		});
+
+		$filtered = Kernel_Utils::_filter($filtered, 'class_require', $player, function($cls, $player) {
+			return $cls === $player->getClass() || $cls === 'all';
+		});
+
+		$filtered = Kernel_Utils::_filter($filtered, 'level_require', $player, function($lv, $player) {
+			return $lv <= $player->getLevel();
+		});
+
+		$map = new Model_Kingdom_Object_WeightMap();
+		foreach ($filtered as $evt) {
+			$wt = $player->translate($evt['decision_factor']);
+			if($wt < 0) $wt = 0;
+			$map->feed($evt['name'], $wt);
+		}
+		//var_dump($player);
+		$decision = $map->makeDecision();
+		return Kernel_Utils::_query($filtered, 'name', $decision);
+	}
+
+	protected static function _processEventEffect($evt, $player) {
+		$effect = $evt['effect'];
+		$effect = explode('|', $effect);
+
+		foreach ($effect as $e) {
+			self::_applyEffect($e, $player);
+		}
+	}
+
+	protected static function _applyEffect($effect, $player) {
+		$config = self::$_config;
+		$effect = explode(':', $effect);
+
+		switch ($effect[0]) {
+			case 'add_item':
+				$itemIds = explode(',', $effect[1]);
+				foreach ($itemIds as $id) {
+					//$item = $config->getItemById($itemId);
+					$player->addItem($id);
+				}
+				break;
+		}
 	}
 }

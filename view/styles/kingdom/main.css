@@ -6,17 +6,20 @@ body {
 	margin: 0;
 }
 
+ul, li {
+	list-style-type: none;
+}
+
 .fa-refresh {
 	color: #fff;
 	cursor: pointer;
 }
 
 #kingdom_middle_field {
-	width: 640px;
+	width: 670px;
 	height: 100%;
 	padding: 35px 10px 10px 10px;
 	background-color: #111;
-	margin: 0 20px;
 	-webkit-box-shadow: 0px 0px 10px 10px rgba(17,17,17,1), inset 0px 0px 10px 5px rgba(0,0,0,0.75);
 	-moz-box-shadow: 0px 0px 10px 10px rgba(17,17,17,1), inset 0px 0px 10px 5px rgba(0,0,0,0.75);
 	box-shadow: 0px 0px 10px 10px rgba(17,17,17,1), inset 0px 0px 10px 5px rgba(0,0,0,0.75);
@@ -44,13 +47,14 @@ body {
 	float: left;
 }
 
-.container .tag.recruit {
+.container .tag {
 	padding: 2px 5px 0 5px;
 	border-radius: 5px 5px 0 0;
 	border: 1px solid #ccc;
 	float: right;
 	margin-top: -25px;
 	text-transform: uppercase;
+	text-align: center;
 	color: #fff;
 	font-size: 12px;
 	font-family: "Acme";
@@ -127,25 +131,26 @@ body {
 }
 
 .avatar.player {
-	width: 65%;
-	height: 80px;
+	width: 160px;
+	height: 75px;
 	float: left;
+	clear: right;
 }
 
 .icon.player {
 	margin: 5px;
 }
 
-.icon.player .box {
+.icon.big .box {
+	width: 58px;
+	height: 58px;
 	background-color: #fff;
 	-webkit-clip-path: circle(29px at 29px 29px);
 }
 
-.icon.table .box {
-	-webkit-clip-path: circle(15px at 15px 15px);
-}
-
-.icon.equip .box {
+.icon .box {
+	width: 30px;
+	height: 30px;
 	-webkit-clip-path: circle(15px at 15px 15px);
 }
 
@@ -164,6 +169,22 @@ body {
     font-size: 14px;
 }
 
+.icon.item .level {
+	color: #fff;
+	font-family: "Acme";
+	position: relative;
+	width: 10px;
+	height: 10px;
+    top: -9px;
+    display: inline-block;
+    text-align: center;
+    border-radius: 50%;
+    border: 1px solid #ccc;
+    margin: auto;
+    font-size: 8px;
+    background-color: #666;
+}
+
 .icon.player .level.m {
 	background-color: #668dff;
 }
@@ -172,17 +193,16 @@ body {
 	background-color: #ff668d;
 }
 
-.icon.player img {
+.icon.big img {
+	width: 56px;
+	height: 56px;
 	margin: 1px 0 0 1px;
 	-webkit-clip-path: circle(28px at 28px 28px);
 }
 
-.icon.table img {
-	margin: 1px 0 0 1px;
-	-webkit-clip-path: circle(14px at 14px 14px);
-}
-
-.icon.equip img {
+.icon img {
+	width: 28px;
+	height: 28px;
 	margin: 1px 0 0 1px;
 	-webkit-clip-path: circle(14px at 14px 14px);
 }
@@ -192,11 +212,16 @@ body {
     margin-top: 5px;
 }
 
+.icon.table .box {
+	background-color: #fff;
+}
+
 .message {
 	clear: both;
 }
 
-.message.recruit {
+.message.recruit,
+.message.event {
 	background: linear-gradient(to bottom, rgba(0, 0, 0, 1), rgba(0, 0, 0, 0));
 	margin: 0 5px;
 	padding: 10px;
@@ -214,4 +239,22 @@ body {
 	display: inline-block;
 	min-width: 50px;
 	padding-left: 25px;
+}
+
+.list.items {
+	clear: both;
+}
+
+.list.items ul {
+	padding: 10px 0;
+	margin: 0;
+}
+
+.list.items .icon {
+	float: none;
+	cursor: pointer;
+}
+
+.item.info .level {
+	display: none;
 }

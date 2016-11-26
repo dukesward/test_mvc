@@ -206,7 +206,9 @@ Common_Utils.processTimeFormat = function(time) {
 	for(var prop in player) {
 		this['_' + prop] = player[prop];
 	}
-	this._max_hp = this._hp;
+
+	this._max_hp = this._props.hp_max;
+	if(!this._hp) this._hp = this._max_hp;
 }
 
 Player.prototype.translate = function(str) {
@@ -219,6 +221,8 @@ Player.prototype.translate = function(str) {
 		if(c && self['_' + c]) {
 			var modified = Common_Utils.capitalizeAllTokens(self['_' + c]);
 			return "<span class='" + c + "'>" + modified + "</span>";
+		}else if(c === 'evt') {
+			
 		}
 	})
 	return replaced;
@@ -261,6 +265,7 @@ Player.prototype.collectEquips = function() {
 			equips[part] = iconName;
 		}
 	}
+	//console.log(this._equips);
 	return equips;
 }
 ;var Plate = function(type, sub) {
@@ -274,6 +279,7 @@ Player.prototype.collectEquips = function() {
 	this._base = "/staticcontent/image/";
 	this.addAttr(this._type);
 	this.addAttr(this._sub);
+	//this._loader = EventLoader($);
 };
 
 Plate.prototype.addAttr = function(attr) {
@@ -312,8 +318,32 @@ Plate.prototype.settlePlate = function(data) {
 	//'cls_' + this._player._class
 	switch(this._type) {
 		case 'icon':
-			this._url = this._base + "icon/" + this._sub + '/' + this._source.main + '.jpg';
-			this._prepareIconImg();
+			if(this._source['style']) this._template.addClass(this._source['style']);
+			
+			if(!this._imgBox) this._imgBox = $("<div></div>");
+			if(this._source['style']) {
+				this._imgBox
+				.css('background-color', this._source.style || '#fff');
+			}
+			
+			if(!this._levelTag) this._levelTag = $("<div></div>");
+			if(this._source['sub']) {
+				this._levelTag
+				.text(this._source.sub);
+			}
+
+			if(this._source['subStyle']) {
+				this._levelTag
+				.addClass(this._source.subStyle);
+			}
+
+			if(this._source['main']) {
+				this._url = this._base + "icon/" + this._sub + '/' + this._source.main + '.jpg';
+				$img = $("<img>");
+				$img.attr('src', this._url);
+				this._imgBox
+				.append($img);
+			}
 			break;
 		case 'avatar':
 			this._player = data;
@@ -322,6 +352,7 @@ Plate.prototype.settlePlate = function(data) {
 			//console.log(this._player._class);
 			this._icon.settlePlate({
 				'main': 'cls_' + this._player._class,
+				'style': 'big',
 				'sub': this._player._level,
 				'subStyle': this._player._gender.toLowerCase()
 			});
@@ -362,6 +393,17 @@ Plate.prototype.settlePlate = function(data) {
 			this._data = data;
 			this._table = $("<table></table>");
 			break;
+		case 'list':
+			this._data = data;
+			this._list = $("<ul></ul>");
+		case 'item':
+			this._data = data;
+			if(this._icon) {
+				this._icon.settlePlate({
+					'main' : this._data['icon']
+				});
+			}
+			break;
 		default:
 			this._url = this._base + this._sub + '/' + this._source + '.jpg';
 			break;
@@ -374,9 +416,10 @@ Plate.prototype.render = function() {
 
 	switch(this._type) {
 		case 'icon':
-			var size = this._configIconSize();
-			this._imgBox.width(size[0] + 2);
-			this._imgBox.height(size[1] + 2);
+			//var size = this._configIconSize();
+			this._prepareIconImg();
+			//this._imgBox.width(size[0] + 2);
+			//this._imgBox.height(size[1] + 2);
 			template.append(this._imgBox);
 			template.append(this._levelTag);
 			break;
@@ -424,6 +467,24 @@ Plate.prototype.render = function() {
 			};
 			template.append(this._table);
 			break;
+		case 'list':
+			for(var d in this._data) {
+				var $li = $("<li></li>");
+
+				$data = this._createListData(d, this._data[d], $li);
+				this.attachChild($data);
+				$data.attachParent($li);
+			}
+			this._list.append($li);
+			template.append(this._list);
+			break;
+		case 'item':
+			if(!this._icon) this._icon = new Plate('icon', 'item');
+			this._icon.settlePlate({
+				'style': 'big'
+			});
+			this.attachChild(this._icon);
+			break;
 	}
 
 	for(var attr in this._attr) {
@@ -442,44 +503,26 @@ Plate.prototype.hideTemplate = function() {
 	this._template.css('display', 'none');
 }
 
+Plate.prototype.foldTemplate = function() {
+	this._template.slideUp();
+}
+
 Plate.prototype.showTemplate = function() {
+	this._parent.children().each(function(i, e) {
+		$(e).slideUp();
+	})
 	this._template.slideDown();
 }
 
 Plate.prototype._prepareIconImg = function() {
-	this._imgBox = $("<div></div>");
-	$img = $("<img>");
-	$img.attr('src', this._url);
-
-	$img.width(this._configIconSize()[0]);
-	$img.height(this._configIconSize()[1]);
+	if(!this._imgBox) this._imgBox = $("<div></div>");
 
 	this._imgBox
-	.addClass('box')
-	.css('background-color', this._source.style || '#fff')
-	.append($img);
+	.addClass('box');
 
-	this._levelTag = $("<div></div>");
+	if(!this._levelTag) this._levelTag = $("<div></div>");
 	this._levelTag
-	.addClass('level')
-	.text(this._source.sub);
-	this._levelTag.addClass(this._source.subStyle);
-}
-
-Plate.prototype._configIconSize = function() {
-	var sizes = [0, 0];
-	switch (this._sub) {
-		case 'player':
-			sizes = [56, 56];
-			break;
-		case 'table':
-			sizes = [28, 28];
-			break;
-		case 'equip':
-			sizes = [28, 28];
-			break;
-	}
-	return sizes;
+	.addClass('level');
 }
 
 Plate.prototype._settleTemplateStyles = function(template) {
@@ -498,6 +541,9 @@ Plate.prototype._settleTagText = function() {
 	switch(this._sub) {
 		case 'recruit':
 			text = "new recruit";
+			break;
+		case 'event':
+			text = "event";
 			break;
 	}
 	return text;
@@ -601,6 +647,33 @@ Plate.prototype._createTableValue = function(data, parent) {
 	}
 	return $label;
 }
+
+Plate.prototype._createListData = function(d, n, parent) {
+	var $li;
+	switch(this._sub) {
+		case 'items':
+			$li = new Plate('icon', 'item');
+			this._hold = true;
+			var self = this,
+				$itemInfo = new Plate('item', 'info');
+			loader.pullItem({'type':'item','id':d}, function(item) {
+				console.log(item);
+				$li.settlePlate({
+					'main': item.icon,
+					'sub' : n
+				});
+				if(self._infoBoard) {
+					$itemInfo.settlePlate(item);
+				}
+			});
+			//$li.attachChild($itemInfo);
+			this._infoBoard.attachChild($itemInfo);
+			$li.attachHandler('click', $itemInfo);
+			//$li.attachParent(parent);
+			break;
+	}
+	return $li;
+}
 ;var Board = function(type) {
 	this._type = type;
 	this.renderBoard();
@@ -610,6 +683,7 @@ Board.prototype.renderBoard = function() {
 	this._stage = $("#kingdom_middle_field");
 	this._left = $("#kingdom_left_field");
 	this._container = new Plate('container', 'scene');
+	this._info = new Plate('container', 'info');
 	this['create' + this._type + 'Board'].call(this);
 }
 
@@ -627,7 +701,9 @@ Board.prototype.createNewPlayerBoard = function() {
 	this._leftInfo = new Plate('table', 'text'),
 	this._leftIcons = new Plate('table', 'icon');
 	this._leftEquips = new Plate('table', 'equips');
-	this._info = this.createPlayerInfoBoard();
+	this._leftItems = new Plate('list', 'items');
+	this._leftItemInfo = new Plate('container', 'item');
+	this.createPlayerInfoBoard();
 
 	this._container.attachChild([
 		this._tag, 
@@ -640,35 +716,73 @@ Board.prototype.createNewPlayerBoard = function() {
 	this._avatar.attachHandler('click', this._info);
 }
 
-Board.prototype.createPlayerInfoBoard = function() {
-	var infoPlate = new Plate('container', 'info');
+Board.prototype.createNewEventBoard = function() {
+	this._player = null;
+	this._event = null;
+	this._world = null;
+	this._location = null;
+	this._tag = new Plate('tag', 'event');
+	this._calendar = new Plate('calendar');
+	this._message = new Plate('message', 'event');
 
+	this._evt = new Plate('container', 'event');
+
+	this._avatar = new Plate('avatar', 'player');
+	this._leftAvatar = new Plate('avatar', 'player');
+
+	this._leftInfo = new Plate('table', 'text'),
+	this._leftIcons = new Plate('table', 'icon');
+	this._leftEquips = new Plate('table', 'equips');
+	this._leftItems = new Plate('list', 'items');
+	this._leftItemInfo = new Plate('container', 'item');
+	this.createPlayerInfoBoard();
+
+	this._container.attachChild([
+		this._tag, 
+		this._calendar,
+		this._avatar,
+		this._evt,
+		this._message
+		//this._info
+	]);
+
+	this._avatar.attachHandler('click', this._info);
+}
+
+Board.prototype.createPlayerInfoBoard = function() {
+	infoPlate = this._info;
 	infoPlate.attachChild(this._leftAvatar);
 	infoPlate.attachChild(this._leftIcons);
 	infoPlate.attachChild(this._leftInfo);
 	infoPlate.attachChild(this._leftEquips);
-	return infoPlate;
+	infoPlate.attachChild(this._leftItems);
+	infoPlate.attachChild(this._leftItemInfo);
+	this._info.attachParent(this._left);
 }
 
 Board.prototype.trigger = function(config) {
-	if(null === this._player) {
+	if(null === this._player && config['player']) {
 		this._player = config['player'];
-		console.log(this._player);
 		this._preparePlayerData();
 	}
 
-	if(null === this._location) {
+	if(null === this._location && config['location']) {
 		this._location = config['location'];
 		this._container.settlePlate(this._location.brief);
 		switch (this._type) {
 			case 'NewPlayer':
 				this._message.settlePlate(this._player.translate(this._location.welcome));
 				break;
-		}
-		
+		}	
 	}
 
-	if(null === this._world) {
+	if(null === this._event && config['event']) {
+		this._event = config['event'];
+		this._message.settlePlate(this._player.translate(this._event.description));
+		this._evt.settlePlate(this._event.effect);
+	}
+
+	if(null === this._world && config['world']) {
 		this._world = config['world'];
 		this._calendar.settlePlate(Common_Utils.query(this._world, 'collection', 'calendar'));
 	}
@@ -683,28 +797,36 @@ Board.prototype._preparePlayerData = function() {
 	if(Common_Utils.isArray(this._avatar)) {
 
 	}else {
-		this._avatar.settlePlate(this._player);
-		this._leftAvatar.settlePlate(this._player);
-		this._leftInfo.settlePlate({
-			'str': this._player._attrs.str,
-			'agi': this._player._attrs.agi,
-			'int': this._player._attrs['int'],
-			'sta': this._player._attrs.sta,
-			'spr': this._player._attrs.spr,
-			'luc': this._player._attrs.luc,
-			'ap': this._player._props.ap,
-			'blk': this._player._props.blk,
-			'crt': this._player._props.crt,
-			'eva': this._player._props.eva,
-			'hit': this._player._props.hit
-		});
+		if(this._avatar) this._avatar.settlePlate(this._player);
+		if(this._leftAvatar) this._leftAvatar.settlePlate(this._player);
+		if(this._leftInfo) {
+			this._leftInfo.settlePlate({
+				'str': this._player._attrs.str,
+				'agi': this._player._attrs.agi,
+				'int': this._player._attrs['int'],
+				'sta': this._player._attrs.sta,
+				'spr': this._player._attrs.spr,
+				'luc': this._player._attrs.luc,
+				'ap': this._player._props.ap,
+				'blk': this._player._props.blk,
+				'crt': this._player._props.crt,
+				'eva': this._player._props.eva,
+				'hit': this._player._props.hit
+			});
+		}
 
-		this._leftIcons.settlePlate({
-			'damage': this._player.calculateDamage('literal'),
-			'armor': this._player.calculateArmor()
-		});
+		if(this._leftIcons) {
+			this._leftIcons.settlePlate({
+				'damage': this._player.calculateDamage('literal'),
+				'armor': this._player.calculateArmor()
+			});
+		}
 
-		this._leftEquips.settlePlate(this._player.collectEquips());
+		if(this._leftEquips) this._leftEquips.settlePlate(this._player.collectEquips());
+		if(this._leftItems) {
+			this._leftItems.settlePlate(this._player._items);
+			this._leftItems._infoBoard = this._leftItemInfo;
+		}
 	}
 }
 
@@ -718,10 +840,13 @@ Board.prototype.assembly = function() {
 		url_base = "kingdom";
 
 	var processAjaxRequest = function(url, post, callback) {
-		var url_full = url_base + '/' + url;
+		var url_full = url_base + '/' + url,
+			method = post ? 'POST' : 'GET';
 
 		$.ajax({
 			url: url_full,
+			data: post || null,
+			method: method,
 			dataType: 'json'
 		})
 		.done(function(data) {
@@ -735,11 +860,16 @@ Board.prototype.assembly = function() {
 		pull: function(callback) {
 			processAjaxRequest("pulling", null, callback);
 		},
+		pullItem: function(r, callback) {
+			processAjaxRequest("request", r, callback);
+		},
 		push: function(data) {
 			processAjaxRequest("pushing", data);
 		}
 	}
 };
+
+window.loader = EventLoader($);
 
 ;var Renderer = function() {
 	this._type = null;
@@ -764,11 +894,22 @@ Renderer.prototype.renderNewPlayerEvent = function(data, board) {
 		'world'   : data['world']
 	});
 }
+
+Renderer.prototype.renderNewEventEvent = function(data, board) {
+	var player = new Player(data['player']),
+		location = data['location'];
+
+	board.trigger({
+		'player'   : player,
+		'location' : location,
+		'world'    : data['world'],
+		'event'    : data['event']   
+	});
+}
 ;(function($) {
 
 	$(document).ready(function() {
-		var loader = EventLoader($),
-			renderer = new Renderer(),
+		var renderer = new Renderer(),
 			$refresh = $('.refresh');
 
 		function processPostData(data) {

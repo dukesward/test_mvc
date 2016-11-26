@@ -24,8 +24,12 @@ class Model_Kingdom_Object_WeightMap {
 
 	public function makeDecision($debug = 0) {
 		$total = $this->_calculateTotal();
-		$random = Kernel_Utils::_createRandomNumber(0, 1, $total);
-		return $this->_findDecision($random, 1);
+		$decision = null;
+		if($total > 0) {
+			$random = Kernel_Utils::_createRandomNumber(0, 1, $total);
+			$decision = $this->_findDecision($random, 1);
+		}
+		return $decision;
 	}
 
 	public function multipleDecision($num = 1) {

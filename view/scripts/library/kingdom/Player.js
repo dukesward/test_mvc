@@ -2,7 +2,9 @@
 	for(var prop in player) {
 		this['_' + prop] = player[prop];
 	}
-	this._max_hp = this._hp;
+
+	this._max_hp = this._props.hp_max;
+	if(!this._hp) this._hp = this._max_hp;
 }
 
 Player.prototype.translate = function(str) {
@@ -15,6 +17,8 @@ Player.prototype.translate = function(str) {
 		if(c && self['_' + c]) {
 			var modified = Common_Utils.capitalizeAllTokens(self['_' + c]);
 			return "<span class='" + c + "'>" + modified + "</span>";
+		}else if(c === 'evt') {
+			
 		}
 	})
 	return replaced;
@@ -57,5 +61,6 @@ Player.prototype.collectEquips = function() {
 			equips[part] = iconName;
 		}
 	}
+	//console.log(this._equips);
 	return equips;
 }

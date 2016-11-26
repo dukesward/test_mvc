@@ -21,3 +21,15 @@ Renderer.prototype.renderNewPlayerEvent = function(data, board) {
 		'world'   : data['world']
 	});
 }
+
+Renderer.prototype.renderNewEventEvent = function(data, board) {
+	var player = new Player(data['player']),
+		location = data['location'];
+
+	board.trigger({
+		'player'   : player,
+		'location' : location,
+		'world'    : data['world'],
+		'event'    : data['event']   
+	});
+}
