@@ -43,6 +43,88 @@ Common_Utils.capitalizeAllTokens = function(str, delimitter, camel, connector) {
 	return result;
 }
 
+Common_Utils.mapQualityWithColor = function(q) {
+	var map = ['#bbb','#fff'], q = parseInt(q);
+	return (q+1) ? map[q] : '#fff';
+}
+
+Common_Utils.reformatBigNumber = function(num, fixed, reformat) {
+	var reformatted = num, fixed = fixed || 2;
+
+	if(reformat !== false) reformat = true;
+
+	if(num >= Math.pow(10, 9) && reformat) {
+		var temp = num/Math.pow(10, 9);
+		reformatted = Math.round(temp*10)/10;
+		reformatted = reformatted.toFixed(1) + 'B';
+	}else if(num >= Math.pow(10, 7) && reformat) {
+		var temp = num/Math.pow(10, 6);
+		reformatted = Math.round(temp*10)/10;
+		reformatted = reformatted.toFixed(1) + 'M';
+	}else {
+		reformatted = Math.round(num*100)/100;
+		reformatted = reformatted.toFixed(fixed);
+	}
+	return reformatted;
+}
+
+Common_Utils.mergeSort = function(array) {
+	if(array.length <= 1) {
+        return array;
+    }
+
+	var segment = array,
+		length = segment.length,
+		mid = Math.round(length/2);
+
+	function merge(left, right) {
+		var temp = [], l = left, r = right;
+
+		while(l.length && r.length) {
+            if(l.length > 1) var test = 1;
+            if(l[0] < r[0]) {
+                temp.push(l[0]);
+                l.shift();
+            }else {
+                temp.push(r[0]);
+                r.shift();
+            }
+        }
+		temp = l.length ? temp.concat(l) : temp.concat(r);
+		return temp;
+	}
+
+	return merge(this.mergeSort(segment.slice(0, mid)), this.mergeSort(segment.slice(mid, length)));
+};
+
+//must pass an array with obj type elements
+Common_Utils.sortObjectsByProperty = function(objs, prop, order) {
+	var temp = [],
+		sortedTemp,
+		sorted = [];
+
+	for(var obj in objs) {
+		//search for prop with name matching the arg prop
+        temp.push(this.searchProp(objs[obj], prop));
+    }
+
+    sortedTemp = this.mergeSort(temp);
+
+    while(sortedTemp.length && sortedTemp[0] != null) {
+    	for(var obj in objs) {
+    		if(sortedTemp[0] !== null && this.searchProp(objs[obj], prop) == sortedTemp[0]) {
+	    		sorted.push(objs[obj]);
+	    		sortedTemp.shift();
+	    	}
+    	}
+    }
+
+    if(sortedTemp.length) sorted.concat(sortedTemp);
+    //if need descending order, pass 1 to the function
+    if(order && order === 1) sorted.reverse();
+	return sorted;
+};
+
 Common_Utils.searchProp = function(obj, prop) {
 	if(!obj || null === prop || typeof prop === 'undefined') {
 		return null;
@@ -202,16 +284,41 @@ Common_Utils.processTimeFormat = function(time) {
 	}
 	return refined.join('|');
 }
-;var Player = function(player) {
-	for(var prop in player) {
-		this['_' + prop] = player[prop];
-	}
 
-	this._max_hp = this._props.hp_max;
-	if(!this._hp) this._hp = this._max_hp;
+Common_Utils.processPrice = function(price) {
+	var gold = Math.round(price/10000),
+		silver = Math.round((price-gold*10000)/100),
+		copper = Math.round(price-gold*10000-silver*100);
+
+	return {
+		'gold': gold, 
+		'silver': silver, 
+		'copper': copper
+	};
 }
 
-Player.prototype.translate = function(str) {
+Common_Utils.processEquipLiterals = function(data) {
+	var literals = {},
+		c = this.capitalizeAllTokens.bind(this);
+
+	switch(data['sub_type']) {
+		case 'weapon':
+			//part
+			literals['part'] = c(data['part']) + '-Hand';
+			literals['type'] = c(data['type']);
+			literals['damage'] = data['damage'] + ' Damage';
+			literals['speed'] = this.reformatBigNumber(data['speed'], 2) + ' Speed';
+			break;
+		case 'armor':
+			literals['part'] = c(data['part']);
+			literals['type'] = c(data['type']);
+			literals['armor'] = data['armor_i'] + ' Armor';
+			break;
+	}
+	return literals;
+}
+
+Common_Utils.translate = function(str) {
 	var pattern = /\{([a-zA-Z_]+?)\}/g,
 		self = this,
 		replaced = '';
@@ -222,12 +329,181 @@ Player.prototype.translate = function(str) {
 			var modified = Common_Utils.capitalizeAllTokens(self['_' + c]);
 			return "<span class='" + c + "'>" + modified + "</span>";
 		}else if(c === 'evt') {
-			
+
 		}
 	})
 	return replaced;
 }
+;var Action = function(actor, targets, ability) {
+	this._actor = actor || null;
+	this._targets = targets || null;
+	this._ability = ability || null;
+}
 
+
+;var Player = function(player, role, timer) {
+	this._role = role || 'player';
+
+	for(var prop in player) {
+		this['_' + prop] = player[prop];
+	}
+
+	if(this._isPlayer()) {
+		this._max_hp = this._props.hp_max;
+	}
+	if(!this._hp) this._hp = this._max_hp;
+	this._queue = [];
+	this._timer = timer;
+	this._setBattleInitAttrs();
+}
+
+Player.prototype.translate = function(str) {
+	return Common_Utils.translate.call(this, str);
+};
+
+Player.prototype._isPlayer = function() {
+	return this._role === 'player';
+}
+
+Player.prototype._isDead = function() {
+	return this._hp <= 0;
+}
+
+//===============================
+//start: battle related functions
+Player.prototype.searchPlayerAction = function() {
+
+}
+
+Player.prototype.createAction = function(ability) {
+	var action = new Action(this, this._targets, ability);
+	return action;
+}
+
+Player.prototype._setBattleInitAttrs = function() {
+	this._cooldown = 0;
+	this._targets = [];
+	this._processNormalAttack();
+	this._processPassiveAbilities();
+}
+
+Player.prototype._setTarget = function(target) {
+	this._targets = [];
+	if(Common_Utils.isArray(target)) {
+		this._targets = target;
+	}else {
+		this._targets.push(target);
+	}
+}
+
+Player.prototype._hasTarget = function() {
+	return this._targets.length > 0;
+}
+
+Player.prototype._numOfTargets = function() {
+	return this._targets.length;
+}
+
+Player.prototype._processNormalAttack = function() {
+	var normal = {
+		'type'        : 'basic',
+		'sub_type'    : 'attack',
+		'is_active'   : 'T',
+		'threat_basic': 1,
+		'threat_extra': 0,
+		'attrs'       : 'physical',
+		'bonus'       : '{ap}',
+		'target'      : 'target',
+		'num_target'  : 'single',
+		'ability_name': '普通攻击'
+	}
+
+	if(!this._abilities) {
+		this._abilities = [];
+	}
+
+	this._abilities.push(normal);
+}
+
+Player.prototype._processPassiveAbilities = function() {
+
+}
+//end: battle related functions
+//=============================
+
+//=================================
+//start: ui board related functions
+Player.prototype.createAvatar = function() {
+	//console.log(this);
+	this._avatar = new Plate('avatar', 'player');
+	this._avatar.settlePlate(this);
+}
+
+Player.prototype.createInfo = function() {
+	this._info = new Plate('container', 'info');
+	this._leftAvatar = new Plate('avatar', 'player');
+	this._leftInfo = new Plate('table', 'text'),
+	this._leftIcons = new Plate('table', 'icon');
+	if(this._isPlayer()) {
+		this._leftEquips = new Plate('table', 'equips');
+		this._leftItems = new Plate('list', 'items');
+	}else {
+		this._leftItems = new Plate('list', 'equips');
+	}
+	this._leftItemInfo = new Plate('container', 'item');
+
+	if(this._isPlayer()) {
+		this._info.attachChild([
+			this._leftAvatar, this._leftIcons, this._leftInfo, this._leftEquips, this._leftItems, this._leftItemInfo
+		]);
+	}else {
+		this._info.attachChild([
+			this._leftAvatar, this._leftIcons, this._leftInfo, this._leftItems, this._leftItemInfo
+		]);
+	}
+	this._settleInfoBoard();
+}
+
+Player.prototype._settleInfoBoard = function() {
+	this._leftAvatar.settlePlate(this);
+	if(this._isPlayer()) {
+		this._leftInfo.settlePlate({
+			'str': this._attrs.str,
+			'agi': this._attrs.agi,
+			'int': this._attrs['int'],
+			'sta': this._attrs.sta,
+			'spr': this._attrs.spr,
+			'luc': this._attrs.luc,
+			'ap': this._props.ap,
+			'blk': this._props.blk,
+			'crt': this._props.crt,
+			'eva': this._props.eva,
+			'hit': this._props.hit
+		});
+		this._leftEquips.settlePlate(this.collectEquips());
+	}else {
+		this._leftInfo.settlePlate({
+			'blk': this._blk || 0,
+			'crt': this._crt || 0,
+			'eva': this._eva || 0,
+			'hit': this._hit || 0
+		})
+	}
+	this._leftIcons.settlePlate({
+		'damage': this.calculateDamage('literal'),
+		'armor': this.calculateArmor()
+	});
+	if(this._isPlayer()) {
+		this._leftItems.settlePlate(this._items);
+	}else {
+		this._leftItems.settlePlate(this._loot);
+	}
+	this._leftItems._infoBoard = this._leftItemInfo;
+}
+//end: ui board related functions
+
+//====================================
+//start: player general util functions
 Player.prototype.calculatePropFromEquips = function(prop) {
 	var equips = this._equips, sum = 0;
 	for(var e in equips) {
@@ -240,9 +516,14 @@ Player.prototype.calculatePropFromEquips = function(prop) {
 }
 
 Player.prototype.calculateDamage = function(form) {
-	var ap = this._props.ap + this.calculatePropFromEquips('ap'),
-		damage = this.calculatePropFromEquips('dmg'),
-		result;
+	var ap = 0, damage = 0, result;
+	if(this._isPlayer()) {
+		ap = this._props.ap + this.calculatePropFromEquips('ap');
+		damage = this.calculatePropFromEquips('dmg');
+	}else {
+		ap = this._max_dmg - this._min_dmg;
+		damage = this._min_dmg;
+	}
 
 	switch(form) {
 		case 'literal':
@@ -262,13 +543,307 @@ Player.prototype.collectEquips = function() {
 		if(this._equips[e]) {
 			var part = this._equips[e].part,
 				iconName = this._equips[e].icon;
-			equips[part] = iconName;
+			equips[part] = iconName + '|' + this._equips[e].quality;
 		}
 	}
 	//console.log(this._equips);
 	return equips;
 }
+
+Player.prototype.hasAbilityType = function(type, targets) {
+	var abilities = [], targets = targets || 'single';
+	for(var i=0; i<this._abilities.length; i++) {
+		var a = this._abilities[i];
+		if(a.sub_type === type && a.num_target === targets) {
+			if(!a._cooldown) abilities.push(a);
+		}
+	}
+	return abilities;
+}
+
+Player.prototype.sortAbilityByThreat = function(target) {
+	var targets = targets || 'single', 
+		unsorted = [],
+		t = 0;
+
+	for(var i=0; i<this._abilities.length; i++) {
+		var a = this._abilities[i];
+		if(a.sub_type === 'attack' && a.num_target === targets && !a._cooldown) {
+			unsorted.push({
+				'a' : a,
+				't' : a.threat_basic + a.threat_extra
+			});
+		}
+	}
+	return Common_Utils.sortObjectsByProperty(unsorted, 't');
+}
+//end: player general util functions
+//==================================
+;var AI_PVE = function(config) {
+	this._enemies = config['enemies'];
+}
+
+AI_PVE.prototype.decidePlayerAction = function(player) {
+	var action;
+	if(player._isPlayer()) {
+		if(this._enemies) {
+			switch (player._class_type) {
+				case 'tank':
+					action = this._decideTankAction(player);
+					break;
+				case 'dps':
+					action = this._decideDpsAction(player);
+					break;
+				case 'healer':
+					action = this._decideHealerAction(player);
+					break;
+			}
+		}
+	}else {
+		action = this._decideEnemyAction(player);
+	}
+	return action;
+}
+
+AI_PVE.prototype._decideTankAction = function(player) {
+	var enemy = this._findTankableEnemy(), action, ability;
+	if(enemy) {
+		player._setTarget(enemy);
+		var abilities = player.hasAbilityType('tank');
+		if(abilities.length > 0) {
+			ability = abilities[0];
+		}else {
+			abilities = player.sortAbilityByThreat();
+			if(abilities.length > 0) {
+				ability = abilities[0]['a'];
+			}
+		}
+	}
+	return player.createAction(ability);
+}
+
+AI_PVE.prototype._decideDpsAction = function(player) {
+	
+}
+
+AI_PVE.prototype._decideHealerAction = function(player) {
+	
+}
+
+//start: tank related AIs
+AI_PVE.prototype._findTankableEnemy = function() {
+	var ordered, tankable;
+	ordered = this._orderEnemyByType(['king','knight','rook','bishop','pawn']);
+	tankable = this._findEnemyWithoutTarget(ordered);
+	//console.log(tankable);
+	return tankable;
+}
+//end: tank related AIs
+
+//start: enemy related AIs
+AI_PVE.prototype._decideEnemyAction = function(enemy) {
+	
+}
+//end: enemy related AIs
+
+AI_PVE.prototype._orderEnemyByType = function(order) {
+	var ordered = [], enemies = this._enemies;
+	for(var i=0; i<order.length; i++) {
+		for(var j=0; j<enemies.length; j++) {
+			if(enemies[j]['type'] === order[i]) ordered.push(enemies[j]);
+		}
+	}
+	return ordered;
+}
+
+AI_PVE.prototype._findEnemyType = function(t) {
+	var enemies = [];
+	for(var i=0; i<this._enemies.length; i++) {
+		if(this._enemies[i].type === t) {
+			enemies.push(this._enemies[i]);
+		}
+	}
+	return enemies;
+}
+
+AI_PVE.prototype._findEnemyWithoutTarget = function(enemies) {
+	var enemies = enemies || this._enemies;
+	for(var i=0; i<this._enemies.length; i++) {
+		if(!this._enemies[i]._hasTarget()) {
+			return this._enemies[i];
+		}
+	}
+	return null;
+}
+;var Battle = function(config) {
+	//this._queue = new ActionQueue();
+	this._timer = this._prepareTimer();
+	this._players = this.preparePlayers(config['players']);
+	this._troop = config['troop'];
+	this._enemies = this.prepareEnemies(config['enemies']);
+	this._ai = new AI_PVE({
+		'enemies' : this._enemies
+	});
+}
+
+Battle.prototype.translate = function(str) {
+	return Common_Utils.translate.call(this, str);
+};
+
+Battle.prototype.collectPlayerAvatars = function() {
+	var avatars = [];
+
+	for(var i=0; i<this._players.length; i++) {
+		avatars.push(this._players[i]._avatar);
+	}
+	return avatars;
+}
+
+Battle.prototype.collectPlayerInfo = function() {
+	var avatars = [];
+
+	for(var i=0; i<this._players.length; i++) {
+		avatars.push(this._players[i]._info);
+	}
+	return avatars;
+}
+
+Battle.prototype.collectEnemyAvatars = function() {
+	var avatars = [];
+
+	for(var i=0; i<this._enemies.length; i++) {
+		avatars.push(this._enemies[i]._avatar);
+	}
+	return avatars;
+}
+
+Battle.prototype.collectEnemyInfo = function() {
+	var avatars = [];
+
+	for(var i=0; i<this._enemies.length; i++) {
+		avatars.push(this._enemies[i]._info);
+	}
+	return avatars;
+}
+
+Battle.prototype.preparePlayers = function(players) {
+	var temp = [];
+	
+	for(var i=0; i<players.length; i++) {
+		var player = new Player(players[i], 'player', this._timer);
+		player.createAvatar();
+		player.createInfo();
+		player._avatar.attachHandler('click', player._info);
+		temp.push(player);
+	}
+	return temp;
+}
+
+Battle.prototype.prepareEnemies = function(enemies) {
+	var temp = [];
+	
+	for(var i=0; i<enemies.length; i++) {
+		var enemy = new Player(enemies[i], 'enemy', this._timer);
+		enemy.createAvatar();
+		enemy.createInfo();
+		enemy._avatar.attachHandler('click', enemy._info);
+		temp.push(enemy);
+	}
+	return temp;
+}
+
+Battle.prototype._prepareBattle = function() {
+
+}
+
+Battle.prototype.startBattle = function() {
+	if(!this._timer) {
+		this._timer = this._prepareTimer();
+	}
+	this._timer.resumeTimer(100);
+	this._startBattle();
+}
+
+Battle.prototype.debugBattle = function() {
+	this._timer.stopTimer();
+	console.log(this._timer.getTimeInSecond());
+}
+
+Battle.prototype.inBattle = function() {
+	return !this._timer.isStopped();
+}
+
+Battle.prototype._prepareTimer = function() {
+	var timeCounter = 0, 
+		stopped = false,
+		timer = null;
+
+	return {
+		getTimeInMilliSecond: function() {
+			return timeCounter;
+		},
+		getTimeInSecond: function() {
+			return timeCounter/1000;
+		},
+		stopTimer: function() {
+			clearInterval(timer);
+			stopped = true;
+		},
+		resumeTimer: function(itv) {
+			console.log(itv);
+			stopped = false;
+			timer = setInterval(function() {
+				timeCounter += itv;
+				console.log(timeCounter);
+			}, itv || 100);
+		},
+		isStopped: function() {
+			return stopped === true;
+		}
+	}
+}
+
+Battle.prototype._startBattle = function() {
+	while(!this._isBattleComplete() && this.inBattle()) {
+		this._startAction(this._decideNextAction());
+	}
+}
+
+Battle.prototype._isBattleComplete = function() {
+	return this._allDead(this._players) || this._allDead(this._enemies);
+}
+
+Battle.prototype._allDead = function(players) {
+	var allDead = true;
+	for(var i=0; i<players.length; i++) {
+		if(!players[i]._isDead()) {
+			allDead = false;
+		}
+	}
+	return allDead;
+}
+
+Battle.prototype._startAction = function(action) {
+
+}
+
+Battle.prototype._decideNextAction = function() {
+	return this._searchPlayerAction(this._players) || this._searchPlayerAction(this._enemies);
+}
+
+Battle.prototype._searchPlayerAction = function(players) {
+	var action = null;
+	for(var i=0; i<players.length; i++) {
+		var player = players[i];
+		action = player.searchPlayerAction() || this._ai.decidePlayerAction(player);
+		console.log(action);
+		this.debugBattle();
+	}
+	return action;
+}
+
 ;var Plate = function(type, sub) {
+	this._proto = 'Plate';
 	this._type = type;
 	this._sub = sub;
 	this._attr = [];
@@ -289,8 +864,11 @@ Plate.prototype.addAttr = function(attr) {
 Plate.prototype.attachChild = function(children) {
 	if(Common_Utils.isArray(children)) {
 		for(var i=0; i<children.length; i++) {
-			children[i]._parent = this._template;
-			this._children.push(children[i]);
+			//now undefined child will not be attached
+			if(children[i]) {
+				children[i]._parent = this._template;
+				this._children.push(children[i]);
+			}
 		}
 	}else {
 		this._children.push(children);
@@ -305,9 +883,14 @@ Plate.prototype.attachParent = function(parent) {
 Plate.prototype.attachHandler = function(evt, el) {
 	switch(evt) {
 		case 'click':
+			var self = this;
 			el.hideTemplate();
 			this._template.on('click', function() {
-				el.showTemplate();
+				if(el._proto === 'Plate') {
+					el.showTemplate();
+				}else if(typeof el === 'function') {
+					el.call(self);
+				}
 			})
 			break;
 	}
@@ -338,7 +921,7 @@ Plate.prototype.settlePlate = function(data) {
 			}
 
 			if(this._source['main']) {
-				this._url = this._base + "icon/" + this._sub + '/' + this._source.main + '.jpg';
+				this._url = this._base + "icon/" + this._sub + '/' + this._source.main + '.' + (this._source.ext || 'jpg');
 				$img = $("<img>");
 				$img.attr('src', this._url);
 				this._imgBox
@@ -354,7 +937,7 @@ Plate.prototype.settlePlate = function(data) {
 				'main': 'cls_' + this._player._class,
 				'style': 'big',
 				'sub': this._player._level,
-				'subStyle': this._player._gender.toLowerCase()
+				'subStyle': this._player._isPlayer() ? this._player._gender.toLowerCase() : 'N'
 			});
 			this.attachChild(this._icon);
 
@@ -372,6 +955,13 @@ Plate.prototype.settlePlate = function(data) {
 			break;
 		case 'label':
 			this._text = this._settleLabelText(data);
+			if(this._stateName) {
+				this._template.append(this._generateInner());
+				this._template.append(this._generateStateText());
+			}else {
+				this._template.text(this._text);
+			}
+			this._settleTemplateStyles(data);
 			break;
 		case 'message':
 			this._msgContent = data;
@@ -391,7 +981,27 @@ Plate.prototype.settlePlate = function(data) {
 			break;
 		case 'table':
 			this._data = data;
-			this._table = $("<table></table>");
+			if(!this._table) this._table = $("<table></table>");
+			if(this._sub === 'price') {
+				//console.log(data);
+				for(var p in data) {
+					if(data[p]) {
+						var icon = new Plate('icon', 'price'),
+							price = new Plate('label', 'text');
+
+						icon.settlePlate({
+							'main': p,
+							'ext' : 'gif'
+						});
+						price.settlePlate(data[p]);
+
+						this['_' + p].append(price.render());
+						this['_' + p].append(icon.render());
+					}else {
+						this['_' + p].css('display', 'none');
+					}
+				}
+			}
 			break;
 		case 'list':
 			this._data = data;
@@ -403,9 +1013,41 @@ Plate.prototype.settlePlate = function(data) {
 					'main' : this._data['icon']
 				});
 			}
+
+			if(this._board) {
+				this._board.settlePlate(this._data);
+			}
 			break;
-		default:
+		case 'container':
+			if(this._sub === 'itemInfo') {
+				this._itemName.settlePlate(data['brief'] + '|' + data['quality']);
+				this._itemQuality.settlePlate('Item Level ' + data['level']);
+				//this._itemRequire.settlePlate('Requires Level ' + data['require_level']);
+				this._priceLabel.settlePlate(data['price']);
+				this._usage.settlePlate(data['usage']);
+				this._desc.settlePlate('"' + data['description'] + '"');
+			}else if(this._sub === 'equipInfo') {
+				this._itemName.settlePlate(data['name'] + '|' + data['quality']);
+				this._itemQuality.settlePlate('Item Level ' + data['level']);
+				this._priceLabel.settlePlate(data['price']);
+				this._equipDetail.settlePlate(data);
+			}else if(this._sub === 'equipDetail') {
+				var equipLiterals = Common_Utils.processEquipLiterals(data);
+				for(var a in equipLiterals) {
+					var label = new Plate('label', a);
+					label.settlePlate(equipLiterals[a]);
+					this._template.append(label.render());
+				}
+			}
 			this._url = this._base + this._sub + '/' + this._source + '.jpg';
+			break;
+		case 'priceLabel':
+			var price = Common_Utils.processPrice(data);
+			this._table.settlePlate(price);
+			break;
+		case 'button':
+			this._prepareButton();
+			this._attachButtonEvent(data);
 			break;
 	}
 	
@@ -434,13 +1076,6 @@ Plate.prototype.render = function() {
 		case 'label':
 			var content = this._text || 'Err: Content Not Defined';
 			//template.css('min-width', '100px');
-			if(this._stateName) {
-				template.append(this._generateInner());
-				template.append(this._generateStateText());
-			}else {
-				template.text(content);
-			}
-			this._settleTemplateStyles(template);
 			break;
 		case 'message':
 			var content = this._msgContent || 'Err: Message Content Not Defined';
@@ -451,20 +1086,49 @@ Plate.prototype.render = function() {
 				template.css('background', 'url(' + this._url + ')');
 				template.css('background-size', '100% auto');
 			}
+
+			if(this._sub === 'itemInfo' || this._sub === 'equipInfo') {
+				this._itemName = new Plate('label', 'item');
+				this._itemQuality = new Plate('label', 'quality');
+				this._itemRequire = new Plate('label', 'text');
+				this._priceLabel = new Plate('priceLabel');
+				this._moreInfo = new Plate('container', 'moreInfo');
+				this._usage = new Plate('label', 'usage');
+				this._desc = new Plate('label', 'desc');
+				this._moreInfo.attachChild([this._usage, this._desc]);
+				if(this._sub === 'equipInfo') {
+					this._equipDetail = new Plate('container', 'equipDetail');
+				}
+				this.attachChild([this._itemName, this._itemQuality, this._priceLabel, this._equipDetail, this._moreInfo]);
+			}
 			break;
 		case 'table':
-			for(var d in this._data) {
-				var $tr = $("<tr></tr>"),
-					$td = $("<td></td>");
+			if(this._sub === 'price') {
+				this._table = $("<table></table>");
+				var $tr = $("<tr></tr>");
 
-				$tr.addClass(d);
-				$d = this._createTableLabel(Common_Utils.capitalizeAllTokens(d), $td);
-				$data = this._createTableValue(this._data[d], $td);
+				this._gold = $("<td class='gold'></td>");
+				this._silver = $("<td class='silver'></td>");
+				this._copper = $("<td class='copper'></td>");
 
-				$td.append($d).append($data);
-				$tr.append($td);
+				$tr.append(this._gold);
+				$tr.append(this._silver);
+				$tr.append(this._copper);
 				this._table.append($tr);
-			};
+			}else {
+				for(var d in this._data) {
+					var $tr = $("<tr></tr>"),
+						$td = $("<td></td>");
+
+					$tr.addClass(d);
+					$d = this._createTableLabel(Common_Utils.capitalizeAllTokens(d), $td);
+					$data = this._createTableValue(this._data[d], $td);
+
+					$td.append($d).append($data);
+					$tr.append($td);
+					this._table.append($tr);
+				};
+			}
 			template.append(this._table);
 			break;
 		case 'list':
@@ -474,16 +1138,26 @@ Plate.prototype.render = function() {
 				$data = this._createListData(d, this._data[d], $li);
 				this.attachChild($data);
 				$data.attachParent($li);
+				this._list.append($li);
 			}
-			this._list.append($li);
 			template.append(this._list);
 			break;
 		case 'item':
-			if(!this._icon) this._icon = new Plate('icon', 'item');
+			if(!this._icon) this._icon = new Plate('icon', this._sub);
 			this._icon.settlePlate({
 				'style': 'big'
 			});
 			this.attachChild(this._icon);
+
+			if(!this._board) this._board = new Plate('container', this._sub + 'Info');
+			this.attachChild(this._board);
+			break;
+		case 'priceLabel':
+			this._table = new Plate('table', 'price');
+			this.attachChild(this._table);
+			break;
+		case 'button':
+			//this._prepareButton();
 			break;
 	}
 
@@ -525,13 +1199,68 @@ Plate.prototype._prepareIconImg = function() {
 	.addClass('level');
 }
 
-Plate.prototype._settleTemplateStyles = function(template) {
+Plate.prototype._prepareButton = function() {
+	var self = this;
+	switch (this._sub) {
+		case 'play':
+			this._play = $("<i class='fa fa-play-circle'></i>"),
+			this._stop = $("<i class='fa fa-pause' style='display:none'></i>");
+
+			this._play.on('click', function() {
+				self._play.css('display', 'none');
+				self._stop.css('display', 'block');
+			});
+
+			this._stop.on('click', function() {
+				self._stop.css('display', 'none');
+				self._play.css('display', 'block');
+			});
+
+			this._template.append(this._play);
+			this._template.append(this._stop);
+			break;
+	}
+}
+
+Plate.prototype._attachButtonEvent = function(data) {
+	var self = this;
+	switch (this._sub) {
+		case 'play':
+			if(data['play']) {
+				this._play.on('click', function() {
+					data['play'].call(this);
+				})
+			}
+
+			if(data['stop']) {
+				this._stop.on('click', function() {
+					data['stop'].call(this);
+				})
+			}
+			break;
+	}
+}
+
+Plate.prototype._settleTemplateStyles = function(data) {
+	var template = this._template;
 	switch(this._sub) {
 		case 'name':
-			template.css('background', 'linear-gradient(to right, rgba(0, 0, 0, 1), rgba(0, 0, 0, 0))')
+			template.css('background', 'linear-gradient(to right, rgba(0, 0, 0, 1), rgba(0, 0, 0, 0))');
 			break;
 		case 'state':
 			template.addClass(this._stateName);
+			break;
+		case 'item':
+			var quality = data.split('|')[1];
+			template.css('color', Common_Utils.mapQualityWithColor(quality));
+			template.css('background', 'linear-gradient(to right, rgba(0, 0, 0, 1), rgba(0, 0, 0, 0))');
+			break;
+		case 'quality':
+			template.css('color', '#ffd100');
+			break;
+		case 'text':
+			template.css('color', '#fff');
+			template.css('font-size', '12px');
 			break;
 	}
 }
@@ -544,6 +1273,12 @@ Plate.prototype._settleTagText = function() {
 			break;
 		case 'event':
 			text = "event";
+			break;
+		case 'announcement':
+			text = "announcement";
+			break;
+		case 'battle':
+			text = "battle";
 			break;
 	}
 	return text;
@@ -587,6 +1322,12 @@ Plate.prototype._settleLabelText = function(data) {
 			this._stateInner = states[0];
 			this._stateOuter = states[1];
 			text = tokens[1].split('|').join(' / ');
+			break;
+		case 'item':
+			text = data.split('|')[0];
+			break;
+		default:
+			text = data;
 			break;
 	}
 	return text;
@@ -637,9 +1378,11 @@ Plate.prototype._createTableValue = function(data, parent) {
 			$label.text(data);
 			break;
 		case 'equips':
+			var tokens = data.split('|');
 			$label = new Plate('icon', 'equip');
 			$label.settlePlate({
-				'main': data
+				'main': tokens[0],
+				'style': Common_Utils.mapQualityWithColor(tokens[1])
 			});
 			//this.attachChild($label);
 			$label = $label.render();
@@ -655,15 +1398,37 @@ Plate.prototype._createListData = function(d, n, parent) {
 			$li = new Plate('icon', 'item');
 			this._hold = true;
 			var self = this,
-				$itemInfo = new Plate('item', 'info');
+				$itemInfo = new Plate('item', 'item');
 			loader.pullItem({'type':'item','id':d}, function(item) {
-				console.log(item);
+				//console.log(item);
 				$li.settlePlate({
-					'main': item.icon,
-					'sub' : n
+					'main' : item.icon,
+					'sub'  : n,
+					'style': Common_Utils.mapQualityWithColor(item.quality)
 				});
 				if(self._infoBoard) {
 					$itemInfo.settlePlate(item);
+				}
+			});
+			//$li.attachChild($itemInfo);
+			this._infoBoard.attachChild($itemInfo);
+			$li.attachHandler('click', $itemInfo);
+			//$li.attachParent(parent);
+			break;
+		case 'equips':
+			$li = new Plate('icon', 'equip');
+			this._hold = true;
+			var self = this,
+				$itemInfo = new Plate('item', 'equip');
+			loader.pullItem({'type':'equips','id':d}, function(equip) {
+				//console.log(equip);
+				$li.settlePlate({
+					'main': equip.icon,
+					'sub' : n,
+					'style': Common_Utils.mapQualityWithColor(equip.quality)
+				});
+				if(self._infoBoard) {
+					$itemInfo.settlePlate(equip);
 				}
 			});
 			//$li.attachChild($itemInfo);
@@ -683,8 +1448,26 @@ Board.prototype.renderBoard = function() {
 	this._stage = $("#kingdom_middle_field");
 	this._left = $("#kingdom_left_field");
 	this._container = new Plate('container', 'scene');
-	this._info = new Plate('container', 'info');
+	//this._info = new Plate('container', 'info');
 	this['create' + this._type + 'Board'].call(this);
+}
+
+Board.prototype.createPublicBoard = function() {
+	this._annc = null;
+	this._world = null;
+	this._location = null;
+	this._tag = new Plate('tag', 'announcement');
+	this._calendar = new Plate('calendar');
+	this._anncIcon = new Plate('icon', 'event');
+	this._anncMsg = new Plate('message', 'annc');
+
+	this._container.attachChild([
+		this._tag, 
+		this._calendar, 
+		this._anncIcon,
+		this._anncMsg
+		//this._info
+	]);
 }
 
 Board.prototype.createNewPlayerBoard = function() {
@@ -694,10 +1477,10 @@ Board.prototype.createNewPlayerBoard = function() {
 	this._tag = new Plate('tag', 'recruit');
 	this._calendar = new Plate('calendar');
 	this._message = new Plate('message', 'recruit');
-
 	this._avatar = new Plate('avatar', 'player');
-	this._leftAvatar = new Plate('avatar', 'player');
 
+	this._info = new Plate('container', 'info');
+	this._leftAvatar = new Plate('avatar', 'player');
 	this._leftInfo = new Plate('table', 'text'),
 	this._leftIcons = new Plate('table', 'icon');
 	this._leftEquips = new Plate('table', 'equips');
@@ -724,12 +1507,11 @@ Board.prototype.createNewEventBoard = function() {
 	this._tag = new Plate('tag', 'event');
 	this._calendar = new Plate('calendar');
 	this._message = new Plate('message', 'event');
-
 	this._evt = new Plate('container', 'event');
-
 	this._avatar = new Plate('avatar', 'player');
-	this._leftAvatar = new Plate('avatar', 'player');
 
+	this._info = new Plate('container', 'info');
+	this._leftAvatar = new Plate('avatar', 'player');
 	this._leftInfo = new Plate('table', 'text'),
 	this._leftIcons = new Plate('table', 'icon');
 	this._leftEquips = new Plate('table', 'equips');
@@ -747,6 +1529,29 @@ Board.prototype.createNewEventBoard = function() {
 	]);
 
 	this._avatar.attachHandler('click', this._info);
+}
+
+Board.prototype.createBattleBoard = function() {
+	this._battle = null;
+	this._evt = null;
+	this._world = null;
+	this._location = null;
+	this._tag = new Plate('tag', 'battle');
+	this._button = new Plate('button', 'play');
+	this._calendar = new Plate('calendar');
+	this._playerField = new Plate('container', 'players');
+	this._enemyField = new Plate('container', 'enemies');
+	this._message = new Plate('message', 'event');
+
+	this._container.attachChild([
+		this._tag, 
+		this._button,
+		this._calendar,
+		this._playerField,
+		this._message,
+		//this._info
+		this._enemyField
+	]);
 }
 
 Board.prototype.createPlayerInfoBoard = function() {
@@ -785,6 +1590,56 @@ Board.prototype.trigger = function(config) {
 	if(null === this._world && config['world']) {
 		this._world = config['world'];
 		this._calendar.settlePlate(Common_Utils.query(this._world, 'collection', 'calendar'));
+	}
+
+	if(null === this._annc && config['public']) {
+		this._annc = config['public'];
+		//console.log(this._annc);
+		this._anncMsg.settlePlate(this._annc.message);
+		this._anncIcon.settlePlate({
+			'main' : this._annc.icon,
+			'style': 'big'
+		});
+	}
+
+	if(null === this._battle && config['battle']) {
+		var self = this;
+		this._battle = config['battle'];
+		this._event = config['event'];
+		this._message.settlePlate(this._battle.translate(this._event.description));
+
+		this._playerAvatars = this._battle.collectPlayerAvatars();
+		for(var i=0; i<this._playerAvatars.length; i++) {
+			this._playerField.attachChild(this._playerAvatars[i]);
+		}
+
+		this._playerInfos = this._battle.collectPlayerInfo();
+		for(var i=0; i<this._playerInfos.length; i++) {
+			this._playerInfos[i].attachParent(this._left);
+			this._left.append(this._playerInfos[i].render());
+		}
+
+		this._enemyAvatars = this._battle.collectEnemyAvatars();
+		for(var i=0; i<this._enemyAvatars.length; i++) {
+			this._enemyField.attachChild(this._enemyAvatars[i]);
+		}
+
+		this._enemyInfos = this._battle.collectEnemyInfo();
+		for(var i=0; i<this._enemyInfos.length; i++) {
+			this._enemyInfos[i].attachParent(this._left);
+			this._left.append(this._enemyInfos[i].render());
+		}
+
+		this._button.settlePlate({
+			play: function() {
+				console.log('play');
+				self._battle.startBattle();
+			},
+			stop: function() {
+				console.log('stop');
+				self._battle.debugBattle();
+			}
+		});
 	}
 
 	this.assembly();
@@ -832,7 +1687,7 @@ Board.prototype._preparePlayerData = function() {
 
 Board.prototype.assembly = function() {
 	this._stage.append(this._container.render());
-	this._left.append(this._info.render());
+	if(this._info) this._left.append(this._info.render());
 }
 ;var EventLoader = function($) {
 	
@@ -863,6 +1718,9 @@ Board.prototype.assembly = function() {
 		pullItem: function(r, callback) {
 			processAjaxRequest("request", r, callback);
 		},
+		pullEquip: function(r, callback) {
+			processAjaxRequest("request", r, callback);
+		},
 		push: function(data) {
 			processAjaxRequest("pushing", data);
 		}
@@ -881,7 +1739,27 @@ Renderer.prototype.initNewBoard = function(data) {
 
 	var type = Common_Utils.capitalizeAllTokens(this._type, "_"),
 		board = new Board(type);
+
+	this.renderPublicBoard(data);
 	this['render' + type + 'Event'].call(this, data, board);
+}
+
+Renderer.prototype.renderPublicBoard = function(data, board) {
+	var location = data['location'];
+
+	if(data['public']) {
+		for(var i=0; i<data['public'].length; i++) {
+			var d = data['public'][i]
+				pub = new Board('Public');
+
+			pub.trigger({
+				'public'  : d,
+				'location': location,
+				'world'   : data['world'] 
+			});
+			//pubBoards.push(pub);
+		}
+	}
 }
 
 Renderer.prototype.renderNewPlayerEvent = function(data, board) {
@@ -904,6 +1782,18 @@ Renderer.prototype.renderNewEventEvent = function(data, board) {
 		'location' : location,
 		'world'    : data['world'],
 		'event'    : data['event']   
+	});
+}
+
+Renderer.prototype.renderBattleEvent = function(data, board) {
+	var battle = new Battle(data['battle']),
+		location = data['location'];
+
+	board.trigger({
+		'location' : location,
+		'world'    : data['world'],
+		'battle'    : battle,
+		'event'    : data['event']
 	});
 }
 ;(function($) {

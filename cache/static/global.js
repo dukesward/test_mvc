@@ -32,16 +32,98 @@ Common_Utils.capitalizeAllTokens = function(str, delimitter, camel, connector) {
 		result = str.replace(/\w\S*/g, function(s) {
 			return s.charAt(0).toUpperCase() + s.substr(1);
 		})
+		//the camel indicator simply uncapitalizes the first letter of the str
+		if(camel) {
+			result = result.charAt(0).toLowerCase() + result.substr(1);
+		}
+		//replace blanks with the connector
+		result = result.split(' ').join(connector);
 	}
-	//the camel indicator simply uncapitalizes the first letter of the str
-	if(camel) {
-		result = result.charAt(0).toLowerCase() + result.substr(1);
-	}
-
-	//replace blanks with the connector
-	result = result.split(' ').join(connector);
+	if(result == null) result = str;
 	return result;
 }
+
+Common_Utils.mapQualityWithColor = function(q) {
+	var map = ['#bbb','#fff'], q = parseInt(q);
+	return (q+1) ? map[q] : '#fff';
+}
+
+Common_Utils.reformatBigNumber = function(num, fixed, reformat) {
+	var reformatted = num, fixed = fixed || 2;
+
+	if(reformat !== false) reformat = true;
+
+	if(num >= Math.pow(10, 9) && reformat) {
+		var temp = num/Math.pow(10, 9);
+		reformatted = Math.round(temp*10)/10;
+		reformatted = reformatted.toFixed(1) + 'B';
+	}else if(num >= Math.pow(10, 7) && reformat) {
+		var temp = num/Math.pow(10, 6);
+		reformatted = Math.round(temp*10)/10;
+		reformatted = reformatted.toFixed(1) + 'M';
+	}else {
+		reformatted = Math.round(num*100)/100;
+		reformatted = reformatted.toFixed(fixed);
+	}
+	return reformatted;
+}
+
+Common_Utils.mergeSort = function(array) {
+	if(array.length <= 1) {
+        return array;
+    }
+
+	var segment = array,
+		length = segment.length,
+		mid = Math.round(length/2);
+
+	function merge(left, right) {
+		var temp = [], l = left, r = right;
+
+		while(l.length && r.length) {
+            if(l.length > 1) var test = 1;
+            if(l[0] < r[0]) {
+                temp.push(l[0]);
+                l.shift();
+            }else {
+                temp.push(r[0]);
+                r.shift();
+            }
+        }
+		temp = l.length ? temp.concat(l) : temp.concat(r);
+		return temp;
+	}
+
+	return merge(this.mergeSort(segment.slice(0, mid)), this.mergeSort(segment.slice(mid, length)));
+};
+
+//must pass an array with obj type elements
+Common_Utils.sortObjectsByProperty = function(objs, prop, order) {
+	var temp = [],
+		sortedTemp,
+		sorted = [];
+
+	for(var obj in objs) {
+		//search for prop with name matching the arg prop
+        temp.push(this.searchProp(objs[obj], prop));
+    }
+
+    sortedTemp = this.mergeSort(temp);
+
+    while(sortedTemp.length && sortedTemp[0] != null) {
+    	for(var obj in objs) {
+    		if(sortedTemp[0] !== null && this.searchProp(objs[obj], prop) == sortedTemp[0]) {
+	    		sorted.push(objs[obj]);
+	    		sortedTemp.shift();
+	    	}
+    	}
+    }
+
+    if(sortedTemp.length) sorted.concat(sortedTemp);
+    //if need descending order, pass 1 to the function
+    if(order && order === 1) sorted.reverse();
+	return sorted;
+};
 
 Common_Utils.searchProp = function(obj, prop) {
 	if(!obj || null === prop || typeof prop === 'undefined') {
@@ -110,6 +192,15 @@ Common_Utils.searchProp = function(obj, prop) {
 
     return currentProp;
 };
+
+Common_Utils.query = function(data, key, val) {
+	var result = [];
+	for(var i in data) {
+		var d = data[i];
+		if(this.searchProp(d, key) === val) result.push(d);
+	}
+	return result;
+}
 
 Common_Utils.hexToRgb = function(hex) {
 	var rgb = [];
@@ -181,6 +272,67 @@ Common_Utils.extractAxisFromMap = function(map, type) {
 		}
 	}
 	return axis;
+}
+
+Common_Utils.processTimeFormat = function(time) {
+	var tokens = time.split('|'),
+		refined = [];
+	for(var i=0; i<tokens.length; i++) {
+		var t = tokens[i].toString();
+		if(t.length === 1) t = 0 + t;
+		refined.push(t);
+	}
+	return refined.join('|');
+}
+
+Common_Utils.processPrice = function(price) {
+	var gold = Math.round(price/10000),
+		silver = Math.round((price-gold*10000)/100),
+		copper = Math.round(price-gold*10000-silver*100);
+
+	return {
+		'gold': gold, 
+		'silver': silver, 
+		'copper': copper
+	};
+}
+
+Common_Utils.processEquipLiterals = function(data) {
+	var literals = {},
+		c = this.capitalizeAllTokens.bind(this);
+
+	switch(data['sub_type']) {
+		case 'weapon':
+			//part
+			literals['part'] = c(data['part']) + '-Hand';
+			literals['type'] = c(data['type']);
+			literals['damage'] = data['damage'] + ' Damage';
+			literals['speed'] = this.reformatBigNumber(data['speed'], 2) + ' Speed';
+			break;
+		case 'armor':
+			literals['part'] = c(data['part']);
+			literals['type'] = c(data['type']);
+			literals['armor'] = data['armor_i'] + ' Armor';
+			break;
+	}
+	return literals;
+}
+
+Common_Utils.translate = function(str) {
+	var pattern = /\{([a-zA-Z_]+?)\}/g,
+		self = this,
+		replaced = '';
+
+	replaced += str.replace(pattern, function(r, c) {
+		//console.log(self);
+		if(c && self['_' + c]) {
+			var modified = Common_Utils.capitalizeAllTokens(self['_' + c]);
+			return "<span class='" + c + "'>" + modified + "</span>";
+		}else if(c === 'evt') {
+
+		}
+	})
+	return replaced;
 }
 var FlashCard = FlashCard || function() { this._service = new this.service(); };
 

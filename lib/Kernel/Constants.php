@@ -102,7 +102,7 @@ class Kernel_Constants {
 	);
 
 	protected static $playerInfo = array(
-		"id","name","level","gender","class","class_alt","race","attrs","props","sp_type","equips","items","abilities","hp","sp","exp","exp_next"
+		"id","name","level","gender","class","class_type","class_alt","race","attrs","props","sp_type","equips","items","abilities","hp","sp","exp","exp_next"
 	);
 
 	public static function getPlayerAttrMap() {

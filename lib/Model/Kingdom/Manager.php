@@ -4,6 +4,7 @@ class Model_Kingdom_Manager {
 
 	const NPEW = 'new_player_event_weight';
 	const WORLD = 'world_settings';
+	const ITEMS = 'player_items';
 
 	private static $_config;
 	private static $_decision;
@@ -16,6 +17,7 @@ class Model_Kingdom_Manager {
 			self::$_config = Model_Kingdom_Config_Common::getInstance();
 		}
 
+		self::_processPublicAnnouncement();
 		self::_makeBasicEventDecision();
 		self::$_eventInfo['world'] = self::$_config->getWorldConfig();
 		//self::_updateWorldSettings();
@@ -31,8 +33,17 @@ class Model_Kingdom_Manager {
 				$id = Kernel_Utils::_getArrayElement($config, 'id');
 				if($id) $data = self::$_config->getItemById($id);
 				break;
+			case 'equips':
+				$id = Kernel_Utils::_getArrayElement($config, 'id');
+				if($id) $data = self::$_config->getEquipById($id);
+				break;
 		}
 		return json_encode($data);
+	}
+
+	protected static function _processPublicAnnouncement() {
+		$announcements = self::$_config->getActiveAnnc();
+		self::$_eventInfo['public'] = $announcements;
 	}
 
 	protected static function _makeBasicEventDecision() {
@@ -46,15 +57,17 @@ class Model_Kingdom_Manager {
 		$basicDecision->feed('event', $playerCount);
 
 		$decision = $basicDecision->makeDecision();
+		//var_dump($decision);//die();
 		self::$_decision = $decision;
 		//var_dump($decision);
 		if($decision === 'create') {
 			self::$_eventInfo['type'] = "new_player";
 			self::$_eventInfo['player'] = self::_createNewPlayer();
 		}else if($decision === 'event') {
+			self::$_eventInfo['type'] = "new_event";
 			$event = self::_makeEventDecision();
 			$player = self::$_eventInfo['player'];
-			self::$_eventInfo['type'] = "new_event";
+			
 			self::$_eventInfo['event'] = $event;
 			self::$_eventInfo['location'] = $config->getLocation($player->getLocation());
 		}
@@ -65,7 +78,7 @@ class Model_Kingdom_Manager {
 
 		$player = new Model_Kingdom_Object_Player($config);
 		$player->initRandomly();
-		//self::$_config->postNewPlayer($player->serialize());
+		self::$_config->postNewPlayer($player->serialize());
 		//var_dump(json_encode($player));
 		return $player;
 	}
@@ -156,11 +169,15 @@ class Model_Kingdom_Manager {
 		$config = self::$_config;
 		$playerCount = $config->getPlayerCount();
 		//this is not the best solution
-		do {
-			$random = Kernel_Utils::_createRandomNumber(0, 1, $playerCount);
-			$player = $config->getPlayer($random);
-			//var_dump($player);
-		} while ($player['is_dead'] == 'T');
+		$player = $config->getDebugPlayer();
+		//var_dump($player);die();
+		if(!$player) {
+			do {
+				$random = Kernel_Utils::_createRandomNumber(0, 1, $playerCount);
+				$player = $config->getPlayer($random);
+				//var_dump($player);
+			} while ($player['is_dead'] == 'T');
+		}
 		return $player;
 	}
 
@@ -175,6 +192,11 @@ class Model_Kingdom_Manager {
 
 		$filtered = Kernel_Utils::_filter($filtered, 'level_require', $player, function($lv, $player) {
 			return $lv <= $player->getLevel();
+		});
+
+		$filtered = Kernel_Utils::_filter($filtered, 'class_level', $player, function($lv, $player) {
+			$cls_config = self::$_config->getClassPropConfig($player->getClass());
+			return $lv <= $cls_config['class_level'];
 		});
 
 		$map = new Model_Kingdom_Object_WeightMap();
@@ -208,7 +230,95 @@ class Model_Kingdom_Manager {
 					//$item = $config->getItemById($itemId);
 					$player->addItem($id);
 				}
+				$config->simpleUpdate(self::ITEMS, $player->serializeItems(), 'player_name');
+				break;
+			case 'battle':
+				self::_prepareBattleEvent($player);
+				break;
+			case 'special':
+				self::_applySpecialEffect($effect[1], $player);
 				break;
 		}
+	}
+
+	protected static function _applySpecialEffect($id, $player) {
+		$config = self::$_config;
+
+		switch($id) {
+			case '70':
+				$player->convert('mercenary');
+				$config->updatePlayerInfo(array(
+					'name' =>$player->getName(),
+					'class'=>$player->getClass()
+				));
+				break;
+			case '71':
+				$player->convert('apprentice');
+				$config->updatePlayerInfo(array(
+					'name' =>$player->getName(),
+					'class'=>$player->getClass()
+				));
+				break;
+			case '72':
+				$player->convert('deacon');
+				$config->updatePlayerInfo(array(
+					'name' =>$player->getName(),
+					'class'=>$player->getClass()
+				));
+				break;
+			case '73':
+				$player->convert('thief');
+				$config->updatePlayerInfo(array(
+					'name' =>$player->getName(),
+					'class'=>$player->getClass()
+				));
+				break;
+		}
+	}
+
+	protected static function _prepareBattleEvent($player) {
+		self::$_eventInfo['type'] = 'battle';
+		self::$_eventInfo['battle'] = array();
+
+		self::$_eventInfo['battle']['players'] = array();
+		array_push(self::$_eventInfo['battle']['players'], self::$_eventInfo['player']);
+
+		$config = self::$_config;
+		$location = $player->getLocation();
+		$enemies = $config->getEnemyByLocation($location);
+
+		$map = new Model_Kingdom_Object_WeightMap();
+		foreach($enemies as $e) {
+			$map->feed($e['troop_name'], $e['chance']);
+		}
+		$decision = $map->makeDecision();
+		$troopEnemies = self::_buildEnemyTroop(Kernel_Utils::_query($enemies, 'troop_name', $decision, 'composition'), $decision);
+		self::$_eventInfo['battle']['troop'] = $decision;
+		self::$_eventInfo['battle']['enemies'] = $troopEnemies;
+	}
+
+	protected static function _buildEnemyTroop($troop, $name) {
+		$troopEnemies = array();
+		$enemies = explode('|', $troop);
+		foreach ($enemies as $e) {
+			$tokens = explode('*', $e);
+			$enemy = self::$_config->getEnemy($tokens[0]);
+			$enemy['loot'] = self::_processEnemyLoot($tokens[0], $name);
+			$enemy['number'] = $tokens[1];
+			array_push($troopEnemies, $enemy);
+		}
+		return $troopEnemies;
+	}
+
+	protected static function _processEnemyLoot($e, $troop) {
+		$lootItems = array();
+		$loot = self::$_config->getEnemyLoot($e, $troop);
+
+		for($i=1; $i<sizeof($loot)-1; $i++) {
+			$l = explode('*', $loot['loot_'.$i]);
+			//array_push($lootItems, $loot['loot_'.$i]);
+			$lootItems[$l[0]] = $l[1];
+		}
+		return $lootItems;
 	}
 }

@@ -7,8 +7,26 @@ Board.prototype.renderBoard = function() {
 	this._stage = $("#kingdom_middle_field");
 	this._left = $("#kingdom_left_field");
 	this._container = new Plate('container', 'scene');
-	this._info = new Plate('container', 'info');
+	//this._info = new Plate('container', 'info');
 	this['create' + this._type + 'Board'].call(this);
+}
+
+Board.prototype.createPublicBoard = function() {
+	this._annc = null;
+	this._world = null;
+	this._location = null;
+	this._tag = new Plate('tag', 'announcement');
+	this._calendar = new Plate('calendar');
+	this._anncIcon = new Plate('icon', 'event');
+	this._anncMsg = new Plate('message', 'annc');
+
+	this._container.attachChild([
+		this._tag, 
+		this._calendar, 
+		this._anncIcon,
+		this._anncMsg
+		//this._info
+	]);
 }
 
 Board.prototype.createNewPlayerBoard = function() {
@@ -18,10 +36,10 @@ Board.prototype.createNewPlayerBoard = function() {
 	this._tag = new Plate('tag', 'recruit');
 	this._calendar = new Plate('calendar');
 	this._message = new Plate('message', 'recruit');
-
 	this._avatar = new Plate('avatar', 'player');
-	this._leftAvatar = new Plate('avatar', 'player');
 
+	this._info = new Plate('container', 'info');
+	this._leftAvatar = new Plate('avatar', 'player');
 	this._leftInfo = new Plate('table', 'text'),
 	this._leftIcons = new Plate('table', 'icon');
 	this._leftEquips = new Plate('table', 'equips');
@@ -48,12 +66,11 @@ Board.prototype.createNewEventBoard = function() {
 	this._tag = new Plate('tag', 'event');
 	this._calendar = new Plate('calendar');
 	this._message = new Plate('message', 'event');
-
 	this._evt = new Plate('container', 'event');
-
 	this._avatar = new Plate('avatar', 'player');
-	this._leftAvatar = new Plate('avatar', 'player');
 
+	this._info = new Plate('container', 'info');
+	this._leftAvatar = new Plate('avatar', 'player');
 	this._leftInfo = new Plate('table', 'text'),
 	this._leftIcons = new Plate('table', 'icon');
 	this._leftEquips = new Plate('table', 'equips');
@@ -71,6 +88,29 @@ Board.prototype.createNewEventBoard = function() {
 	]);
 
 	this._avatar.attachHandler('click', this._info);
+}
+
+Board.prototype.createBattleBoard = function() {
+	this._battle = null;
+	this._evt = null;
+	this._world = null;
+	this._location = null;
+	this._tag = new Plate('tag', 'battle');
+	this._button = new Plate('button', 'play');
+	this._calendar = new Plate('calendar');
+	this._playerField = new Plate('container', 'players');
+	this._enemyField = new Plate('container', 'enemies');
+	this._message = new Plate('message', 'event');
+
+	this._container.attachChild([
+		this._tag, 
+		this._button,
+		this._calendar,
+		this._playerField,
+		this._message,
+		//this._info
+		this._enemyField
+	]);
 }
 
 Board.prototype.createPlayerInfoBoard = function() {
@@ -109,6 +149,56 @@ Board.prototype.trigger = function(config) {
 	if(null === this._world && config['world']) {
 		this._world = config['world'];
 		this._calendar.settlePlate(Common_Utils.query(this._world, 'collection', 'calendar'));
+	}
+
+	if(null === this._annc && config['public']) {
+		this._annc = config['public'];
+		//console.log(this._annc);
+		this._anncMsg.settlePlate(this._annc.message);
+		this._anncIcon.settlePlate({
+			'main' : this._annc.icon,
+			'style': 'big'
+		});
+	}
+
+	if(null === this._battle && config['battle']) {
+		var self = this;
+		this._battle = config['battle'];
+		this._event = config['event'];
+		this._message.settlePlate(this._battle.translate(this._event.description));
+
+		this._playerAvatars = this._battle.collectPlayerAvatars();
+		for(var i=0; i<this._playerAvatars.length; i++) {
+			this._playerField.attachChild(this._playerAvatars[i]);
+		}
+
+		this._playerInfos = this._battle.collectPlayerInfo();
+		for(var i=0; i<this._playerInfos.length; i++) {
+			this._playerInfos[i].attachParent(this._left);
+			this._left.append(this._playerInfos[i].render());
+		}
+
+		this._enemyAvatars = this._battle.collectEnemyAvatars();
+		for(var i=0; i<this._enemyAvatars.length; i++) {
+			this._enemyField.attachChild(this._enemyAvatars[i]);
+		}
+
+		this._enemyInfos = this._battle.collectEnemyInfo();
+		for(var i=0; i<this._enemyInfos.length; i++) {
+			this._enemyInfos[i].attachParent(this._left);
+			this._left.append(this._enemyInfos[i].render());
+		}
+
+		this._button.settlePlate({
+			play: function() {
+				console.log('play');
+				self._battle.startBattle();
+			},
+			stop: function() {
+				console.log('stop');
+				self._battle.debugBattle();
+			}
+		});
 	}
 
 	this.assembly();
@@ -156,5 +246,5 @@ Board.prototype._preparePlayerData = function() {
 
 Board.prototype.assembly = function() {
 	this._stage.append(this._container.render());
-	this._left.append(this._info.render());
+	if(this._info) this._left.append(this._info.render());
 }

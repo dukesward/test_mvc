@@ -16,7 +16,10 @@
 	<files name='kingdom'>
 		<file>library\jquery\jquery-min</file>
 		<file>library\common\utils</file>
+		<file>library\kingdom\Action</file>
 		<file>library\kingdom\Player</file>
+		<file>library\kingdom\AI_PVE</file>
+		<file>library\kingdom\Battle</file>
 		<file>library\kingdom\Plate</file>
 		<file>library\kingdom\Board</file>
 		<file>library\kingdom\EventLoader</file>

@@ -27,6 +27,9 @@
 		pullItem: function(r, callback) {
 			processAjaxRequest("request", r, callback);
 		},
+		pullEquip: function(r, callback) {
+			processAjaxRequest("request", r, callback);
+		},
 		push: function(data) {
 			processAjaxRequest("pushing", data);
 		}

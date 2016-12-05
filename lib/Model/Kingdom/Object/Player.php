@@ -7,6 +7,7 @@ class Model_Kingdom_Object_Player implements JsonSerializable {
 	protected $_gender;
 	protected $_class;
 	protected $_class_conf;
+	protected $_class_type;
 	protected $_race;
 
 	protected $_attr_wt = array();
@@ -47,12 +48,13 @@ class Model_Kingdom_Object_Player implements JsonSerializable {
 		} while ($this->_db->getPlayerCount($name) > 0);
 
 		$this->_name = $name;
-		$this->_name = 'test';
+		//$this->_name = 'test';
 		$this->_gender = Kernel_Utils::_decide() ? 'M' : 'F';
 		$this->_generatePlayerBaseAttrWt();
 		$this->_level = 1;
 
 		$this->_class_conf = $this->_db->getClassPropConfig($this->_class);
+		$this->_class_type = $this->_class_conf['type'];
 		$this->_class_alt = $this->_class_conf['class_name_alt'];
 		if($this->_class) $this->_addPlayerAttrWt($this->_class_conf);
 		if($this->_race) $this->_addPlayerAttrWt($this->_db->getRacePropConfig($this->_race, $this->_gender));
@@ -72,6 +74,8 @@ class Model_Kingdom_Object_Player implements JsonSerializable {
 		$this->_level = $player['level'];
 
 		$this->_class = $player['class'];
+		$this->_class_conf = $this->_db->getClassPropConfig($this->_class);
+		$this->_class_type = $this->_class_conf['type'];
 		$this->_race = $player['race'];
 		$this->_location = $player['location'];
 
@@ -127,7 +131,7 @@ class Model_Kingdom_Object_Player implements JsonSerializable {
 			"player"     => array(),
 			"attributes" => array(),
 			"equipments" => array(),
-			"items"      => array(),
+			"items"      => $this->serializeItems(),
 			"weights"    => array()
 		);
 
@@ -158,19 +162,27 @@ class Model_Kingdom_Object_Player implements JsonSerializable {
 		foreach ($this->_attr_wt as $attr => $wt) {
 			$serialized['weights'][$attr.'_wt'] = $wt;
 		}
+		return $serialized;
+	}
 
-		$serialized['items']['player_name'] = $this->_name;
-		$serialized['items']['num_items'] = sizeof($this->_items);
+	public function serializeItems() {
+		$items = array();
+		$items['player_name'] = $this->_name;
+		$items['num_items'] = sizeof($this->_items);
 		$counter = 1;
 		foreach ($this->_items as $id => $num) {
-			$serialized['items']['item_'.$counter] = $id.'*'.$num;
+			$items['item_'.$counter] = $id.'*'.$num;
 			$counter++;
 		}
-		return $serialized;
+		return $items;
 	}
 
 	public function getId() {
 		return $this->_id;
+	}
+
+	public function getName() {
+		return $this->_name;
 	}
 
 	public function getLocation() {
@@ -179,6 +191,10 @@ class Model_Kingdom_Object_Player implements JsonSerializable {
 
 	public function getClass() {
 		return $this->_class;
+	}
+
+	public function convert($cls) {
+		$this->_class = $cls;
 	}
 
 	public function getLevel() {

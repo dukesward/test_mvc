@@ -351,7 +351,7 @@ class Kernel_Utils {
 
 	public static function _wrapStr($str, $wrapper) {
 		$output = $str;
-
+		//var_dump($output);
 		if(is_string($wrapper)) {
 			$output = $wrapper . $output . $wrapper;
 		}

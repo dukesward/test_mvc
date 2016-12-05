@@ -60,6 +60,10 @@ ul, li {
 	font-family: "Acme";
 }
 
+.container .tag.announcement {
+	text-shadow: 1px 1px #000;
+}
+
 .container.state {
 	padding-left: 15px;
 	margin-left: -30px;
@@ -100,10 +104,51 @@ ul, li {
 	float: right;
 }
 
+.container.moreInfo {
+	clear: both;
+	padding-right: 15px;
+}
+
+.container.players:after, .container.enemies:after {
+	content: " ";
+	display: block; 
+   	height: 0; 
+   	clear: both;
+}
+
+.container.enemies .avatar {
+	float: right;
+}
+
+.container.item {
+	clear: both;
+}
+
+.container.equipDetail {
+	clear: both;
+	padding-right: 15px;
+}
+
 .label.name,
 .label.state {
 	color: #fff;
 	padding-left: 15px;
+}
+
+.label.part, .label.type, .label.damage, .label.speed {
+	color: #fff;
+}
+
+.label.damage {
+	clear: both;
+}
+
+.label.part {
+	float: left;
+}
+
+.label.type {
+	float: right;
 }
 
 .label.state.hp {
@@ -130,9 +175,23 @@ ul, li {
 	height: 14px;
 }
 
+.label.usage {
+	color: #1eff00;
+}
+
+.label.desc {
+	color: #ffd100;
+}
+
 .avatar.player {
 	width: 160px;
 	height: 75px;
+	float: left;
+	clear: right;
+}
+
+.icon.event {
+	margin: 5px;
 	float: left;
 	clear: right;
 }
@@ -152,6 +211,12 @@ ul, li {
 	width: 30px;
 	height: 30px;
 	-webkit-clip-path: circle(15px at 15px 15px);
+}
+
+.icon.price .box {
+	width: 13px;
+	height: 13px;
+	-webkit-clip-path: circle(6px at 6px 6px);
 }
 
 .icon.player .level {
@@ -193,6 +258,15 @@ ul, li {
 	background-color: #ff668d;
 }
 
+.icon.player .level.n {
+	background-color: #bbb;
+	color: #000;
+}
+
+.icon.big.item .level {
+	display: none;
+}
+
 .icon.big img {
 	width: 56px;
 	height: 56px;
@@ -205,6 +279,13 @@ ul, li {
 	height: 28px;
 	margin: 1px 0 0 1px;
 	-webkit-clip-path: circle(14px at 14px 14px);
+}
+
+.icon.price img {
+	width: 13px;
+	height: 13px;
+	margin: 1px 0 0 1px;
+	-webkit-clip-path: circle(6px at 6px 6px);
 }
 
 .icon.table span {
@@ -221,12 +302,20 @@ ul, li {
 }
 
 .message.recruit,
-.message.event {
+.message.event,
+.message.annc {
 	background: linear-gradient(to bottom, rgba(0, 0, 0, 1), rgba(0, 0, 0, 0));
 	margin: 0 5px;
 	padding: 10px;
 	color: #fff;
 	border-radius: 3px;
+}
+
+.message.annc {
+	width: 84%;
+	clear: none;
+	float: left;
+	margin-top: 5px;
 }
 
 .calendar {
@@ -241,20 +330,40 @@ ul, li {
 	padding-left: 25px;
 }
 
-.list.items {
+.list.items,
+.list.equips {
 	clear: both;
 }
 
-.list.items ul {
+.list.items ul,
+.list.equips ul {
 	padding: 10px 0;
 	margin: 0;
 }
 
-.list.items .icon {
+.list.equips li {
+	float: left;
+	padding-right: 5px;
+}
+
+.list.items .icon,
+.list.equips .icon {
 	float: none;
 	cursor: pointer;
 }
 
 .item.info .level {
 	display: none;
+}
+
+.table.price td div {
+	display: inline-block;
+	float: left;
+}
+
+.button {
+	color: #fff;
+	float: right;
+	font-size: 18px;
+	padding-left: 20px;
 }

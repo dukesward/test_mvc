@@ -28,6 +28,19 @@ class Model_Kingdom_Config_Common {
 		return $this->_player->getConfig($id);
 	}
 
+	public function getDebugPlayer() {
+		$query = array(
+			'table' => 'kingdom_players',
+			'query' => array(
+				'where' => array(
+					'key' => 'debug',
+					'value' => 'T'
+				)
+			)
+		);
+		return $this->_player->getCustomConfig($query)[0];
+	}
+
 	public function getPlayerAttrs($name) {
 		$query = array(
 			'table' => 'player_attributes',
@@ -67,6 +80,47 @@ class Model_Kingdom_Config_Common {
 		return $this->_player->getCustomConfig($query);
 	}
 
+	public function getEnemyByLocation($loc) {
+		$query = array(
+			'table' => 'location_enemy',
+			'query' => array(
+				"where_n" => array(
+					"location" => $loc,
+					"active"   => "T"
+				)
+			),
+			//"debug" => "1"
+		);
+		return $this->_player->getCustomConfig($query);
+	}
+
+	public function getEnemy($name) {
+		$query = array(
+			'table' => 'enemies',
+			'query' => array(
+				'where' => array(
+					'key' => 'name',
+					'value' => $name
+				)
+			)
+		);
+		return $this->_player->getCustomConfig($query)[0];
+	}
+
+	public function getEnemyLoot($e, $troop) {
+		$query = array(
+			'table' => 'enemy_loot',
+			'query' => array(
+				"where_n" => array(
+					"enemy_name" => $e,
+					"troop"      => $troop
+				)
+			),
+			//"debug" => "1"
+		);
+		return $this->_player->getCustomConfig($query)[0];
+	}
+
 	public function getWorldConfig() {
 		return $this->_player->fetchAll('world_settings');
 	}
@@ -80,6 +134,19 @@ class Model_Kingdom_Config_Common {
 				)
 			),
 			//"debug" => "1"
+		);
+		return $this->_player->getCustomConfig($query);
+	}
+
+	public function getActiveAnnc() {
+		$query = array(
+			'table' => 'events',
+			'query' => array(
+				'where' => array(
+					'key' => 'active',
+					'value' => 'T'
+				)
+			)
 		);
 		return $this->_player->getCustomConfig($query);
 	}
@@ -174,6 +241,21 @@ class Model_Kingdom_Config_Common {
 		return $data;
 	}
 
+	public function getEquipById($id) {
+		$query = array(
+			'table' => 'equipments',
+			'query' => array(
+				"where" => array(
+					"key" => "id",
+					"value" => $id
+				)
+			),
+			//"debug" => "1"
+		);
+		$data = $this->_player->getCustomConfig($query);
+		return $data[0];
+	}
+
 	public function getEquipObject($name) {
 		$query = array(
 			'table' => 'equipments',
@@ -223,11 +305,22 @@ class Model_Kingdom_Config_Common {
 		$this->_player->insertData('kingdom_players', $player['player']);
 		$this->_player->insertData('player_attributes', $player['attributes']);
 		$this->_player->insertData('player_equips', $player['equipments']);
-		$this->_player->insertData('player_items', $player['items']);
+		$this->postPlayerItems($player);
 		$this->_player->insertData('player_weights', $player['weights']);
+	}
+
+	public function postPlayerItems($player) {
+		$this->_player->insertData('player_items', $player['items']);
 	}
 
 	public function simpleUpdate($table, $data, $prime) {
 		$this->_player->updateData($table, $data, $prime);
+	}
+
+	public function updatePlayerInfo($data) {
+		$table = 'kingdom_players';
+		$prime = 'name';
+
+		$this->simpleUpdate($table, $data, $prime);
 	}
 }
