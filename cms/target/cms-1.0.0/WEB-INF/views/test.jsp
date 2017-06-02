@@ -25,7 +25,7 @@
 			</div>
 		</c:if>
 		<c:if test='${code != null}'>
-			<div class='cms_test_result cms_blocker_main'><span class='cms_head'>Testing Code</span>${code}</div>
+			<div class='cms_test_result cms_blocker_main'><span class='cms_head'>Testing Code</span> ${code}</div>
 		</c:if>
 		<c:if test='${log != null}'>
 			<div class='cms_test_log cms_blocker_main'><span class='cms_head'>Testing Log</span></div>
