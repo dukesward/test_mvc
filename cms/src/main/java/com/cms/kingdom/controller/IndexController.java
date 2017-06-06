@@ -38,8 +38,13 @@ public class IndexController {
 	
 	@RequestMapping(value = "/home", method = RequestMethod.GET)
 	public String init(ModelMap model) {
-		System.out.println("test std log out");
+		System.out.println("test db pulling");
 		model.addAttribute("message", "Welcome!");
+		
+		Session session = kdao.prepareSession();
+		node.setNid(1);
+		node = (Node) session.get(Node.class, node.getNid());
+		model.addAttribute("node", node.toString());
 
 		/*try {
 			//File file = new File(HIBERNATE_CONFIG);
@@ -75,5 +80,11 @@ public class IndexController {
 	public String search(@PathVariable String content, ModelMap model) {
 		String result = searchController.handleRequests(content, request);
 		return result;
+	}
+	
+	@RequestMapping(value = "/services/{name}")
+	public String service(@PathVariable String name) {
+		String output = serviceController.handleRequests(name, request);
+		return output;
 	}
 }
