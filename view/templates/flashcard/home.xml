@@ -3,6 +3,20 @@
 	<node type='div' override='content'>
 		<node type='div' _id='cards'>
 			<t>CARDS</t>
+			<node type='ul' _class='handlers load-button' _util='load'>
+				<node type='li' _util='fetchCards'>
+					<t>All</t>
+				</node>
+				<node type='li' _util='fetchCards' _param='10'>
+					<t>10</t>
+				</node>
+				<node type='li' _util='fetchCards' _param='20'>
+					<t>20</t>
+				</node>
+				<node type='li' _util='search'>
+					<t>Search</t>
+				</node>
+			</node>
 			<node type='div' _class='tab-container'>
 				<node type='ul'>
 					<node type='li' _class='active' _util='word'>
@@ -26,7 +40,7 @@
 				<node type='div' _class='word-container example'>
 					<node type='div' _class='wrapper'></node>
 				</node>
-				<node type='div' _class='exp-container'>
+				<!--<node type='div' _class='exp-container'>
 					<node type='div' _class='wrapper'>
 						<node type='span' _class='exp title'>
 							<t>EXP: </t>
@@ -37,15 +51,15 @@
 						</node>
 						<node type='span' _class='exp next'></node>
 					</node>
-				</node>
+				</node>-->
 			</node>
 			<node type='ul' _class='handlers'>
 				<node type='li' _util='next'>
 					<t>Next</t>
 				</node>
-				<node type='li' _util='earn'>
+				<!--<node type='li' _util='earn'>
 					<t>Earn Exp</t>
-				</node>
+				</node>-->
 				<node type='li' _util='add'>
 					<t>Add</t>
 				</node>

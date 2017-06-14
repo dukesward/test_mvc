@@ -16,6 +16,10 @@ Common_Utils.isNumber = function(num) {
 	return num/1 !== NaN;
 }
 
+Common_Utils.createRandomNumber = function(min, max, decimals) {
+	return Math.round(((max - min)*Math.random() + min)*Math.pow(10, decimals))/Math.pow(10, decimals);
+}
+
 Common_Utils.capitalizeAllTokens = function(str, delimitter, camel, connector) {
 	var result = null, connector = connector || '';
 	if(typeof str === 'string') {

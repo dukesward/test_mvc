@@ -7,7 +7,7 @@ class Model_FlashCard_Processor extends Model_CoreProcessor {
 	protected $_default;
 	protected $_table = array();
 	
-	public function loadCardDetails($params) {
+	public function loadCardDetails($params, $data) {
 		$adapter = Kernel_Db_Adapter::getDbAdapter(null, 'flashcard');
 
 		$card_details = array(

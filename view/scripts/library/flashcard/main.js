@@ -1,11 +1,20 @@
-if(typeof jQuery === 'function' && FlashCard) {
+if(typeof jQuery === 'function' && window.FlashCard) {
 	(function initFlashCard($) {
-		var flashCard = new FlashCard(),
+		var flashCard = window.FlashCard,
 			currentWord = null;
 
-		flashCard._service.get(function(cards) {
-			injectWordCards(cards);
+		var $tabContainer = $('.tab-container'),
+			$loadButtons = $('.load-button');
+
+		flashCard.setContainer($tabContainer);
+
+		$loadButtons.find('li').each(function() {
+			flashCard.attachHandler($(this));
 		});
+
+		//flashCard._service.get(function(cards) {
+			//injectWordCards(cards);
+		//}.bind(flashCard));
 
 		function injectWordCards(data) {
 			var $container = $('.card-container'),
