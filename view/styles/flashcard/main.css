@@ -61,6 +61,7 @@ ul {
 	font-family: 'Microsoft Yahei';
 	display: none;
 	margin: 15px auto;
+	text-align: center;
 }
 
 .word-container .word {
@@ -89,15 +90,15 @@ ul {
 	opacity: 1;
 }
 
-.exp-container {
+.progress-container {
 	overflow: hidden;
 }
 
-.exp-container .wrapper {
+.progress-container .wrapper {
 	float: right;
 }
 
-.exp.title {
+.progress.title {
 	font-size: 14px;
 }
 

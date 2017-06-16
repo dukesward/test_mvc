@@ -13,8 +13,8 @@
 				<node type='li' _util='fetchCards' _param='20'>
 					<t>20</t>
 				</node>
-				<node type='li' _util='search'>
-					<t>Search</t>
+				<node type='li' _util='fetchCards' _param='30'>
+					<t>30</t>
 				</node>
 			</node>
 			<node type='div' _class='tab-container'>
@@ -40,27 +40,24 @@
 				<node type='div' _class='word-container example'>
 					<node type='div' _class='wrapper'></node>
 				</node>
-				<!--<node type='div' _class='exp-container'>
+				<node type='div' _class='progress-container'>
 					<node type='div' _class='wrapper'>
-						<node type='span' _class='exp title'>
-							<t>EXP: </t>
-						</node>
-						<node type='span' _class='exp current'></node>
+						<node type='span' _class='progress current'></node>
 						<node type='span'>
 							<t>/</t>
 						</node>
-						<node type='span' _class='exp next'></node>
+						<node type='span' _class='progress total'></node>
 					</node>
-				</node>-->
+				</node>
 			</node>
-			<node type='ul' _class='handlers'>
-				<node type='li' _util='next'>
+			<node type='ul' _class='handlers control-button'>
+				<node type='li' _util='nextCard'>
 					<t>Next</t>
 				</node>
 				<!--<node type='li' _util='earn'>
 					<t>Earn Exp</t>
 				</node>-->
-				<node type='li' _util='add'>
+				<node type='li' _util='addCard'>
 					<t>Add</t>
 				</node>
 			</node>
@@ -74,6 +71,11 @@
 				<node type='span' ><t>Type</t></node>
 				<node type='input' _type='text' _class='create-input' _name='type'></node>
 				<node type='span' _util='send' _class='send'><t>Send</t></node>
+			</node>
+			<node type='div'>
+				<node type='span' _util='search'>
+					<t>Search</t>
+				</node>
 			</node>
 		</node>
 	</node>

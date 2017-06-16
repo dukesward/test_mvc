@@ -21,6 +21,10 @@ Common_Utils.isNumber = function(num) {
 	return num/1 !== NaN;
 }
 
+Common_Utils.createRandomNumber = function(min, max, decimals) {
+	return Math.round(((max - min)*Math.random() + min)*Math.pow(10, decimals))/Math.pow(10, decimals);
+}
+
 Common_Utils.capitalizeAllTokens = function(str, delimitter, camel, connector) {
 	var result = null, connector = connector || '';
 	if(typeof str === 'string') {
@@ -338,6 +342,9 @@ var FlashCard = FlashCard || function(service, card) {
 	this._service = new service();
 	this._collection = null;
 	this._container = null;
+	this._progress = null;
+	this._tabs = [];
+	this.activeTab = "word";
 };
 
 (function(root, $) {
@@ -403,18 +410,107 @@ var FlashCard = FlashCard || function(service, card) {
 		}
 
 		var card = function(word) {
+			this.isCard = true;
 			this.word = word;
-			this.tabs = ["word", "meaning", "example"];
-			this.activeTab = this.tabs[0];
 		};
 
+		card.prototype.testFilter = function(filter) {
+			var result = true;
+
+			if(filter) {
+				//switch(filter) {
+					
+				//}
+			}
+			return result;
+		}
+
 		var collection = function(cards) {
-			this.cards = cards;
+			this.cards = this.makeCards(cards);
+			this.currentCardIndex = null;
+			this.size = cards.length;
+		}
+
+		collection.prototype.setSize = function(number) {
+			if(!isNaN(number) && this.size > number) {
+				this.size = number;
+				this.refineCollection();
+			}
+		}
+
+		collection.prototype.makeCards = function(cards) {
+			var temp = [];
+
+			for(var i=0; i<cards.length; i++) {
+				var c = cards[i];
+				temp.push(c.isCard ? c : new card(c));
+			}
+			return temp;
+		}
+
+		collection.prototype.getCurrentWord = function() {
+			if(!this.currentCardIndex) {
+				this.currentCardIndex = 1;
+			}
+			return this.cards[this.currentCardIndex];
+		}
+
+		collection.prototype.refineCollection = function(filter) {
+			if(this.size < this.cards.length) {
+				this.applyFilter(filter);
+			}else if(this.size > this.cards.length) {
+				this.size = this.cards.length;
+			}
+		}
+
+		collection.prototype.pickCard = function() {
+			if(!this.currentCardIndex || this.currentCardIndex >= this.cards.length) {
+				this.applyFilter(null, this.cards.length);
+				this.currentCardIndex = 1;
+			}else {
+				this.currentCardIndex ++;
+			}
+
+			return this.cards[this.currentCardIndex - 1];
+		}
+
+		collection.prototype.applyFilter = function(filter, size, cards) {
+			var temp = [],
+				cards = cards || this.cards,
+				size = size || this.size;
+
+			if(size <= cards.length) {
+				while(temp.length < size) {
+					var rand = Common_Utils.createRandomNumber(0, cards.length - 1, 0),
+						c = cards[rand].isCard ? cards[rand] : new card(cards[rand]);
+
+					if(c.testFilter(filter)) {
+						temp.push(c);
+					}
+					cards.splice(rand, 1);
+				}
+			}else {
+				temp = cards;
+			}
+			//apply filter will auto replace the cards with the filtered cards
+			this.cards = temp;
 		}
 
 		FlashCard.prototype.setContainer = function($el) {
 			if($el.length) {
 				this._container = $el;
+				this._starList = $('.star-list', this._container);
+				this._type = $('.type', this._container);
+				this._word = $('.word', this._container);
+				this._meaning = $('.meaning', this._container);
+			}
+		}
+
+		FlashCard.prototype.setProgressContainer = function($el) {
+			if($el.length) {
+				this._progress = $el;
+				this._progressCurrent = $('.current', this._progress);
+				this._progressTotal = $('.total', this._progress);
 			}
 		}
 
@@ -430,38 +526,133 @@ var FlashCard = FlashCard || function(service, card) {
 
 			if(this._service) {
 				this._service.get(function(cards) {
-					this._collection = new collection(cards);
-					self.injectCard(new card(self.pickRandom(this._collection)));
+					self._collection = new collection(cards);
+					self._collection.setSize(parseInt(number));
+					self.injectCard(self._collection.pickCard());
 				}, params);
 			}
+		}
+
+		FlashCard.prototype.nextCard = function() {
+			this.injectCard(this._collection.pickCard());
 		}
 
 		FlashCard.prototype.search = function() {
 
 		}
 
+		FlashCard.prototype.refreshStars = function(word) {
+			if(this._starList.length) {
+				this._starList.html('');
+				for(var i=0; i<word.word.base; i++) {
+					var star = "<li class='fa fa-asterisk' aria-hidden='true'></li>"
+					this._starList.append($(star));
+				}
+			}
+		}
+
+		FlashCard.prototype.refreshWord = function(word) {
+			if(this._type.length) {
+				this._type.text(word.word.type);
+			}
+
+			if(this._meaning.length) {
+				this._meaning.text(word.word.meaning);
+			}
+
+			if(this._word.length) {
+				this._word.html('');
+				var tokens = word.word.word.split('|');
+				for(var i=0; i<tokens.length; i++) {
+					var token = tokens[i].split(':'),
+						$word = $('<div></div>').addClass('word').attr('i', i);
+
+					if(token.length === 2) {
+						var $hiroLabel = $('<span></span>').addClass('label').addClass('l' + i).text(token[0]);
+						$word.addClass('kanji').text(token[1]);
+						$word.prepend($hiroLabel);
+					}else {
+						$word.addClass('hiro').text(token[0]);
+					}
+					
+					$word.on('click', function() {
+						var index = $(this).attr('i');
+						$('.label.l'+index).addClass('display');
+					});
+
+					this._word.append($word);
+					this._word.css('display', 'table');
+				}
+			}	
+		}
+
+		FlashCard.prototype.refreshProgress = function() {
+			if(this._progressCurrent.length) {
+				this._progressCurrent.text(this._collection.currentCardIndex || 0);
+			}
+
+			if(this._progressTotal.length) {
+				this._progressTotal.text(this._collection.size);
+			}
+		}
+
 		FlashCard.prototype.injectCard = function(card) {
-
+			var word = this._collection.getCurrentWord();
+			this.refreshWord(word);
+			this.refreshStars(word);
+			this.refreshProgress();
 		}
 
-		FlashCard.prototype.pickRandom = function(collection) {
-
-		}
-
-		FlashCard.prototype.attachHandler = function(target) {
+		FlashCard.prototype.attachHandler = function(target, scope) {
 			if(target.length) {
 				var self = this, 
 					util = target.attr('util'),
 					params = target.attr('param'),
 					closure = function() {
-						if(self[util])
-							self[util](params);
+						if(this[util])
+							this[util].call(this, params);
 						else
 							console.warn("specified util:[" + util + "] does not exist");
 					};
 
-				target.on('click', closure);
+				target.on('click', closure.bind(scope || self));
 			}
+		}
+
+		FlashCard.prototype.configureTabs = function(target) {
+			this._tabs.push(target);
+			var self = this,
+				scope = {
+					word: function() {
+						self.activeTab = "word";
+						refreshTab("word");
+
+						self._word.css('display', 'table');
+						self._meaning.css('display', 'none');
+					},
+					meaning: function() {
+						self.activeTab = "meaning";
+						refreshTab("meaning");
+
+						self._word.css('display', 'none');
+						self._meaning.css('display', 'block');
+					},
+					example: function() {
+
+					}
+				},
+				refreshTab = function(tab) {
+					for(var i=0; i<self._tabs.length; i++) {
+						var util = self._tabs[i].attr('util');
+						if(util === tab) {
+							self._tabs[i].addClass('active');
+						}else {
+							self._tabs[i].removeClass('active');
+						}
+					}
+				};
+
+			this.attachHandler(target, scope);
 		}
 
 		root.FlashCard = new FlashCard(service, card);
@@ -474,145 +665,25 @@ if(typeof jQuery === 'function' && window.FlashCard) {
 		var flashCard = window.FlashCard,
 			currentWord = null;
 
-		var $tabContainer = $('.tab-container'),
-			$loadButtons = $('.load-button');
+		var $tabContainer = $('.card-container'),
+			$loadButtons = $('.load-button'),
+			$controlButtons = $('.control-button'),
+			$tabs = $('.tab-container');
 
 		flashCard.setContainer($tabContainer);
+		flashCard.setProgressContainer($('.progress-container'));
 
 		$loadButtons.find('li').each(function() {
 			flashCard.attachHandler($(this));
 		});
 
-		//flashCard._service.get(function(cards) {
-			//injectWordCards(cards);
-		//}.bind(flashCard));
+		$controlButtons.find('li').each(function() {
+			flashCard.attachHandler($(this));
+		});
 
-		function injectWordCards(data) {
-			var $container = $('.card-container'),
-				$wordContainer = $('.word-container.word', $container),
-				$handlers = $('.handlers', $container),
-				$tabs = $('ul li', $('.tab-container')),
-				$createWords = $('.create-words');
-				
-			if(Common_Utils.isArray(data) && data.length > 0) {
-				//refresh word container on click
-				$("li[util='next']").on('click', function() {
-					$wordContainer.empty();
-					$('.star-list').empty();
-					appendWord(data, $container);
-				});
-
-				$("li[util='earn']").on('click', function() {
-					currentWord['points'] += 1;
-
-					while(currentWord['points'] >= currentWord['base'] * currentWord['stars']) {
-						currentWord['points'] -= currentWord['base'];
-						currentWord['stars'] ++;
-
-						$star = $('<li></li>')
-						.addClass('fa fa-asterisk')
-						.attr('aria-hidden', 'true');
-						$('.star-list', $container).append($star);
-					}
-
-					$('.exp.current', $container).text(currentWord['points']);
-					$('.exp.next', $container).text(currentWord['base'] * currentWord['stars']);
-
-					flashCard._service.update(function(data) {
-
-					}, currentWord);
-				});
-
-				$(".send", $createWords).on('click', function() {
-					var dataPool = {};
-					$('.create-input', $createWords).each(function(i, el) {
-						var $input = $(el),
-							id = $input.attr('name');
-
-						dataPool[id] = $input.val();
-						//console.log($input.val());
-					});
-
-					dataPool['stars'] = 1;
-					dataPool['points'] = 0;
-
-					flashCard._service.update(function(data) {
-
-					}, dataPool);
-				});
-
-				appendWord(data, $container);
-				$wordContainer.css('display', 'table');
-
-				$tabs.each(function(i, el) {
-					$(el).on('click', function() {
-						var util = $(el).attr('util');
-						$tabs.each(function(j, e) {
-							if($(e).hasClass('active')) $(e).removeClass('active');
-						})
-
-						$('.word-container', $container).each(function(j, e) {
-							$(e).css('display', 'none');
-						})
-
-						$('.word-container.'+util, $container).css('display', 'table');
-						$(el).addClass('active');
-					});
-				});
-			}
-		};
-
-		function appendWord(data, $container) {
-			var $wordContainer = $('.word-container.word', $container),
-				chosen = chooseRandomWord(data),
-				word = chosen['word'] || '',
-				meaning = chosen['meaning'],
-				stars = chosen['stars'],
-				points = chosen['points'],
-				base = chosen['base'],
-				type = chosen['type'],
-				tokens = word.split('|');
-
-			currentWord = chosen;
-
-			$('.exp.current', $container).text(points);
-			$('.exp.next', $container).text(base * stars);
-
-			$('.word-container.meaning .wrapper', $container).text(meaning);
-			$('.type', $container).addClass(type).text(type);
-
-			for(var i=0; i<stars; i++) {
-				$star = $('<li></li>')
-				.addClass('fa fa-asterisk')
-				.attr('aria-hidden', 'true');
-				$('.star-list', $container).append($star);
-			}
-
-			for(var i=0; i<tokens.length; i++) {
-				var token = tokens[i].split(':'),
-					$word = $('<div></div>').addClass('word').attr('i', i);
-
-				if(token.length === 2) {
-					var $hiroLabel = $('<span></span>').addClass('label').addClass('l' + i).text(token[0]);
-					$word.addClass('kanji').text(token[1]);
-					$word.prepend($hiroLabel);
-				}else {
-					$word.addClass('hiro').text(token[0]);
-				}
-				$wordContainer.append($word);
-				$word.on('click', function() {
-					var index = $(this).attr('i');
-					$('.label.l'+index).addClass('display');
-				})
-			}
-		}
-
-		function chooseRandomWord(words) {
-			var num = words.length,
-				random = Math.random() * (words.length);
-			//console.log(words);
-			return words[Math.floor(random)];
-		}
+		$tabs.find('li').each(function() {
+			flashCard.configureTabs($(this));
+		});
 
 	})(jQuery);
 }
