@@ -37,6 +37,7 @@ class Model_FlashCard_Processor extends Model_CoreProcessor {
 						'value' => $card[$prime],
 					),
 				),
+				'debug' => 1
 			);
 
 			foreach ($card as $key => $value) {

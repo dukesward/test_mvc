@@ -5,9 +5,50 @@ var FlashCard = FlashCard || function(service, card) {
 	this._progress = null;
 	this._tabs = [];
 	this.activeTab = "word";
+	this._cachedData = null;
 };
 
 (function(root, $) {
+
+	var KanjiMap = {
+
+		"hirogana": ["あ","い","う","え","お"
+					,"か","き","く","け","こ"
+					,"さ","し","す","せ","そ"
+					,"た","ち","つ","て","と"
+					,"な","に","ぬ","ね","の"
+					,"は","ひ","ふ","へ","ほ"
+					,"ま","み","む","め","も"
+					,"や","ゆ","よ","を","ん"
+					,"が","ぎ","ぐ","げ","ご"
+					,"ざ","じ","ず","ぜ","ぞ"
+					,"だ","ぢ","づ","で","ど"
+					,"ば","び","ぶ","べ","ぼ"
+					,"ぱ","ぴ","ぷ","ぺ","ぽ"
+					,"ゃ","ゅ","ょ"
+					,"ぁ","ぇ","ぉ","っ","ー"],
+
+		"katagana": ["ア","イ","ウ","エ","オ"
+					,"カ","キ","ク","ケ","コ"
+					,"サ","シ","ス","セ","ソ"
+					,"タ","チ","ツ","テ","ト"
+					,"ナ","ニ","ヌ","ネ","ノ"
+					,"ハ","ヒ","フ","ヘ","ホ"
+					,"マ","ミ","ム","メ","モ"
+					,"ヤ","ユ","ヨ","ヲ","ン"
+					,"ガ","ギ","グ","ゲ","ゴ"
+					,"ザ","ジ","ズ","ゼ","ゾ"
+					,"ダ","ヂ","ヅ","デ","ド"
+					,"バ","ビ","ブ","ベ","ボ"
+					,"パ","ピ","プ","ペ","ポ"
+					,"ャ","ュ","ョ"
+					,"ァ","ェ","ォ","ッ","ー"],
+
+		"kanji": {
+			"拜": ["拝"],
+			"见": ["見"]
+		}
+	}
 
 	var FlashCard;
 
@@ -45,7 +86,7 @@ var FlashCard = FlashCard || function(service, card) {
 			}.bind(this));
 		}
 
-		service.prototype.update = function(callback, data) {
+		service.prototype.update = function(data, callback) {
 			var url = this._url + '/update';
 
 			if(this._host !== 'localhost') {
@@ -72,23 +113,75 @@ var FlashCard = FlashCard || function(service, card) {
 		var card = function(word) {
 			this.isCard = true;
 			this.word = word;
+			this.lastSearch = -1;
 		};
 
-		card.prototype.testFilter = function(filter) {
+		card.prototype.testFilter = function(filter, referrer) {
 			var result = true;
 
 			if(filter) {
-				//switch(filter) {
-					
-				//}
+				switch(filter) {
+					case 'match':
+						result = this.matchWord(referrer);
+						break;
+				}
 			}
 			return result;
+		}
+
+		card.prototype.matchWord = function(r) {
+			var result = false, 
+				w = this.word.word, 
+				kanji = KanjiMap.kanji,
+				index = -1;
+
+			if(r) {
+				if(kanji[r]) {
+					for(var i=0; i<kanji[r].length; i++) {
+						if(w.indexOf(kanji[r][i]) >= 0) {
+							index = w.indexOf(kanji[r][i]);
+							result = (index > this.lastSearch);
+						}
+					}
+				}else {
+					index = w.indexOf(r);
+					if(index >= 0) {
+						result = (index > this.lastSearch);
+					}
+				}
+				this.lastSearch = index;
+
+			}else {
+				result = true;
+			}
+			return result;
+		}
+
+		card.prototype.reformat = function() {
+			var w = this.word.word,
+				tokens = w.split('|');
+
+			return tokens.reduce(function(prev, next, i) {
+				var t, t0, t1;
+				if(i == 1) {
+					t0 = prev.split(':');
+					t = t0.length > 1 ? t0[1] : t0[0];
+				}else {
+					t = prev;
+				}
+				
+				t1 = next.split(':');
+				t += t1.length > 1 ? t1[1] : t1[0];
+
+				return t;
+			})
 		}
 
 		var collection = function(cards) {
 			this.cards = this.makeCards(cards);
 			this.currentCardIndex = null;
 			this.size = cards.length;
+			this.referrer = null;
 		}
 
 		collection.prototype.setSize = function(number) {
@@ -109,10 +202,10 @@ var FlashCard = FlashCard || function(service, card) {
 		}
 
 		collection.prototype.getCurrentWord = function() {
-			if(!this.currentCardIndex) {
+			if(!this.currentCardIndex || this.currentCardIndex > this.cards.length) {
 				this.currentCardIndex = 1;
 			}
-			return this.cards[this.currentCardIndex];
+			return this.cards[this.currentCardIndex - 1];
 		}
 
 		collection.prototype.refineCollection = function(filter) {
@@ -137,20 +230,25 @@ var FlashCard = FlashCard || function(service, card) {
 		collection.prototype.applyFilter = function(filter, size, cards) {
 			var temp = [],
 				cards = cards || this.cards,
-				size = size || this.size;
+				size = size || this.size,
+				referrer = this.referrer;
 
-			if(size <= cards.length) {
-				while(temp.length < size) {
-					var rand = Common_Utils.createRandomNumber(0, cards.length - 1, 0),
-						c = cards[rand].isCard ? cards[rand] : new card(cards[rand]);
-
-					if(c.testFilter(filter)) {
+			if(filter) {
+				for(var i=0; i<this.cards.length; i++) {
+					var c = this.cards[i];
+					if(c.testFilter(filter, referrer)) {
 						temp.push(c);
 					}
-					cards.splice(rand, 1);
 				}
 			}else {
 				temp = cards;
+			}
+
+			while(temp.length > size) {
+				var rand = Common_Utils.createRandomNumber(0, temp.length - 1, 0),
+					c = temp[rand].isCard ? temp[rand] : new card(temp[rand]);
+
+				temp = temp.splice(rand, 1);
 			}
 			//apply filter will auto replace the cards with the filtered cards
 			this.cards = temp;
@@ -174,7 +272,15 @@ var FlashCard = FlashCard || function(service, card) {
 			}
 		}
 
-		FlashCard.prototype.fetchCards = function(number) {
+		FlashCard.prototype.setSearchContainer = function($el) {
+			if($el.length) {
+				this._searchInput = $('input', $el);
+				this._searchResult = $('.results-list', $el);
+				this._searchHandler = $('.search-btn', $el);
+			}
+		}
+
+		FlashCard.prototype.fetchCards = function(number, cb) {
 			var self = this,
 				params = null;
 
@@ -186,19 +292,20 @@ var FlashCard = FlashCard || function(service, card) {
 
 			if(this._service) {
 				this._service.get(function(cards) {
+					self._cachedData = cards;
 					self._collection = new collection(cards);
 					self._collection.setSize(parseInt(number));
-					self.injectCard(self._collection.pickCard());
+					if(cb) {
+						cb.call(self);
+					}else {
+						self.injectCard(self._collection.pickCard());
+					}
 				}, params);
 			}
 		}
 
 		FlashCard.prototype.nextCard = function() {
 			this.injectCard(this._collection.pickCard());
-		}
-
-		FlashCard.prototype.search = function() {
-
 		}
 
 		FlashCard.prototype.refreshStars = function(word) {
@@ -257,20 +364,45 @@ var FlashCard = FlashCard || function(service, card) {
 		}
 
 		FlashCard.prototype.injectCard = function(card) {
-			var word = this._collection.getCurrentWord();
+			var word = card || this._collection.getCurrentWord();
 			this.refreshWord(word);
 			this.refreshStars(word);
 			this.refreshProgress();
 		}
 
+		FlashCard.prototype.injectResult = function(result) {
+			var self = this,
+				r = $("<li util='inject'>"
+						 + "<span>"
+						 	+ result.reformat()
+						 + "</span>"
+						 + "<span class='tag-id'>"
+						 	+ result.word.id
+						 + "</span>"
+					 + "</li>"),
+				scope = {
+					inject: function() {
+						self._service.update({ id: result.word.id, times_used: (result.word.times_used+1) });
+						self.injectCard(result);
+					}
+				};
+
+			this.attachHandler(r, scope);
+			this._searchResult.append(r);
+		}
+
+		FlashCard.prototype.refreshResults = function() {
+			this._searchResult.html('');
+		}
+
 		FlashCard.prototype.attachHandler = function(target, scope) {
 			if(target.length) {
-				var self = this, 
+				var self = this,
 					util = target.attr('util'),
 					params = target.attr('param'),
 					closure = function() {
 						if(this[util])
-							this[util].call(this, params);
+							this[util].call(self, params);
 						else
 							console.warn("specified util:[" + util + "] does not exist");
 					};
@@ -284,18 +416,18 @@ var FlashCard = FlashCard || function(service, card) {
 			var self = this,
 				scope = {
 					word: function() {
-						self.activeTab = "word";
+						this.activeTab = "word";
 						refreshTab("word");
 
-						self._word.css('display', 'table');
-						self._meaning.css('display', 'none');
+						this._word.css('display', 'table');
+						this._meaning.css('display', 'none');
 					},
 					meaning: function() {
-						self.activeTab = "meaning";
+						this.activeTab = "meaning";
 						refreshTab("meaning");
 
-						self._word.css('display', 'none');
-						self._meaning.css('display', 'block');
+						this._word.css('display', 'none');
+						this._meaning.css('display', 'block');
 					},
 					example: function() {
 
@@ -313,6 +445,36 @@ var FlashCard = FlashCard || function(service, card) {
 				};
 
 			this.attachHandler(target, scope);
+		}
+
+		FlashCard.prototype.configureSearch = function(target) {
+			this.setSearchContainer(target);
+			this.attachHandler(this._searchHandler, { search: this.searchHandler })
+		}
+
+		FlashCard.prototype.searchHandler = function() {
+			var input = this._searchInput.val(),
+				closure = function() {
+					var c = new collection(this._cachedData);
+					//c.referrer = input;
+					while(input) {
+						c.referrer = input[0];
+						c.applyFilter("match");
+						input = input.substr(1);
+					}
+					
+					for(var i=0; i<c.cards.length; i++) {
+						this.injectResult(c.cards[i]);
+					}
+				};
+
+			this.refreshResults();
+			
+			if(!this._cachedData) {
+				this.fetchCards(null, closure);
+			}else {
+				closure.call(this);
+			}
 		}
 
 		root.FlashCard = new FlashCard(service, card);

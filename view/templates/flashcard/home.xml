@@ -2,79 +2,92 @@
 	<var name='message' value='Welcome'></var>
 	<node type='div' override='content'>
 		<node type='div' _id='cards'>
-			<t>CARDS</t>
-			<node type='ul' _class='handlers load-button' _util='load'>
-				<node type='li' _util='fetchCards'>
-					<t>All</t>
-				</node>
-				<node type='li' _util='fetchCards' _param='10'>
-					<t>10</t>
-				</node>
-				<node type='li' _util='fetchCards' _param='20'>
-					<t>20</t>
-				</node>
-				<node type='li' _util='fetchCards' _param='30'>
-					<t>30</t>
-				</node>
-			</node>
-			<node type='div' _class='tab-container'>
-				<node type='ul'>
-					<node type='li' _class='active' _util='word'>
-						<t>Word</t>
+			<node type='div' _class='left-rail'>
+				<node type='ul' _class='handlers load-button' _util='load'>
+					<node type='li' _util='fetchCards'>
+						<t>All</t>
 					</node>
-					<node type='li' _util='meaning'>
-						<t>Meaning</t>
+					<node type='li' _util='fetchCards' _param='10'>
+						<t>10</t>
 					</node>
-					<node type='li' _util='example'>
-						<t>Example</t>
+					<node type='li' _util='fetchCards' _param='20'>
+						<t>20</t>
+					</node>
+					<node type='li' _util='fetchCards' _param='30'>
+						<t>30</t>
 					</node>
 				</node>
-			</node>
-			<node type='div' _class='card-container'>
-				<node type='ul' _class='star-list'></node>
-				<node type='div' _class='type'></node>
-				<node type='div' _class='word-container word'></node>
-				<node type='div' _class='word-container meaning'>
-					<node type='div' _class='wrapper'></node>
-				</node>
-				<node type='div' _class='word-container example'>
-					<node type='div' _class='wrapper'></node>
-				</node>
-				<node type='div' _class='progress-container'>
-					<node type='div' _class='wrapper'>
-						<node type='span' _class='progress current'></node>
-						<node type='span'>
-							<t>/</t>
+				<node type='div' _class='tab-container'>
+					<node type='ul'>
+						<node type='li' _class='active' _util='word'>
+							<t>Word</t>
 						</node>
-						<node type='span' _class='progress total'></node>
+						<node type='li' _util='meaning'>
+							<t>Meaning</t>
+						</node>
+						<node type='li' _util='example'>
+							<t>Example</t>
+						</node>
 					</node>
 				</node>
-			</node>
-			<node type='ul' _class='handlers control-button'>
-				<node type='li' _util='nextCard'>
-					<t>Next</t>
+				<node type='div' _class='card-container'>
+					<node type='ul' _class='star-list'></node>
+					<node type='div' _class='type'></node>
+					<node type='div' _class='word-container word'></node>
+					<node type='div' _class='word-container meaning'>
+						<node type='div' _class='wrapper'></node>
+					</node>
+					<node type='div' _class='word-container example'>
+						<node type='div' _class='wrapper'></node>
+					</node>
+					<node type='div' _class='progress-container'>
+						<node type='div' _class='wrapper'>
+							<node type='span' _class='progress current'></node>
+							<node type='span'>
+								<t>/</t>
+							</node>
+							<node type='span' _class='progress total'></node>
+						</node>
+					</node>
 				</node>
-				<!--<node type='li' _util='earn'>
-					<t>Earn Exp</t>
-				</node>-->
-				<node type='li' _util='addCard'>
-					<t>Add</t>
+				<node type='ul' _class='handlers control-button'>
+					<node type='li' _util='nextCard'>
+						<t>Next</t> 
+					</node>
+					<!--<node type='li' _util='earn'>
+						<t>Earn Exp</t>
+					</node>-->
+					<node type='li' _util='addCard'>
+						<t>Add</t>
+					</node>
+				</node>
+				<node type='div' _class='create-words'>
+					<node type='span' ><t>Word</t></node>
+					<node type='input' _type='text' _class='create-input' _name='word'></node>
+					<node type='span' ><t>Meaning</t></node>
+					<node type='input' _type='text' _class='create-input' _name='meaning'></node>
+					<node type='span' ><t>Base</t></node>
+					<node type='input' _type='text' _class='create-input' _name='base'></node>
+					<node type='span' ><t>Type</t></node>
+					<node type='input' _type='text' _class='create-input' _name='type'></node>
+					<node type='span' _util='send' _class='send'><t>Send</t></node>
 				</node>
 			</node>
-			<node type='div' _class='create-words'>
-				<node type='span' ><t>Word</t></node>
-				<node type='input' _type='text' _class='create-input' _name='word'></node>
-				<node type='span' ><t>Meaning</t></node>
-				<node type='input' _type='text' _class='create-input' _name='meaning'></node>
-				<node type='span' ><t>Base</t></node>
-				<node type='input' _type='text' _class='create-input' _name='base'></node>
-				<node type='span' ><t>Type</t></node>
-				<node type='input' _type='text' _class='create-input' _name='type'></node>
-				<node type='span' _util='send' _class='send'><t>Send</t></node>
-			</node>
-			<node type='div'>
-				<node type='span' _util='search'>
-					<t>Search</t>
+			<node type='div' _class='right-rail'>
+				<node type='div'>
+					<node type='div' _class='search-container'>
+						<node type='div' _class='search-input'>
+							<node type='input' _placeholder='Search Word'></node>
+							<node type='span' _class='search-handler'>
+								<node type='a' _class='search-btn' _util='search' _href='javascript:void(0)'>
+									<node type='i' _class='fa fa-search fa-2'></node>
+								</node>
+							</node>
+						</node>
+						<node type='div' _class='results-container'>
+							<node type='ul' _class='results-list'></node>
+						</node>
+					</node>
 				</node>
 			</node>
 		</node>
