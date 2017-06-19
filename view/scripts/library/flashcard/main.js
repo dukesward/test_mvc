@@ -6,7 +6,8 @@ if(typeof jQuery === 'function' && window.FlashCard) {
 		var $tabContainer = $('.card-container'),
 			$loadButtons = $('.load-button'),
 			$controlButtons = $('.control-button'),
-			$tabs = $('.tab-container');
+			$tabs = $('.tab-container'),
+			$search = $('.search-container');
 
 		flashCard.setContainer($tabContainer);
 		flashCard.setProgressContainer($('.progress-container'));
@@ -22,6 +23,8 @@ if(typeof jQuery === 'function' && window.FlashCard) {
 		$tabs.find('li').each(function() {
 			flashCard.configureTabs($(this));
 		});
+
+		flashCard.configureSearch($search);
 
 	})(jQuery);
 }
