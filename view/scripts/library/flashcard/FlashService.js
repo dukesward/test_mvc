@@ -112,7 +112,7 @@ var FlashCard = FlashCard || function(service, card) {
 			if(!this.currentCardIndex) {
 				this.currentCardIndex = 1;
 			}
-			return this.cards[this.currentCardIndex];
+			return this.cards[this.currentCardIndex - 1];
 		}
 
 		collection.prototype.refineCollection = function(filter) {

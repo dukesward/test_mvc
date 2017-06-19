@@ -11,6 +11,7 @@ class Controller_StaticController extends Controller_BaseController {
 	protected $base_static = Kernel_Constants::KERNEL_ROUTES_VIEW_ROOT;
 	protected $base_image = Kernel_Constants::KERNEL_ROUTES_IMAGE_ROOT;
 	protected $base_cache = Kernel_Constants::CACHE_CACHE_BASE;
+	protected $base_video = Kernel_Constants::KERNEL_ROUTES_VIDEO_ROOT;
 
 	public function __construct(Kernel_Request $request, Kernel_Response $response) {
 		parent::__construct($request, $response);
@@ -91,6 +92,35 @@ class Controller_StaticController extends Controller_BaseController {
 
 		$content = $this->_loader->getFileContent($base, $ext_file);
 		$this->_response->setHeader(self::CONTENT, 'image/' . $ext);
+		return $content;
+	}
+
+	public function videoAction() {
+		$params = $this->_request->getParams();
+		$ext = 'mp4';
+		$ext_file = '';
+
+		$base = $this->base_video;
+		foreach ($params as $i => $param) {
+			if($i === sizeof($params) - 1) {
+				$tokens = explode('.', $param);
+				if(sizeof($tokens) > 1) {
+					$index = sizeof($tokens) - 1;
+					if($tokens[$index] !== $ext && $tokens[$index] !== 'mp4') {
+						$ext = $tokens[$index];
+					}
+					$ext_file = $tokens[$index];
+					$base .= self::FILE_SPLITTER;
+					$base .= array_shift($tokens);
+				}
+			}else {
+				$base .= self::FILE_SPLITTER;
+				$base .= $param;
+			}
+		}
+
+		$content = $this->_loader->getFileContent($base, $ext_file);
+		$this->_response->setHeader(self::CONTENT, 'video/' . $ext);
 		return $content;
 	}
 }

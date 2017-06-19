@@ -14,6 +14,7 @@ class Kernel_Constants {
 	const KERNEL_ROUTES_TEMPLATE_CONFIG_ROOT = "view\\configs\\";
 	const KERNEL_ROUTES_SCRIPT_ROOT          = "view\\scripts\\";
 	const KERNEL_ROUTES_IMAGE_ROOT           = "view\\images";
+	const KERNEL_ROUTES_VIDEO_ROOT           = "src\\video";
 	const KERNEL_ROUTES_CONFIG_ROOT          = "config\\";
 	const KERNEL_ROUTES_CONFIG_EXT           = "conf";
 	const KERNEL_ROUTES_TEMPLATE_DEFAULT_EXT = "xml";
