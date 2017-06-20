@@ -45,8 +45,19 @@ var FlashCard = FlashCard || function(service, card) {
 					,"ァ","ェ","ォ","ッ","ー"],
 
 		"kanji": {
+			//b
 			"拜": ["拝"],
-			"见": ["見"]
+			//j
+			"极": ["極"],
+			"见": ["見"],
+			"惊": ["驚"],
+			//m
+			"满": ["満"],
+			//w
+			"务": ["務"],
+			"稳": ["穏"],
+			//x
+			"细": ["細"]
 		}
 	}
 
@@ -384,6 +395,7 @@ var FlashCard = FlashCard || function(service, card) {
 					inject: function() {
 						self._service.update({ id: result.word.id, times_used: (result.word.times_used+1) });
 						self.injectCard(result);
+						self.refreshResults();
 					}
 				};
 

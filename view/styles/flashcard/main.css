@@ -16,12 +16,12 @@ a {
 }
 
 .left-rail {
-	width: 45%;
+	width: 400px;
 	float: left;
 }
 
 .right-rail {
-	width: 35%;
+	width: 240px;
 	float: left;
 }
 
