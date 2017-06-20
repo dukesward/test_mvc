@@ -190,6 +190,7 @@ var FlashCard = FlashCard || function(service, card) {
 
 		var collection = function(cards) {
 			this.cards = this.makeCards(cards);
+			this.sorted = null;
 			this.currentCardIndex = null;
 			this.size = cards.length;
 			this.referrer = null;
@@ -259,10 +260,14 @@ var FlashCard = FlashCard || function(service, card) {
 				var rand = Common_Utils.createRandomNumber(0, temp.length - 1, 0),
 					c = temp[rand].isCard ? temp[rand] : new card(temp[rand]);
 
-				temp = temp.splice(rand, 1);
+				temp.splice(rand, 1);
 			}
 			//apply filter will auto replace the cards with the filtered cards
 			this.cards = temp;
+		}
+
+		collection.prototype.applySorting = function(type) {
+			this.sorted = Common_Utils.sortObjectsByProperty(this.cards, type, 1);
 		}
 
 		FlashCard.prototype.setContainer = function($el) {
@@ -313,6 +318,13 @@ var FlashCard = FlashCard || function(service, card) {
 					}
 				}, params);
 			}
+		}
+
+		FlashCard.prototype.searchedCards = function(number) {
+			var number = number || null;
+			this.fetchCards(null, function() {
+				this._collection.applySorting('word->times_used');
+			})
 		}
 
 		FlashCard.prototype.nextCard = function() {

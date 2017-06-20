@@ -24,7 +24,7 @@ public class FlashCardController {
 		Card card = new Card((Word) session.get(Word.class, 1));
 		
         ModelAndView mav = new ModelAndView(VIEW_FLASH);
-        mav.addObject("card", card);
+        mav.addObject("card", card.printWord());
         
         return mav;
     }
