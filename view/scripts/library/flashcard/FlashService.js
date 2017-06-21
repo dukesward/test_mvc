@@ -269,7 +269,8 @@ var FlashCard = FlashCard || function(service, card) {
 		}
 
 		collection.prototype.applySorting = function(type) {
-			this.sorted = Common_Utils.sortObjectsByProperty(this.cards, type, 1);
+			this.cards = Common_Utils.sortObjectsByProperty(this.cards, type, 1);
+			return this;
 		}
 
 		FlashCard.prototype.setContainer = function($el) {
@@ -325,7 +326,8 @@ var FlashCard = FlashCard || function(service, card) {
 		FlashCard.prototype.searchedCards = function(number) {
 			var number = number || null;
 			this.fetchCards(null, function() {
-				this._collection.applySorting('word->times_used');
+				this._collection.applySorting('word->times_used').setSize(number || this._collection.size);
+				this.injectCard(this._collection.pickCard())
 			})
 		}
 
