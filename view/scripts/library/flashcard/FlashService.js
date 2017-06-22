@@ -51,6 +51,8 @@ var FlashCard = FlashCard || function(service, card) {
 			"极": ["極"],
 			"见": ["見"],
 			"惊": ["驚"],
+			//k
+			"夸": ["誇"],
 			//m
 			"满": ["満"],
 			//w
