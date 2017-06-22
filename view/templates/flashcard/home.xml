@@ -16,6 +16,9 @@
 					<node type='li' _util='fetchCards' _param='30'>
 						<t>30</t>
 					</node>
+					<node type='li' _util='searchedCards' _param='10'>
+						<t>Searched</t>
+					</node>
 				</node>
 				<node type='div' _class='tab-container'>
 					<node type='ul'>

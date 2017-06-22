@@ -192,6 +192,7 @@ var FlashCard = FlashCard || function(service, card) {
 
 		var collection = function(cards) {
 			this.cards = this.makeCards(cards);
+			this.sorted = null;
 			this.currentCardIndex = null;
 			this.size = cards.length;
 			this.referrer = null;
@@ -242,6 +243,7 @@ var FlashCard = FlashCard || function(service, card) {
 
 		collection.prototype.applyFilter = function(filter, size, cards) {
 			var temp = [],
+				filtered = [],
 				cards = cards || this.cards,
 				size = size || this.size,
 				referrer = this.referrer;
@@ -257,14 +259,20 @@ var FlashCard = FlashCard || function(service, card) {
 				temp = cards;
 			}
 
-			while(temp.length > size) {
+			while(filtered.length < size && temp.length > 0) {
 				var rand = Common_Utils.createRandomNumber(0, temp.length - 1, 0),
 					c = temp[rand].isCard ? temp[rand] : new card(temp[rand]);
 
-				temp = temp.splice(rand, 1);
+				filtered.push(c);
+				temp.splice(rand, 1);
 			}
 			//apply filter will auto replace the cards with the filtered cards
-			this.cards = temp;
+			this.cards = filtered;
+		}
+
+		collection.prototype.applySorting = function(type) {
+			this.cards = Common_Utils.sortObjectsByProperty(this.cards, type, 1);
+			return this;
 		}
 
 		FlashCard.prototype.setContainer = function($el) {
@@ -315,6 +323,14 @@ var FlashCard = FlashCard || function(service, card) {
 					}
 				}, params);
 			}
+		}
+
+		FlashCard.prototype.searchedCards = function(number) {
+			var number = number || null;
+			this.fetchCards(null, function() {
+				this._collection.applySorting('word->times_used').setSize(number || this._collection.size);
+				this.injectCard(this._collection.pickCard())
+			})
 		}
 
 		FlashCard.prototype.nextCard = function() {

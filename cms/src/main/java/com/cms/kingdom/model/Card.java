@@ -14,6 +14,10 @@ public class Card implements Serializable {
 		this.source = word;
 	}
 	
+	public String printWord() {
+		return this.source.toString();
+	}
+	
 	
 }
 
