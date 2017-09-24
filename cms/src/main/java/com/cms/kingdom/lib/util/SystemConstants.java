@@ -4,4 +4,5 @@ public class SystemConstants {
 
 	public static final String CMS_BASE_PATH = "../webapps/cms/";
 	public static final String CMS_CONFIG_PATH = "../../resources/config/";
+	public static final String CMS_CONFIG_SOURCE = "/webapps/cms/resources/config/";
 }

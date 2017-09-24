@@ -17,6 +17,7 @@
 	</head>
 	<body>
 		<div>Test Word => <c:out value="${card}"/></div>
+		<div>Test Path => <c:out value="${data.getAttribute()}"/></div>
 		<div id="col1">
 			<div id="navhead">
 				<div id="search" class="nav-icon"><i class="fa fa-search" aria-hidden="true"></i></div>

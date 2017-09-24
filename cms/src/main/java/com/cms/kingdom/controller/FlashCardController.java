@@ -1,5 +1,7 @@
 package com.cms.kingdom.controller;
 
+//import com.utils.general.SystemUtils;
+import com.cms.kingdom.lib.core.Engine;
 import com.cms.kingdom.lib.db.KingdomDAO;
 import com.cms.kingdom.model.*;
 
@@ -22,8 +24,10 @@ public class FlashCardController {
     public ModelAndView getCard() {
 		Session session = kdao.prepareSession();
 		Card card = new Card((Word) session.get(Word.class, 1));
+		//use engine to handle all the backend stuff
 		
         ModelAndView mav = new ModelAndView(VIEW_FLASH);
+        mav.addObject("data", Engine.StartEngine());
         mav.addObject("card", card.printWord());
         
         return mav;

@@ -66,7 +66,7 @@ public class KingdomDAO {
 			String filePath = SystemConstants.CMS_CONFIG_PATH + HIBERNATE_CONFIG;
 			try {
 				String content = new String(Files.readAllBytes(Paths.get(filePath)));
-				System.err.println(content);
+				//System.err.println(content);
 			}catch (IOException ioe) {
 				System.err.println("Failed reading file: " + ioe);
 			}

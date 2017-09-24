@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<staticModules>
+	<staticModule>
+		<moduleName>global.css</moduleName>
+		<components>
+			<component>main</component>
+		</components>
+	</staticModule>
+	<staticFile>
+		<fileName>main</fileName>
+		<fileLocation>/resources/static/styles/main.css</fileLocation>
+	</staticFile>
+</staticModules>
