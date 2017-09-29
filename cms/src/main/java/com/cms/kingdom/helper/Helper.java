@@ -10,5 +10,5 @@ interface Helper {
 	
 	public Action prepareAction();
 	
-	public void logAction();
+	public void logAction(Action action);
 }

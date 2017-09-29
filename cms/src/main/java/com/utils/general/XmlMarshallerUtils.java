@@ -58,6 +58,16 @@ public class XmlMarshallerUtils extends FileUtils implements FileParser {
 		}
 		return null;
 	}
+	
+	@Override
+	public void antiParse(String file) {
+		try {
+			JAXBContext jaxbc = JAXBContext.newInstance(StaticModules.class);
+			Marshaller marshaller = jaxbc.createMarshaller();
+		}catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 
 	@Override
 	public int getElementNumber(String element) {

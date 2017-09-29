@@ -6,6 +6,7 @@ import java.util.ArrayList;
 //import org.w3c.dom.Element;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.xml.bind.annotation.*;
 
@@ -24,6 +25,10 @@ public class StaticModules {
 	}
 	
 	public ArrayList<StaticModule> getModules() {
+		if(this.action != null) {
+			this.action.registerStep("get_modules");
+			this.action.configureStep("stepDetail", this.printModuleNames());
+		}
 		return this.modules;
 	}
 	
@@ -42,9 +47,14 @@ public class StaticModules {
 	}
 	
 	public void printModules() {
-		//System.out.println("test");
 		this.modules.stream().forEach(m -> m.printModule());
-		this.files.stream().forEach(f -> f.printModule());
+		//this.files.stream().forEach(f -> f.printModule());
+	}
+	
+	public String printModuleNames() {
+		return this.modules.stream()
+				.map(m -> m.getModuleName())
+				.reduce("", (n1, n2) -> n1 + "|" + n2);
 	}
 	
 	public void registerAction(Action action) {

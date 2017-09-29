@@ -5,11 +5,12 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
-class FileUtils {
+public class FileUtils {
 	
 	public File file;
 	
 	private String filename;
+	private String ext;
 	private String content;
 	
 	public FileUtils() {}
@@ -31,6 +32,10 @@ class FileUtils {
 		}catch (IOException ioe) {
 			System.err.println("Failed reading file: " + filePath);
 		}
+	}
+	
+	public void writeContent() {
+		String filePath = this.filename + this.ext;
 	}
 	
 	public void makeFile() {

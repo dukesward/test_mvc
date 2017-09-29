@@ -10,6 +10,8 @@ public interface FileParser {
 	
 	public Object parse(String file);
 	
+	public void antiParse(String file);
+	
 	public int getElementNumber(String element);
 	
 	public String getRawContent();
