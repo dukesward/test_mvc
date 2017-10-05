@@ -6,14 +6,14 @@ import org.hibernate.Session;
 
 import com.cms.kingdom.model.Node;
 import com.cms.kingdom.lib.util.SystemConstants;
-import com.cms.kingdom.lib.db.KingdomDAO;
+//import com.cms.kingdom.lib.db.KingdomDAO;
 
 public class searchController {
 	
-	private static KingdomDAO kdao;
+	//private static KingdomDAO kdao;
 	
 	public static String handleRequests(String content, HttpServletRequest request) {
-		kdao = KingdomDAO.getInstance();
+		//kdao = KingdomDAO.getInstance();
 		String result = "";
 		switch(content) {
 			case "int":
@@ -24,10 +24,10 @@ public class searchController {
 	}
 	
 	protected static void searchNodeById(int id) {
-		Session session = kdao.prepareSession();
-		session.beginTransaction();
+		//Session session = kdao.getSession();
+		//session.beginTransaction();
 		
-		Node node = (Node)session.get(Node.class, 1);
-		kdao.shutDown();
+		//Node node = (Node)session.get(Node.class, 1);
+		//kdao.shutDown();
 	}
 }

@@ -2,7 +2,7 @@ package com.cms.kingdom.controller;
 
 import com.cms.kingdom.model.Node;
 //import com.cms.kingdom.lib.util.SystemConstants;
-import com.cms.kingdom.lib.db.KingdomDAO;
+//import com.cms.kingdom.lib.db.KingdomDAO;
 import com.cms.kingdom.test.UnitTest;
 import com.utils.general.DateUtils;
 import com.utils.general.StringUtils;
@@ -28,11 +28,11 @@ public class IndexController {
 	private static final String VIEW_INDEX = "index";
 	private static final String VIEW_TEST = "test";
 	//private static final String HIBERNATE_CONFIG = "test.txt";
-	private KingdomDAO kdao = KingdomDAO.getInstance();
+	//private KingdomDAO kdao;
 	private Node node = new Node();
 
-	@Autowired
-	private HttpServletRequest request;
+	//@Autowired
+	//private HttpServletRequest request;
 
 	protected final Log logger = LogFactory.getLog(getClass());
 	
@@ -41,9 +41,9 @@ public class IndexController {
 		System.out.println("test db pulling");
 		model.addAttribute("message", "Welcome!");
 		
-		Session session = kdao.prepareSession();
+		//Session session = kdao.getSession();
 		node.setNid(1);
-		node = (Node) session.get(Node.class, node.getNid());
+		//node = (Node) session.get(Node.class, node.getNid());
 		model.addAttribute("node", node.toString());
 
 		/*try {
@@ -77,13 +77,13 @@ public class IndexController {
 	}
 	
 	@RequestMapping(value = "/search/{content}")
-	public String search(@PathVariable String content, ModelMap model) {
+	public String search(@PathVariable String content, HttpServletRequest request, ModelMap model) {
 		String result = searchController.handleRequests(content, request);
 		return result;
 	}
 	
 	@RequestMapping(value = "/services/{name}")
-	public String service(@PathVariable String name) {
+	public String service(@PathVariable String name, HttpServletRequest request) {
 		String output = serviceController.handleRequests(name, request);
 		return output;
 	}

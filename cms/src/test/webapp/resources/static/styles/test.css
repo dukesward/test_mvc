@@ -1,0 +1,19 @@
+body {
+	font-family: 'PT Sans Narrow', sans-serif;
+	margin: 0px;
+}
+
+.cms_blocker_main {
+	padding: 10px;
+    background: #bbb;
+    border-top: solid 1px #eee;
+    border-bottom: solid 1px #222;
+    border-left: solid 2px #222;
+}
+
+.cms_head {
+	text-transform: uppercase;
+	background: #eee;
+    padding: 4px;
+    border-radius: 4px;
+}

@@ -2,12 +2,6 @@ package com.cms.kingdom.lib.util;
 
 import java.util.ArrayList;
 
-//import org.w3c.dom.Node;
-//import org.w3c.dom.Element;
-
-import java.util.List;
-import java.util.stream.Collectors;
-
 import javax.xml.bind.annotation.*;
 
 import com.utils.general.Action;
@@ -27,7 +21,7 @@ public class StaticModules {
 	public ArrayList<StaticModule> getModules() {
 		if(this.action != null) {
 			this.action.registerStep("get_modules");
-			this.action.configureStep("stepDetail", this.printModuleNames());
+			this.action.configureStep(this.printModuleNames());
 		}
 		return this.modules;
 	}
@@ -54,11 +48,12 @@ public class StaticModules {
 	public String printModuleNames() {
 		return this.modules.stream()
 				.map(m -> m.getModuleName())
-				.reduce("", (n1, n2) -> n1 + "|" + n2);
+				.reduce("", (n1, n2) -> n1 + "," + n2);
 	}
 	
-	public void registerAction(Action action) {
+	public StaticModules registerAction(Action action) {
 		this.action = action;
+		return this;
 	}
 	
 	public Action getAction() {

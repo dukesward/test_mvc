@@ -1,0 +1,51 @@
+body {
+	margin: 0;
+}
+
+#test-message {
+	color: #00f;
+	display: none;
+}
+
+#navhead {
+	margin-left: 10px;
+}
+
+#col1 {
+	width: 250px;
+	height: 100%;
+	background-color: #ccc0c0;
+	border-right: 3px solid #c57575;
+	position: fixed;
+}
+
+#logo {
+    margin-left: 8px;
+    float: left;
+}
+
+#logo span {
+	font-family: "lobster", cursive;
+	font-size: 35px;
+	color: #ab2020;
+}
+
+.nav-icon {
+	width: 25px;
+	height: 25px;
+	background-color: #8c8383;
+	border-radius: 5px;
+    cursor: pointer;
+    float: left;
+    margin-top: 10px;
+    margin-left: 3px;
+}
+
+.nav-icon i {
+	font-size: 22px;
+	color: #efefef;
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    padding-top: 2px;
+}

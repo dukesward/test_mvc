@@ -1,25 +1,23 @@
 package com.cms.kingdom.lib.db;
 
-import java.io.Serializable;
-
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
-public abstract class AbstractDAO<E, I extends Serializable> {
+public class AbstractDAO {
 
 	@Autowired
-	SessionFactory sessionFactory;
-
-	protected AbstractDAO() {
-		System.out.println("test dao init");
+	private SessionFactory sessionFactory;
+	
+	protected Session getSession() {
+		return this.sessionFactory.getCurrentSession();
+	};
+	
+	public void persist(Object entity) {
+		this.getSession().persist(entity);
 	}
 	
-	protected Session getCurrentSession() {
-		return sessionFactory.getCurrentSession();
-	}
-	
-	public void saveOrUpdate(E e) {
-		getCurrentSession().saveOrUpdate(e);
+	public void delete(Object entity) {
+		this.getSession().delete(entity);
 	}
 }
