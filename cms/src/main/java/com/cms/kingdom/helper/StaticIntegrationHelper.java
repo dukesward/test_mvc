@@ -2,8 +2,6 @@ package com.cms.kingdom.helper;
 
 import java.util.stream.Collectors;
 
-import javax.inject.Inject;
-
 import com.cms.kingdom.lib.util.StaticModules;
 import com.cms.kingdom.lib.util.SystemConstants;
 
@@ -15,6 +13,7 @@ import com.utils.general.XmlMarshallerUtils;
 public class StaticIntegrationHelper implements Helper {
 	
 	private static StaticIntegrationHelper helper;
+	private static Action action;
 	private final static String actionName = "static_modules_integration";
 	private final static String configName = "config_static.xml";
 	
@@ -31,7 +30,6 @@ public class StaticIntegrationHelper implements Helper {
 		return helper;
 	}
 	
-	@Inject
 	private StaticIntegrationHelper(FileParser parser) {
 		this.parser = parser;
 		this.init();
@@ -39,7 +37,10 @@ public class StaticIntegrationHelper implements Helper {
 	
 	@Override
 	public Action prepareAction() {
-		return new Action(actionName);
+		if(action == null) {
+			action = new Action(actionName);
+		}
+		return action;
 	}
 	
 	@Override
@@ -49,11 +50,11 @@ public class StaticIntegrationHelper implements Helper {
 	public void takeAction() {
 		//initialize source file path
 		String file = SystemConstants.fetchConfigSourceFull() + configName;
-		StaticModules modules = (StaticModules)this.parser.parse(file);
-		modules.registerAction(this.prepareAction());
-		modules.getModules()
+		StaticModules modules = (StaticModules)this.parser.parse(file, StaticModules.class);
+		modules.registerAction(this.prepareAction())
+			.getModules()
 			.stream()
-			.map(m -> m.getComponents())
+			.map(m -> m.registerAction(action).getComponents())
 			.collect(Collectors.toList());
 		
 		this.content = "test data";

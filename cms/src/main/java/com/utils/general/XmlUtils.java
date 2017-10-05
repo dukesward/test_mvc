@@ -36,9 +36,15 @@ public class XmlUtils extends FileUtils implements FileParser {
 	}
 	
 	@Override
-	public Object parse(String file) {
+	public Object parse(String file, Class object) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+	
+	@Override
+	public void antiParse(String file, Object obejct) {
+		// TODO Auto-generated method stub
+		
 	}
 	
 	public int getElementNumber(String element) {
@@ -52,5 +58,9 @@ public class XmlUtils extends FileUtils implements FileParser {
 	
 	public String print() {
 		return "";
+	}
+	
+	public String printOutputExt() {
+		return ".xml";
 	}
 }

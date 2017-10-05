@@ -1,8 +1,6 @@
 package com.utils.general;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Collection;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -47,10 +45,10 @@ public class XmlMarshallerUtils extends FileUtils implements FileParser {
 	}
 	
 	@Override
-	public Object parse(String file) {
+	public Object parse(String file, Class object) {
 		// TODO Auto-generated method stub
 		try {
-			JAXBContext jaxbc = JAXBContext.newInstance(StaticModules.class);
+			JAXBContext jaxbc = JAXBContext.newInstance(object);
 			Unmarshaller unmarshaller = jaxbc.createUnmarshaller();
 			return unmarshaller.unmarshal(new File(file));
 		}catch (JAXBException jaxbe) {
@@ -60,10 +58,13 @@ public class XmlMarshallerUtils extends FileUtils implements FileParser {
 	}
 	
 	@Override
-	public void antiParse(String file) {
+	public void antiParse(String file, Object object) {
 		try {
-			JAXBContext jaxbc = JAXBContext.newInstance(StaticModules.class);
+			JAXBContext jaxbc = JAXBContext.newInstance(object.getClass());
 			Marshaller marshaller = jaxbc.createMarshaller();
+			
+			marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+			marshaller.marshal(object, new File(file));
 		}catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -85,6 +86,11 @@ public class XmlMarshallerUtils extends FileUtils implements FileParser {
 		}
 		// TODO Auto-generated method stub
 		return null;
+	}
+	
+	@Override
+	public String printOutputExt() {
+		return ".xml";
 	}
 	
 }
