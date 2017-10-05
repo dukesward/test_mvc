@@ -18,17 +18,17 @@ import org.springframework.web.bind.annotation.RequestMethod;
 public class FlashCardController {
 	
 	private static final String VIEW_FLASH = "flash_main";
-	private KingdomDAO kdao = KingdomDAO.getInstance();
+	//private KingdomDAO kdao = KingdomDAO.getInstance();
 	
 	@RequestMapping(value = "/flash", method= RequestMethod.GET)
     public ModelAndView getCard() {
-		Session session = kdao.prepareSession();
-		Card card = new Card((Word) session.get(Word.class, 1));
+		//Session session = kdao.prepareSession();
+		//Card card = new Card((Word) session.get(Word.class, 1));
 		//use engine to handle all the backend stuff
 		
         ModelAndView mav = new ModelAndView(VIEW_FLASH);
         mav.addObject("data", Engine.StartEngine());
-        mav.addObject("card", card.printWord());
+        //mav.addObject("card", card.printWord());
         
         return mav;
     }

@@ -9,7 +9,7 @@
 
     <properties>
         <spring.version>4.3.6.RELEASE</spring.version>
-        <hibernate.version>3.0.0.ga</hibernate.version>
+        <hibernate.version>4.0.1.Final</hibernate.version>
         <mysql.connector.version>5.1.39</mysql.connector.version>
         <javax.api-version>6.0</javax.api-version>
         <javax.servlet-api-version>3.1.0</javax.servlet-api-version>
@@ -113,13 +113,23 @@
         <!-- hibernate -->
         <dependency>
             <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-annotations</artifactId>
-            <version>3.3.1.GA</version>
+            <artifactId>hibernate-core</artifactId>
+            <version>${hibernate.version}</version>
+            <exclusions>
+		        <exclusion>
+		            <groupId>org.hibernate</groupId>
+		            <artifactId>hibernate-annotations</artifactId>
+		        </exclusion>
+		        <exclusion>
+		            <groupId>org.hibernate</groupId>
+		            <artifactId>hibernate-commons-annotations</artifactId>
+		        </exclusion>
+		    </exclusions>
         </dependency>
         <dependency>
             <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-commons-annotations</artifactId>
-            <version>${hibernate.version}</version>
+            <artifactId>hibernate-validator</artifactId>
+            <version>4.2.0.Final</version>
         </dependency>
 
         <!-- mysql -->

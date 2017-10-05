@@ -11,15 +11,21 @@
   metadata-complete="true">
 
   <display-name>Kingdom CMS</display-name>
+  
+  <listener>
+        <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+  </listener>
+  <context-param>
+        <param-name>contextConfigLocation</param-name>
+        <param-value>classpath:cms-servlet.xml, classpath:hibernate-config.xml</param-value>
+  </context-param>
 
   <servlet>
       <servlet-name>cms</servlet-name>
       <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
       <init-param>
 			<param-name>contextConfigLocation</param-name>
-			<param-value>
-				classpath:cms-servlet.xml
-			</param-value>
+			<param-value></param-value>
 	  </init-param>
       <load-on-startup>1</load-on-startup>
   </servlet>
