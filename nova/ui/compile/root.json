@@ -1,0 +1,8 @@
+"dom": {
+	"head": {
+		"title": "title|root"
+	},
+	"body": {
+		"h1": "|compile"
+	}
+}

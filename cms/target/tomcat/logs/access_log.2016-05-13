@@ -1,2 +1,0 @@
-0:0:0:0:0:0:0:1 - - [13/May/2016:15:57:26 -0500] "GET /cms/ HTTP/1.1" 404 959 http-bio-8080-exec-9 3
-127.0.0.1 - - [13/May/2016:16:08:37 -0500] "PUT /manager/text/deploy?path=%2Fcms HTTP/1.1" 404 - http-bio-8080-exec-1 0

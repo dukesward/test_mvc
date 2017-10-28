@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<testModules>
+	<testModule>
+		<moduleName>action</moduleName>
+		<testObjects>
+			<testObject>
+				<objectClass>com.utils.general.Action</objectClass>
+			</testObject>
+		</testObjects>
+	</testModule>
+</testModules>
